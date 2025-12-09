@@ -100,9 +100,9 @@ function Events() {
   };
 
   const handleDelete = async () => {
-    if (!selectedRow?.event_id) return;
+    if (!selectedRow?.id) return;
     
-    await shm_request(`/shm/v1/admin/service/event?id=${selectedRow.event_id}`, {
+    await shm_request(`/shm/v1/admin/service/event?id=${selectedRow.id}`, {
       method: 'DELETE',
     });
     fetchData(limit, offset, filters, sortField, sortDirection);

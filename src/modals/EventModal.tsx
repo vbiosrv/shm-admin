@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
 import { Save, X, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import EventSelect from '../components/EventSelect';
@@ -24,7 +25,7 @@ export default function EventModal({
 }: EventModalProps) {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [mode, setMode] = useState<'default' | 'template' | 'cmd'>('default');
   const [serverTransport, setServerTransport] = useState<string>('');
 
@@ -132,21 +133,15 @@ export default function EventModal({
 
   const handleDelete = async () => {
     if (!onDelete) return;
-    
-    if (!confirm('Вы уверены, что хотите удалить это событие?')) {
-      return;
-    }
 
-    setDeleting(true);
     try {
       await onDelete();
+      setConfirmDeleteOpen(false);
       onClose();
       toast.success('Событие удалено');
     } catch (error) {
       console.error('Ошибка удаления события:', error);
       toast.error('Ошибка удаления события');
-    } finally {
-      setDeleting(false);
     }
   };
 
@@ -165,9 +160,8 @@ export default function EventModal({
       <div>
         {data?.id && onDelete && (
           <button
-            onClick={handleDelete}
-            disabled={deleting || saving}
-            className="px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50 btn-danger"
+            onClick={() => setConfirmDeleteOpen(true)}
+            className="px-4 py-2 rounded flex items-center gap-2 btn-danger"
             style={{
               backgroundColor: 'var(--theme-button-danger-bg)',
               color: 'var(--theme-button-danger-text)',
@@ -175,7 +169,7 @@ export default function EventModal({
             }}
           >
             <Trash2 className="w-4 h-4" />
-            {deleting ? 'Удаление...' : 'Удалить'}
+            Удалить
           </button>
         )}
       </div>
@@ -357,6 +351,17 @@ export default function EventModal({
         </div>
       </div>
       
+      {/* Модалка подтверждения удаления */}
+      <ConfirmModal
+        open={confirmDeleteOpen}
+        onClose={() => setConfirmDeleteOpen(false)}
+        onConfirm={handleDelete}
+        title="Удаление события"
+        message={`Вы уверены, что хотите удалить событие "${formData.title || ''}"?`}
+        confirmText="Удалить"
+        cancelText="Отмена"
+        variant="danger"
+      />
     </Modal>
   );
 }

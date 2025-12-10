@@ -50,11 +50,11 @@ const navigation: MenuItem[] = [
     href: '/', 
     icon: Home 
   },
-  { 
-    name: 'Аналитика', 
-    href: '/analytics', 
-    icon: TrendingUp 
-  },
+  // { 
+  //   name: 'Аналитика', 
+  //   href: '/analytics', 
+  //   icon: TrendingUp 
+  // },
   { 
     name: 'Пользователи', 
     icon: Users,
@@ -107,7 +107,7 @@ const navigation: MenuItem[] = [
   {
     name: 'SHM Cloud',
     icon: Cloud,
-    href: '#',
+    href: '/cloud',
   },
 ];
 

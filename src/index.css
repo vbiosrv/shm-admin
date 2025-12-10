@@ -45,6 +45,9 @@
   --theme-button-secondary-text: #e2e8f0;
   --theme-button-secondary-border: #475569;
   --theme-button-secondary-hover-bg: #475569;
+  --accent-success: #059669;
+  --accent-warning: #fbbf24;
+  --accent-danger: #dc2626;
 }
 
 body {

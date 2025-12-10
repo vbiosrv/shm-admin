@@ -48,8 +48,6 @@ function Dashboard() {
   const [revenueStats, setRevenueStats] = useState<RevenueStats | null>(null);
   const [financialMetrics, setFinancialMetrics] = useState<FinancialMetrics | null>(null);
   const [mrrStats, setMrrStats] = useState<MRRStats | null>(null);
-  const [recentPayments, setRecentPayments] = useState<any[]>([]);
-  const [pendingTasks, setPendingTasks] = useState<any[]>([]);
 
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -81,11 +79,6 @@ function Dashboard() {
       setFinancialMetrics(financial);
       setMrrStats(mrr);
       
-      const { data: pays } = normalizeListResponse(recentPaysRes);
-      setRecentPayments(pays);
-      
-      const { data: tasks } = normalizeListResponse(tasksRes);
-      setPendingTasks(tasks);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
@@ -193,19 +186,12 @@ function Dashboard() {
         />
       </div>
 
-      {/* Key Financial Metrics */}
+      {/* Key Financial Metrics 
       <div className="mt-6">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-lg font-semibold" style={{ color: 'var(--theme-content-text)' }}>
             Ключевые метрики
           </h3>
-          <Link 
-            to="/analytics" 
-            className="text-sm flex items-center gap-1 hover:opacity-80 transition-opacity"
-            style={{ color: 'var(--theme-primary-color)' }}
-          >
-            Вся аналитика <ArrowRight className="w-4 h-4" />
-          </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard
@@ -244,7 +230,7 @@ function Dashboard() {
           />
         </div>
       </div>
-
+      */}
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
         {/* Revenue Chart */}
@@ -254,15 +240,6 @@ function Dashboard() {
           icon={TrendingUp}
           iconColor="text-cyan-400"
           loading={loading}
-          actions={
-            <Link 
-              to="/analytics" 
-              className="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity"
-              style={{ color: 'var(--theme-primary-color)' }}
-            >
-              Подробнее <ArrowRight className="w-3 h-3" />
-            </Link>
-          }
         >
           {paymentStats && paymentStats.timeline.length > 0 ? (
             <AreaLineChart
@@ -309,121 +286,8 @@ function Dashboard() {
         </ChartCard>
       </div>
 
-      {/* Recent Activity Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        {/* Recent Payments */}
-        <ChartCard
-          title="Последние платежи"
-          icon={CreditCard}
-          iconColor="text-emerald-400"
-          loading={loading}
-          actions={
-            <Link 
-              to="/pays" 
-              className="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity"
-              style={{ color: 'var(--theme-primary-color)' }}
-            >
-              Все платежи <ArrowRight className="w-3 h-3" />
-            </Link>
-          }
-        >
-          {recentPayments.length > 0 ? (
-            <div className="space-y-1">
-              {recentPayments.map((payment, idx) => (
-                <div 
-                  key={payment.id || idx}
-                  className="flex items-center justify-between py-2 border-b last:border-b-0"
-                  style={{ borderColor: 'var(--theme-card-border)' }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                      <DollarSign className="w-4 h-4 text-emerald-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium" style={{ color: 'var(--theme-content-text)' }}>
-                        Пользователь #{payment.user_id}
-                      </p>
-                      <p className="text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
-                        {formatDate(payment.date)}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="font-semibold text-emerald-400">
-                    +{formatMoney(parseFloat(payment.money) || 0)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center py-8" style={{ color: 'var(--theme-content-text-muted)' }}>
-              Нет последних платежей
-            </div>
-          )}
-        </ChartCard>
-
-        {/* Pending Tasks */}
-        <ChartCard
-          title="Задачи в очереди"
-          icon={Activity}
-          iconColor="text-amber-400"
-          loading={loading}
-          actions={
-            <Link 
-              to="/spool" 
-              className="text-xs flex items-center gap-1 hover:opacity-80 transition-opacity"
-              style={{ color: 'var(--theme-primary-color)' }}
-            >
-              Все задачи <ArrowRight className="w-3 h-3" />
-            </Link>
-          }
-        >
-          {pendingTasks.length > 0 ? (
-            <div className="space-y-1">
-              {pendingTasks.map((task, idx) => (
-                <div 
-                  key={task.id || idx}
-                  className="flex items-center justify-between py-2 border-b last:border-b-0"
-                  style={{ borderColor: 'var(--theme-card-border)' }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
-                      <Clock className="w-4 h-4 text-amber-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium" style={{ color: 'var(--theme-content-text)' }}>
-                        {typeof task.event === 'string' ? task.event : (task.event?.title || task.event?.name || (typeof task.name === 'string' ? task.name : 'Задача'))}
-                      </p>
-                      <p className="text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
-                        Пользователь #{task.user_id || '-'}
-                      </p>
-                    </div>
-                  </div>
-                  <span 
-                    className="text-xs px-2 py-1 rounded-full"
-                    style={{
-                      backgroundColor: 'var(--theme-sidebar-item-active-bg)',
-                      color: 'var(--theme-primary-color)',
-                    }}
-                  >
-                    {typeof task.status === 'string' ? task.status : 'pending'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-8" style={{ color: 'var(--theme-content-text-muted)' }}>
-              <CheckCircle className="w-8 h-8 text-emerald-400 mb-2" />
-              <p>Нет задач в очереди</p>
-            </div>
-          )}
-        </ChartCard>
-      </div>
-
       {/* Quick Links */}
       <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--theme-content-text)' }}>
-          Быстрые действия
-        </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {[
             { to: '/users', icon: Users, label: 'Пользователи', color: 'cyan' },

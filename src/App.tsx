@@ -26,6 +26,7 @@ import Identities from './pages/Identities';
 import SpoolHistory from './pages/SpoolHistory';
 import Branding from './pages/Branding';
 import Appearance from './pages/Appearance';
+import SHMCloud from './pages/SHMCloud';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -94,8 +95,8 @@ function App() {
           }
         >
           <Route index element={<Dashboard />} />
-          {/* Аналитика */}
-          <Route path="analytics" element={<Analytics />} />
+          {/* Аналитика - временно скрыта до внедрения тарификации */}
+          {/* <Route path="analytics" element={<Analytics />} /> */}
           {/* Пользователи */}
           <Route path="users" element={<Users />} />
           <Route path="profiles" element={<Profiles />} />
@@ -120,6 +121,7 @@ function App() {
           <Route path="config" element={<Config />} />
           <Route path="branding" element={<Branding />} />
           <Route path="appearance" element={<Appearance />} />
+          <Route path="cloud" element={<SHMCloud />} />
         </Route>
       </Routes>
     </BrowserRouter>

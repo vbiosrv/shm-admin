@@ -1,32 +1,44 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import DataTable, { SortDirection } from '../components/DataTable';
 import Help from '../components/Help';
-import EntityModal, { FieldConfig } from '../components/EntityModal';
+import { SpoolModal, SpoolCreateModal } from '../modals';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
 import { useSelectedUserStore } from '../store/selectedUserStore';
+import { Plus } from 'lucide-react';
 
 const spoolColumns = [
-  { key: 'id', label: 'ID', visible: true, sortable: true },
-  { key: 'user_id', label: 'Пользователь', visible: true, sortable: true },
-  { key: 'user_service_id', label: 'Услуга', visible: true, sortable: true },
-  { key: 'status', label: 'Статус', visible: true, sortable: true },
-  { key: 'prio', label: 'Приоритет', visible: true, sortable: true },
   { key: 'created', label: 'Создано', visible: true, sortable: true },
-  { key: 'executed', label: 'Выполнено', visible: false, sortable: true },
+  { key: 'user_id', label: 'Пользователь', visible: true, sortable: true },
+  { key: 'event', label: 'event', visible: true, sortable: true },
+  { 
+    key: 'event', 
+    label: 'title', 
+    visible: true, 
+    sortable: false,
+    render: (value: any) => value?.title || '-'
+  },
+  { 
+    key: 'status', 
+    label: 'Статус', 
+    visible: true, 
+    sortable: true,
+    filterType: 'select' as const,
+    filterOptions: [
+      { value: 'DELAYED', label: 'DELAYED' },
+      { value: 'SUCCESS', label: 'SUCCESS' },
+      { value: 'PAUSED', label: 'PAUSED' },
+      { value: 'STUCK', label: 'STUCK' },
+      { value: 'FAIL', label: 'FAIL' },
+      { value: 'NEW', label: 'NEW' },
+    ]
+  },
+  { key: 'executed', label: 'Выполнено', visible: true, sortable: true },
+  { key: 'id', label: 'ID', visible: false, sortable: true },
+  { key: 'user_service_id', label: 'Услуга', visible: false, sortable: true },
+  { key: 'prio', label: 'Приоритет', visible: false, sortable: true },
+  { key: 'spool_id', label: 'spool_id', visible: false, sortable: true },
   { key: 'delayed', label: 'Задержка', visible: false, sortable: true },
-];
-
-const modalFields: FieldConfig[] = [
-  { key: 'id', label: 'ID', copyable: true },
-  { key: 'user_id', label: 'Пользователь', linkTo: '/users' },
-  { key: 'user_service_id', label: 'Услуга', linkTo: '/user-services' },
-  { key: 'status', label: 'Статус', type: 'badge' },
-  { key: 'prio', label: 'Приоритет' },
-  { key: 'created', label: 'Создано', type: 'datetime' },
-  { key: 'executed', label: 'Выполнено', type: 'datetime' },
-  { key: 'delayed', label: 'Задержка' },
-  { key: 'event', label: 'Событие' },
-  { key: 'settings', label: 'Настройки', type: 'json' },
+  { key: 'settings', label: 'settings', visible: false, sortable: true },
 ];
 
 function Spool() {
@@ -39,7 +51,8 @@ function Spool() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [selectedRow, setSelectedRow] = useState<any>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
     
   // Получаем выбранного пользователя из store
   const { selectedUser } = useSelectedUserStore();
@@ -95,14 +108,43 @@ function Spool() {
 
   const handleRowClick = (row: any) => {
     setSelectedRow(row);
-    setModalOpen(true);
+    setViewModalOpen(true);
+  };
+
+  const handleCreate = () => {
+    setCreateModalOpen(true);
+  };
+
+  const handleSaveNew = async (spoolData: any) => {
+    await shm_request('/shm/v1/admin/spool', {
+      method: 'PUT',
+      body: JSON.stringify(spoolData),
+    });
+    fetchData(limit, offset, filters, sortField, sortDirection);
+  };
+
+  const handleRefresh = () => {
+    fetchData(limit, offset, filters, sortField, sortDirection);
   };
 
   return (
     <div>
-      <div className="flex items-center mb-4">
-        <h2 className="text-xl font-bold">Задачи (Spool)</h2>
-        <Help content="<b>Задачи</b>: список текущих задач биллинга. Можно перейти к пользователю или услуге." />
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <h2 className="text-xl font-bold">Текущие задачи</h2>
+          <Help content="<b>Текущие задачи</b>: список текущих задач биллинга. Можно перейти к пользователю или услуге." />
+        </div>
+        <button
+          onClick={handleCreate}
+          className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
+          style={{ 
+            backgroundColor: 'var(--accent-primary)', 
+            color: 'var(--accent-text)' 
+          }}
+        >
+          <Plus className="w-4 h-4" />
+          Создать
+        </button>
       </div>
       <DataTable
         columns={spoolColumns}
@@ -117,16 +159,27 @@ function Spool() {
         sortField={sortField}
         sortDirection={sortDirection}
         onRowClick={handleRowClick}
-        onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
+        onRefresh={handleRefresh}
         storageKey="spool"
         externalFilters={externalFilters}
       />
-      <EntityModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={`Задача #${selectedRow?.id || ''}`}
-        data={selectedRow}
-        fields={modalFields}
+      
+      {/* Модалка просмотра/редактирования */}
+      <SpoolModal
+        open={viewModalOpen}
+        onClose={() => {
+          setViewModalOpen(false);
+          setSelectedRow(null);
+        }}
+        data={viewModalOpen ? selectedRow : null}
+        onRefresh={handleRefresh}
+      />
+
+      {/* Модалка создания */}
+      <SpoolCreateModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSave={handleSaveNew}
       />
     </div>
   );

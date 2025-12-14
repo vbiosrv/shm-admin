@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
-import { Save, X, Trash2 } from 'lucide-react';
+import Console from '../components/Console';
+import { Save, X, Trash2, Terminal, Play, Mail } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ServerGroupSelect from '../components/ServerGroupSelect';
 import TemplateSelect from '../components/TemplateSelect';
 import IdentitiesSelect from '../components/IdentitiesSelect';
 import JsonEditor from '../components/JsonEditor';
+import { shm_request } from '../lib/shm_request';
 
 interface ServerModalProps {
   open: boolean;
@@ -26,8 +28,12 @@ export default function ServerModal({
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [confirmInitOpen, setConfirmInitOpen] = useState(false);
   const [mode, setMode] = useState<'template' | 'cmd'>('template');
   const [transport, setTransport] = useState<string>('');
+  const [showConsole, setShowConsole] = useState(false);
+  const [consolePipelineId, setConsolePipelineId] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
 
   useEffect(() => {
     if (open && data) {
@@ -120,6 +126,80 @@ export default function ServerModal({
     }
   };
 
+  const handleTestSSH = async () => {
+    setTesting(true);
+    try {
+      const args = {
+        ...formData.settings,
+        host: formData.host,
+      };
+      
+      const res = await shm_request('/shm/v1/admin/transport/ssh/test', {
+        method: 'PUT',
+        body: JSON.stringify(args),
+      });
+      
+      const pipelineId = Array.isArray(res.data) ? res.data[0]?.pipeline_id : res.data?.pipeline_id;
+      if (pipelineId) {
+        setConsolePipelineId(pipelineId);
+        setShowConsole(true);
+      }
+    } catch (error) {
+      console.error('Ошибка тестирования SSH:', error);
+      toast.error('Ошибка тестирования SSH');
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  const handleTemplateInit = async () => {
+    setConfirmInitOpen(true);
+  };
+
+  const handleConfirmInit = async () => {
+    setConfirmInitOpen(false);
+    setTesting(true);
+    try {
+      const args = {
+        ...formData.settings,
+        server_id: formData.server_id,
+        host: formData.host,
+      };
+      
+      const res = await shm_request('/shm/v1/admin/transport/ssh/init', {
+        method: 'PUT',
+        body: JSON.stringify(args),
+      });
+      
+      const pipelineId = Array.isArray(res.data) ? res.data[0]?.pipeline_id : res.data?.pipeline_id;
+      if (pipelineId) {
+        setConsolePipelineId(pipelineId);
+        setShowConsole(true);
+      }
+    } catch (error) {
+      console.error('Ошибка инициализации шаблона:', error);
+      toast.error('Ошибка инициализации шаблона');
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  const handleTestMail = async () => {
+    setTesting(true);
+    try {
+      await shm_request('/shm/admin/mail_test.cgi', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+      });
+      toast.success('Письмо отправлено');
+    } catch (error) {
+      console.error('Ошибка отправки письма:', error);
+      toast.error('Ошибка отправки письма');
+    } finally {
+      setTesting(false);
+    }
+  };
+
   const inputStyles = {
     backgroundColor: 'var(--theme-input-bg)',
     borderColor: 'var(--theme-input-border)',
@@ -132,7 +212,7 @@ export default function ServerModal({
 
   const renderFooter = () => (
     <div className="flex justify-between w-full">
-      <div>
+      <div className="flex gap-2">
         {data?.server_id && onDelete && (
           <button
             onClick={() => setConfirmDeleteOpen(true)}
@@ -149,6 +229,54 @@ export default function ServerModal({
         )}
       </div>
       <div className="flex gap-2">
+        {/* TEST SSH */}
+        {transport === 'ssh' && (
+          <button
+            onClick={handleTestSSH}
+            disabled={testing || !formData.host}
+            className="px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50 btn-primary"
+            style={{
+              backgroundColor: 'var(--accent-info)',
+              color: 'white',
+            }}
+          >
+            <Terminal className="w-4 h-4" />
+            {testing ? 'Тестирование...' : 'TEST SSH'}
+          </button>
+        )}
+        
+        {/* INIT */}
+        {transport === 'ssh' && mode === 'template' && data?.server_id && (
+          <button
+            onClick={handleTemplateInit}
+            disabled={testing || !formData.host}
+            className="px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50"
+            style={{
+              backgroundColor: 'var(--accent-success)',
+              color: 'white',
+            }}
+          >
+            <Play className="w-4 h-4" />
+            {testing ? 'Выполнение...' : 'INIT'}
+          </button>
+        )}
+        
+        {/* TEST MAIL */}
+        {transport === 'mail' && (
+          <button
+            onClick={handleTestMail}
+            disabled={testing}
+            className="px-4 py-2 rounded flex items-center gap-2 disabled:opacity-50"
+            style={{
+              backgroundColor: 'var(--accent-info)',
+              color: 'white',
+            }}
+          >
+            <Mail className="w-4 h-4" />
+            {testing ? 'Отправка...' : 'TEST MAIL'}
+          </button>
+        )}
+        
         <button
           onClick={onClose}
           className="px-4 py-2 rounded flex items-center gap-2"
@@ -176,6 +304,49 @@ export default function ServerModal({
       </div>
     </div>
   );
+
+  if (showConsole && consolePipelineId) {
+    return (
+      <Modal
+        open={open}
+        onClose={onClose}
+        title="Просмотр логов"
+        footer={
+          <div className="flex justify-end gap-2 w-full">
+            <button
+              onClick={() => {
+                setShowConsole(false);
+                setConsolePipelineId(null);
+              }}
+              className="px-4 py-2 rounded flex items-center gap-2"
+              style={{
+                backgroundColor: 'var(--theme-button-secondary-bg)',
+                color: 'var(--theme-button-secondary-text)',
+                border: '1px solid var(--theme-button-secondary-border)',
+              }}
+            >
+              Назад
+            </button>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 rounded flex items-center gap-2"
+              style={{
+                backgroundColor: 'var(--theme-button-secondary-bg)',
+                color: 'var(--theme-button-secondary-text)',
+                border: '1px solid var(--theme-button-secondary-border)',
+              }}
+            >
+              <X className="w-4 h-4" />
+              Закрыть
+            </button>
+          </div>
+        }
+        size="xl"
+      >
+        <Console pipelineId={consolePipelineId} />
+      </Modal>
+    );
+  }
 
   return (
     <Modal
@@ -456,6 +627,18 @@ export default function ServerModal({
         confirmText="Удалить"
         cancelText="Отмена"
         variant="danger"
+      />
+
+      {/* Модалка подтверждения инициализации */}
+      <ConfirmModal
+        open={confirmInitOpen}
+        onClose={() => setConfirmInitOpen(false)}
+        onConfirm={handleConfirmInit}
+        title="Инициализация шаблона"
+        message={`Выполнить шаблон на сервере "${formData.name || formData.server_id}"?`}
+        confirmText="Выполнить"
+        cancelText="Отмена"
+        variant="warning"
       />
     </Modal>
   );

@@ -16,6 +16,15 @@ export { default as PromoModal } from './PromoModal';
 export { default as PromoCreateModal } from './PromoCreateModal';
 export { default as TemplateModal } from './TemplateModal';
 export { default as TemplateCreateModal } from './TemplateCreateModal';
+export { default as ServerGroupModal } from './ServerGroupModal';
+export { default as ServerGroupCreateModal } from './ServerGroupCreateModal';
+export { default as IdentityModal } from './IdentityModal';
+export { default as IdentityCreateModal } from './IdentityCreateModal';
+export { default as SpoolModal } from './SpoolModal';
+export { default as SpoolCreateModal } from './SpoolCreateModal';
+export { default as SpoolHistoryModal } from './SpoolHistoryModal';
+export { default as ConfigModal } from './ConfigModal';
+export { default as ConfigCreateModal } from './ConfigCreateModal';
 
 // Будут добавлены по мере необходимости:
 // export { default as ServiceModal } from './ServiceModal';

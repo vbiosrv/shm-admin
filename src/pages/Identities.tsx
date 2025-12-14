@@ -1,22 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import DataTable, { SortDirection } from '../components/DataTable';
-import EntityModal, { FieldConfig } from '../components/EntityModal';
+import { IdentityModal, IdentityCreateModal } from '../modals';
 import Help from '../components/Help';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
+import { Plus } from 'lucide-react';
 
 const identityColumns = [
   { key: 'id', label: 'ID', visible: true, sortable: true },
   { key: 'name', label: 'Название', visible: true, sortable: true },
-  { key: 'type', label: 'Тип', visible: true, sortable: true },
-  { key: 'credential', label: 'Credential', visible: true, sortable: false },
-];
-
-const identityModalFields: FieldConfig[] = [
-  { key: 'id', label: 'ID', copyable: true },
-  { key: 'name', label: 'Название' },
-  { key: 'type', label: 'Тип' },
-  { key: 'credential', label: 'Учётные данные' },
-  { key: 'settings', label: 'Настройки', type: 'json' },
+  { key: 'fingerprint', label: 'Fingerprint', visible: true, sortable: false },
 ];
 
 function Identities() {
@@ -29,7 +21,8 @@ function Identities() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [selectedRow, setSelectedRow] = useState<any>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
@@ -74,14 +67,66 @@ function Identities() {
 
   const handleRowClick = (row: any) => {
     setSelectedRow(row);
-    setModalOpen(true);
+    setEditModalOpen(true);
+  };
+
+  const handleCreate = () => {
+    setCreateModalOpen(true);
+  };
+
+  const handleSaveEdit = async (identityData: any) => {
+    await shm_request('/shm/v1/admin/server/identity', {
+      method: 'POST',
+      body: JSON.stringify(identityData),
+    });
+    fetchData(limit, offset, filters, sortField, sortDirection);
+  };
+
+  const handleSaveNew = async (identityData: any) => {
+    // Добавляем fingerprint если его нет (API требует это поле)
+    const dataToSend = {
+      ...identityData,
+      fingerprint: identityData.fingerprint || '',
+    };
+    
+    await shm_request('/shm/v1/admin/server/identity', {
+      method: 'PUT',
+      body: JSON.stringify(dataToSend),
+    });
+    fetchData(limit, offset, filters, sortField, sortDirection);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedRow?.id) return;
+    
+    await shm_request(`/shm/v1/admin/server/identity?id=${selectedRow.id}`, {
+      method: 'DELETE',
+    });
+    fetchData(limit, offset, filters, sortField, sortDirection);
+  };
+
+  const handleRefresh = () => {
+    fetchData(limit, offset, filters, sortField, sortDirection);
   };
 
   return (
     <div>
-      <div className="flex items-center mb-4">
-        <h2 className="text-xl font-bold">Ключи (Identities)</h2>
-        <Help content="<b>Ключи</b>: SSH ключи и другие учетные данные для подключения к серверам." />
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <h2 className="text-xl font-bold">Ключи</h2>
+          <Help content="<b>Ключи</b>: SSH ключи и другие учетные данные для подключения к серверам." />
+        </div>
+        <button
+          onClick={handleCreate}
+          className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
+          style={{ 
+            backgroundColor: 'var(--accent-primary)', 
+            color: 'var(--accent-text)' 
+          }}
+        >
+          <Plus className="w-4 h-4" />
+          Добавить
+        </button>
       </div>
       <DataTable
         columns={identityColumns}
@@ -96,15 +141,28 @@ function Identities() {
         sortField={sortField}
         sortDirection={sortDirection}
         onRowClick={handleRowClick}
-        onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
+        onRefresh={handleRefresh}
         storageKey="identities"
       />
-      <EntityModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={`Ключ: ${selectedRow?.name || selectedRow?.id || ''}`}
-        data={selectedRow}
-        fields={identityModalFields}
+      
+      {/* Модалка редактирования */}
+      <IdentityModal
+        open={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          setSelectedRow(null);
+        }}
+        data={editModalOpen ? selectedRow : null}
+        onSave={handleSaveEdit}
+        onDelete={handleDelete}
+        onRefresh={handleRefresh}
+      />
+
+      {/* Модалка создания */}
+      <IdentityCreateModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSave={handleSaveNew}
       />
     </div>
   );

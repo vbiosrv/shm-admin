@@ -1,17 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import DataTable, { SortDirection } from '../components/DataTable';
 import Help from '../components/Help';
-import EntityModal, { FieldConfig } from '../components/EntityModal';
+import { ConfigModal, ConfigCreateModal } from '../modals';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
+import { Plus } from 'lucide-react';
 
 const configColumns = [
   { key: 'key', label: 'Ключ', visible: true, sortable: true },
   { key: 'value', label: 'Значение', visible: true, sortable: false },
-];
-
-const modalFields: FieldConfig[] = [
-  { key: 'key', label: 'Ключ', copyable: true },
-  { key: 'value', label: 'Значение', type: 'json' },
 ];
 
 function Config() {
@@ -24,7 +20,8 @@ function Config() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [selectedRow, setSelectedRow] = useState<any>(null);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
@@ -69,7 +66,11 @@ function Config() {
 
   const handleRowClick = (row: any) => {
     setSelectedRow(row);
-    setModalOpen(true);
+    setEditModalOpen(true);
+  };
+
+  const handleSave = () => {
+    fetchData(limit, offset, filters, sortField, sortDirection);
   };
 
   return (
@@ -77,6 +78,15 @@ function Config() {
       <div className="flex items-center mb-4">
         <h2 className="text-xl font-bold">Конфигурация</h2>
         <Help content="<b>Конфигурация</b>: системные настройки биллинга. Можно редактировать значения через JSON Editor." />
+        <div className="ml-auto">
+          <button
+            onClick={() => setCreateModalOpen(true)}
+          className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
+          >
+            <Plus className="w-4 h-4" />
+            Добавить
+          </button>
+        </div>
       </div>
       <DataTable
         columns={configColumns}
@@ -91,16 +101,19 @@ function Config() {
         sortField={sortField}
         sortDirection={sortDirection}
         onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
-        height="calc(100vh - 220px)"
         onRowClick={handleRowClick}
         storageKey="config"
       />
-      <EntityModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={`Конфигурация: ${selectedRow?.key || ''}`}
+      <ConfigModal
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
         data={selectedRow}
-        fields={modalFields}
+        onSave={handleSave}
+      />
+      <ConfigCreateModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onSave={handleSave}
       />
     </div>
   );

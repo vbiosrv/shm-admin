@@ -1,29 +1,44 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import DataTable, { SortDirection } from '../components/DataTable';
 import Help from '../components/Help';
-import EntityModal, { FieldConfig } from '../components/EntityModal';
+import { SpoolHistoryModal } from '../modals';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
 import { useSelectedUserStore } from '../store/selectedUserStore';
 
 const spoolHistoryColumns = [
-  { key: 'spool_id', label: 'ID', visible: true, sortable: true },
-  { key: 'user_id', label: 'User ID', visible: true, sortable: true },
-  { key: 'user_service_id', label: 'US ID', visible: true, sortable: true },
-  { key: 'event', label: 'Событие', visible: true, sortable: true },
-  { key: 'status', label: 'Статус', visible: true, sortable: true },
   { key: 'executed', label: 'Выполнено', visible: true, sortable: true },
-  { key: 'response', label: 'Ответ', visible: true, sortable: false },
-];
-
-const modalFields: FieldConfig[] = [
-  { key: 'spool_id', label: 'ID', copyable: true },
-  { key: 'user_id', label: 'User ID', linkTo: '/users' },
-  { key: 'user_service_id', label: 'US ID', linkTo: '/user-services' },
-  { key: 'event', label: 'Событие' },
-  { key: 'status', label: 'Статус', type: 'badge' },
-  { key: 'executed', label: 'Выполнено', type: 'datetime' },
-  { key: 'response', label: 'Ответ', type: 'json' },
-  { key: 'settings', label: 'Настройки', type: 'json' },
+  { key: 'user_id', label: 'USER ID', visible: true, sortable: true },
+  { key: 'event', label: 'event', visible: true, sortable: true },
+  { 
+    key: 'event', 
+    label: 'title', 
+    visible: true, 
+    sortable: false,
+    render: (value: any) => value?.title || '-'
+  },
+  { 
+    key: 'status', 
+    label: 'Статус', 
+    visible: true, 
+    sortable: true,
+    filterType: 'select' as const,
+    filterOptions: [
+      { value: 'DELAYED', label: 'DELAYED' },
+      { value: 'SUCCESS', label: 'SUCCESS' },
+      { value: 'PAUSED', label: 'PAUSED' },
+      { value: 'STUCK', label: 'STUCK' },
+      { value: 'FAIL', label: 'FAIL' },
+      { value: 'NEW', label: 'NEW' },
+    ]
+  },
+  { key: 'response', label: 'response', visible: true, sortable: true },
+  { key: 'id', label: 'ID', visible: false, sortable: true },
+  { key: 'user_service_id', label: 'US ID', visible: false, sortable: true },
+  { key: 'prio', label: 'Приоритет', visible: false, sortable: true },
+  { key: 'created', label: 'Создано', visible: false, sortable: true },
+  { key: 'spool_id', label: 'spool_id', visible: false, sortable: true },
+  { key: 'delayed', label: 'Задержка', visible: false, sortable: true },
+  { key: 'settings', label: 'settings', visible: false, sortable: true },
 ];
 
 function SpoolHistory() {
@@ -96,11 +111,15 @@ function SpoolHistory() {
     setModalOpen(true);
   };
 
+  const handleRefresh = () => {
+    fetchData(limit, offset, filters, sortField, sortDirection);
+  };
+
   return (
     <div>
       <div className="flex items-center mb-4">
-        <h2 className="text-xl font-bold">Архив задач</h2>
-        <Help content="<b>Архив задач</b>: история выполненных задач биллинга." />
+        <h2 className="text-xl font-bold">Список завершенных задач</h2>
+        <Help content="<b>Список завершенных задач</b>: история выполненных задач биллинга." />
       </div>
       <DataTable
         columns={spoolHistoryColumns}
@@ -115,16 +134,18 @@ function SpoolHistory() {
         sortField={sortField}
         sortDirection={sortDirection}
         onRowClick={handleRowClick}
-        onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
+        onRefresh={handleRefresh}
         storageKey="spool-history"
         externalFilters={externalFilters}
       />
-      <EntityModal
+      
+      <SpoolHistoryModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={`Задача #${selectedRow?.spool_id || ''}`}
-        data={selectedRow}
-        fields={modalFields}
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedRow(null);
+        }}
+        data={modalOpen ? selectedRow : null}
       />
     </div>
   );

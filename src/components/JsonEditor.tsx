@@ -132,7 +132,7 @@ export default function JsonEditor({
         <div 
           ref={containerRef} 
           className="jsoneditor-react-container"
-          style={{ height: '400px', width: '100%' }}
+          style={{ minHeight: '150px', width: '100%' }}
         />
       </div>
     );

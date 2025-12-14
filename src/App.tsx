@@ -121,7 +121,7 @@ function App() {
           <Route path="config" element={<Config />} />
           <Route path="branding" element={<Branding />} />
           <Route path="appearance" element={<Appearance />} />
-          <Route path="cloud" element={<SHMCloud />} />
+          {/* <Route path="cloud" element={<SHMCloud />} /> */}
         </Route>
       </Routes>
     </BrowserRouter>

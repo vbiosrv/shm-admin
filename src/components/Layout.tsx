@@ -104,11 +104,11 @@ const navigation: MenuItem[] = [
       { name: 'Внешний вид', href: '/appearance' },
     ]
   },
-  {
-    name: 'SHM Cloud',
-    icon: Cloud,
-    href: '/cloud',
-  },
+  // {
+  //   name: 'SHM Cloud',
+  //   icon: Cloud,
+  //   href: '/cloud',
+  // },
 ];
 
 // Theme toggle component

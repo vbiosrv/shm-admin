@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/shm/v1': {
+      '/shm': {
         target: 'https://shm.bkcloud.ru',
         changeOrigin: true,
         secure: false,

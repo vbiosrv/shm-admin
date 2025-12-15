@@ -93,7 +93,7 @@ export default function SpoolHistoryModal({
       size="xl"
     >
       <div className="space-y-4">
-        {/* Событие */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Событие
@@ -107,7 +107,7 @@ export default function SpoolHistoryModal({
           />
         </div>
 
-        {/* Статус */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Статус
@@ -121,7 +121,7 @@ export default function SpoolHistoryModal({
           />
         </div>
 
-        {/* Пользователь */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Пользователь
@@ -135,7 +135,7 @@ export default function SpoolHistoryModal({
           />
         </div>
 
-        {/* Услуга */}
+        {}
         {data?.settings?.user_service_id && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -151,7 +151,7 @@ export default function SpoolHistoryModal({
           </div>
         )}
 
-        {/* Даты */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Создана
@@ -175,7 +175,7 @@ export default function SpoolHistoryModal({
           />
         </div>
 
-        {/* Console Button */}
+        {}
         {data?.response?.pipeline_id && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -195,7 +195,7 @@ export default function SpoolHistoryModal({
           </div>
         )}
 
-        {/* Response */}
+        {}
         {data?.response && (
           <div className="flex items-start gap-3">
             <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
@@ -211,7 +211,7 @@ export default function SpoolHistoryModal({
           </div>
         )}
 
-        {/* Event */}
+        {}
         {data?.event && (
           <div className="flex items-start gap-3">
             <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
@@ -227,7 +227,7 @@ export default function SpoolHistoryModal({
           </div>
         )}
 
-        {/* Settings */}
+        {}
         {data?.settings && (
           <div className="flex items-start gap-3">
             <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>

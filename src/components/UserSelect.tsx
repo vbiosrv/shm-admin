@@ -11,29 +11,15 @@ interface User {
 }
 
 interface UserSelectProps {
-  /** Текущий user_id */
   value?: number | null;
-  /** Callback при выборе пользователя */
   onChange?: (userId: number | null, user: User | null) => void;
-  /** Callback при изменении состояния загрузки */
   onLoadingChange?: (loading: boolean) => void;
-  /** Callback после обновления пользователя через модалку */
   onUserUpdated?: () => void;
-  /** Режим только для чтения */
   readonly?: boolean;
-  /** Placeholder для поля поиска */
   placeholder?: string;
-  /** Дополнительные CSS классы */
   className?: string;
 }
 
-/**
- * Глобальный компонент выбора пользователя с автокомплитом.
- * 
- * Использование:
- * - readonly mode: показывает "user_id# (login) full_name"
- * - edit mode: поле поиска с dropdown для выбора пользователя
- */
 export default function UserSelect({
   value,
   onChange,
@@ -58,19 +44,15 @@ export default function UserSelect({
   const lastLoadedUserIdRef = useRef<number | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Форматирование отображения пользователя
   const formatUser = (user: User) => {
     return `${user.user_id}# (${user.login}) ${user.full_name || ''}`.trim();
   };
 
-  // Загрузка пользователя по ID при инициализации или изменении value
   useEffect(() => {
-    // Отменяем предыдущий запрос при изменении value
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
 
-    // Загружаем только если value есть и отличается от последнего загруженного
     if (value && lastLoadedUserIdRef.current !== value) {
       lastLoadedUserIdRef.current = value;
       abortControllerRef.current = new AbortController();
@@ -87,12 +69,10 @@ export default function UserSelect({
         })
         .catch(err => {
           if (err.name !== 'AbortError') {
-            console.error(err);
           }
         })
         .finally(() => setLoadingUser(false));
     } else if (!value) {
-      // Сброс при отсутствии value
       lastLoadedUserIdRef.current = null;
       setSelectedUser(null);
       setSearch('');
@@ -105,12 +85,10 @@ export default function UserSelect({
     };
   }, [value]);
 
-  // Уведомляем родителя об изменении состояния загрузки
   useEffect(() => {
     onLoadingChange?.(loadingUser);
   }, [loadingUser, onLoadingChange]);
 
-  // Обработчики для UserModal
   const handleOpenUserModal = () => {
     if (selectedUser) {
       setUserModalOpen(true);
@@ -122,9 +100,8 @@ export default function UserSelect({
       method: 'POST',
       body: JSON.stringify(userData),
     });
-    // Перезагружаем данные пользователя
     if (value) {
-      lastLoadedUserIdRef.current = null; // Сбрасываем, чтобы перезагрузить
+      lastLoadedUserIdRef.current = null; 
       const res = await shm_request(`/shm/v1/admin/user?user_id=${value}&limit=1`);
       const data = res.data || res;
       const users = Array.isArray(data) ? data : [];
@@ -136,7 +113,6 @@ export default function UserSelect({
     onUserUpdated?.();
   };
   
-  // Поиск пользователей
   const searchUsers = useCallback((query: string) => {
     if (!query || query.length < 1) {
       setItems([]);
@@ -170,7 +146,6 @@ export default function UserSelect({
       .finally(() => setLoading(false));
   }, []);
 
-  // Обработка изменения поиска с debounce
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setSearch(newValue);
@@ -185,7 +160,6 @@ export default function UserSelect({
     }, 300);
   };
 
-  // Выбор пользователя
   const selectUser = (user: User) => {
     setSelectedUser(user);
     setSearch(formatUser(user));
@@ -194,7 +168,6 @@ export default function UserSelect({
     onChange?.(user.user_id, user);
   };
 
-  // Обработка клавиш
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!dropdownVisible || !items.length) return;
 
@@ -214,7 +187,6 @@ export default function UserSelect({
     }
   };
 
-  // Закрытие dropdown при клике вне компонента
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -226,7 +198,6 @@ export default function UserSelect({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Очистка таймера при размонтировании
   useEffect(() => {
     return () => {
       if (searchTimeoutRef.current) {
@@ -247,9 +218,7 @@ export default function UserSelect({
     color: 'var(--theme-content-text)',
   };
 
-  // Readonly режим
   if (readonly) {
-    // Показываем skeleton пока загружается пользователь
     if (loadingUser) {
       return (
         <div 
@@ -322,7 +291,6 @@ export default function UserSelect({
     );
   }
 
-  // Edit режим с автокомплитом
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <input

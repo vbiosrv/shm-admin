@@ -30,11 +30,9 @@ export default function ServiceModal({
 
   useEffect(() => {
     if (open && data) {
-      // Установка once_service на основе period и next
       const onceService = data.period === 0 && data.next === -1;
       setFormData({ ...data, once_service: onceService });
       
-      // Загрузка списка всех услуг
       shm_request('/shm/v1/admin/service?limit=0')
         .then(res => {
           const { data: items } = normalizeListResponse(res);
@@ -62,7 +60,6 @@ export default function ServiceModal({
       toast.success('Услуга сохранена');
       onClose();
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -79,7 +76,6 @@ export default function ServiceModal({
       toast.success('Услуга удалена');
       onClose();
     } catch (error) {
-      console.error('Ошибка удаления:', error);
       toast.error('Ошибка удаления');
     }
   };

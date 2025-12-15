@@ -1,10 +1,6 @@
 import { shm_request, normalizeListResponse } from './shm_request';
 import { format, subDays, startOfDay, endOfDay, parseISO, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 
-/**
- * Analytics API service for fetching and aggregating SHM data
- */
-
 export interface AnalyticsStats {
   totalUsers: number;
   totalServices: number;
@@ -51,9 +47,6 @@ export interface RevenueStats {
   withdrawTimeline: TimeSeriesData[];
 }
 
-/**
- * Fetches main statistics counters
- */
 export async function fetchMainStats(): Promise<AnalyticsStats> {
   const [
     usersRes,
@@ -85,9 +78,6 @@ export async function fetchMainStats(): Promise<AnalyticsStats> {
   };
 }
 
-/**
- * Helper to get date range based on period
- */
 function getDateRange(period: number | 'month'): { startDate: Date; days: number } {
   if (period === 'month') {
     const now = new Date();
@@ -98,9 +88,6 @@ function getDateRange(period: number | 'month'): { startDate: Date; days: number
   return { startDate: subDays(new Date(), period), days: period };
 }
 
-/**
- * Helper to filter out manual payments
- */
 function filterRealPayments(payments: any[]): any[] {
   return payments.filter((p: any) => {
     const paySystem = String(p.pay_system_id || '').toLowerCase();
@@ -108,15 +95,11 @@ function filterRealPayments(payments: any[]): any[] {
   });
 }
 
-/**
- * Fetches payment statistics with timeline
- */
 export async function fetchPaymentStats(period: number | 'month' = 30): Promise<PaymentStats> {
   try {
     const res = await shm_request(`/shm/v1/admin/user/pay?limit=1000`);
     const { data: allPayments } = normalizeListResponse(res);
     
-    // Filter out manual payments
     const payments = filterRealPayments(allPayments);
 
     const { startDate, days } = getDateRange(period);
@@ -126,10 +109,8 @@ export async function fetchPaymentStats(period: number | 'month' = 30): Promise<
       return payDate >= startDate;
     });
 
-    // Total amount
     const total = recentPayments.reduce((sum: number, p: any) => sum + (parseFloat(p.money) || 0), 0);
 
-    // Group by payment system
     const byPaySystemMap = new Map<string, number>();
     recentPayments.forEach((p: any) => {
       const system = p.pay_system_id || 'unknown';
@@ -140,10 +121,8 @@ export async function fetchPaymentStats(period: number | 'month' = 30): Promise<
       .sort((a, b) => b.value - a.value)
       .slice(0, 10);
 
-    // Timeline - group by date
     const timelineMap = new Map<string, number>();
     if (period === 'month') {
-      // For current month, iterate from start of month to today
       const now = new Date();
       const monthStart = startOfMonth(now);
       const daysInPeriod = eachDayOfInterval({ start: monthStart, end: now });
@@ -178,20 +157,15 @@ export async function fetchPaymentStats(period: number | 'month' = 30): Promise<
       timeline,
     };
   } catch (error) {
-    console.error('Failed to fetch payment stats:', error);
     return { total: 0, count: 0, byPaySystem: [], timeline: [] };
   }
 }
 
-/**
- * Fetches user service statistics
- */
 export async function fetchUserServiceStats(): Promise<UserServiceStats> {
   try {
     const res = await shm_request('/shm/v1/admin/user/service?limit=1000');
     const { data: services } = normalizeListResponse(res);
 
-    // Group by status
     const statusColors: Record<string, string> = {
       ACTIVE: '#22c55e',
       active: '#22c55e',
@@ -215,7 +189,6 @@ export async function fetchUserServiceStats(): Promise<UserServiceStats> {
       color: statusColors[name] || '#6b7280',
     }));
 
-    // Group by service name
     const byServiceMap = new Map<string, number>();
     services.forEach((s: any) => {
       const name = s.name || 'unknown';
@@ -226,7 +199,6 @@ export async function fetchUserServiceStats(): Promise<UserServiceStats> {
       .sort((a, b) => b.value - a.value)
       .slice(0, 10);
 
-    // Timeline - group by creation date (last 30 days)
     const days = 30;
     const timelineMap = new Map<string, number>();
     for (let i = days; i >= 0; i--) {
@@ -255,14 +227,10 @@ export async function fetchUserServiceStats(): Promise<UserServiceStats> {
       timeline,
     };
   } catch (error) {
-    console.error('Failed to fetch user service stats:', error);
     return { total: 0, byStatus: [], byService: [], timeline: [] };
   }
 }
 
-/**
- * Fetches user registration statistics
- */
 export async function fetchUserStats(period: number | 'month' = 30): Promise<UserStats> {
   try {
     const res = await shm_request('/shm/v1/admin/user?limit=1000');
@@ -275,7 +243,6 @@ export async function fetchUserStats(period: number | 'month' = 30): Promise<Use
       return createdDate >= startDate;
     });
 
-    // Timeline
     const timelineMap = new Map<string, number>();
     if (period === 'month') {
       const now = new Date();
@@ -305,7 +272,6 @@ export async function fetchUserStats(period: number | 'month' = 30): Promise<Use
       label: format(new Date(date), 'dd.MM'),
     }));
 
-    // Active users - those who logged in recently
     const activeUsers = users.filter((u: any) => {
       if (!u.last_login) return false;
       const lastLogin = new Date(u.last_login);
@@ -319,14 +285,10 @@ export async function fetchUserStats(period: number | 'month' = 30): Promise<Use
       timeline,
     };
   } catch (error) {
-    console.error('Failed to fetch user stats:', error);
     return { total: 0, newUsers: 0, activeUsers: 0, timeline: [] };
   }
 }
 
-/**
- * Fetches revenue and withdraw statistics
- */
 export async function fetchRevenueStats(period: number | 'month' = 30): Promise<RevenueStats> {
   try {
     const [paysRes, withdrawsRes] = await Promise.all([
@@ -337,12 +299,10 @@ export async function fetchRevenueStats(period: number | 'month' = 30): Promise<
     const { data: allPayments } = normalizeListResponse(paysRes);
     const { data: withdraws } = normalizeListResponse(withdrawsRes);
     
-    // Filter out manual payments
     const payments = filterRealPayments(allPayments);
 
     const { startDate, days } = getDateRange(period);
 
-    // Filter recent
     const recentPayments = payments.filter((p: any) => {
       if (!p.date) return false;
       return new Date(p.date) >= startDate;
@@ -353,13 +313,11 @@ export async function fetchRevenueStats(period: number | 'month' = 30): Promise<
       return new Date(w.date) >= startDate;
     });
 
-    // Totals
     const totalRevenue = recentPayments.reduce((sum: number, p: any) => 
       sum + (parseFloat(p.money) || 0), 0);
     const totalWithdraws = recentWithdraws.reduce((sum: number, w: any) => 
       sum + (parseFloat(w.cost) || parseFloat(w.money) || 0), 0);
 
-    // Timelines
     const revenueTimelineMap = new Map<string, number>();
     const withdrawTimelineMap = new Map<string, number>();
     
@@ -417,7 +375,6 @@ export async function fetchRevenueStats(period: number | 'month' = 30): Promise<
       withdrawTimeline,
     };
   } catch (error) {
-    console.error('Failed to fetch revenue stats:', error);
     return {
       totalRevenue: 0,
       totalWithdraws: 0,
@@ -428,9 +385,6 @@ export async function fetchRevenueStats(period: number | 'month' = 30): Promise<
   }
 }
 
-/**
- * Fetches task (spool) statistics
- */
 export async function fetchTaskStats(): Promise<{
   pending: number;
   completed: number;
@@ -449,7 +403,6 @@ export async function fetchTaskStats(): Promise<{
     const completed = history.filter((t: any) => t.status === 'DONE' || t.status === 'done').length;
     const failed = history.filter((t: any) => t.status === 'ERROR' || t.status === 'error').length;
 
-    // Group by event
     const byEventMap = new Map<string, number>();
     [...pending, ...history].forEach((t: any) => {
       const event = t.event || t.name || 'unknown';
@@ -468,14 +421,10 @@ export async function fetchTaskStats(): Promise<{
       byEvent,
     };
   } catch (error) {
-    console.error('Failed to fetch task stats:', error);
     return { pending: 0, completed: 0, failed: 0, byEvent: [] };
   }
 }
 
-/**
- * Fetches top services by usage
- */
 export async function fetchTopServices(): Promise<{ name: string; count: number; revenue: number }[]> {
   try {
     const res = await shm_request('/shm/v1/admin/user/service?limit=1000');
@@ -497,14 +446,10 @@ export async function fetchTopServices(): Promise<{ name: string; count: number;
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
   } catch (error) {
-    console.error('Failed to fetch top services:', error);
     return [];
   }
 }
 
-/**
- * Fetches server statistics
- */
 export async function fetchServerStats(): Promise<{
   total: number;
   byGroup: { name: string; value: number }[];
@@ -525,7 +470,6 @@ export async function fetchServerStats(): Promise<{
 
     return { total, byGroup };
   } catch (error) {
-    console.error('Failed to fetch server stats:', error);
     return { total: 0, byGroup: [] };
   }
 }
@@ -536,9 +480,6 @@ export interface MonthlyData {
   label: string;
 }
 
-/**
- * Fetches monthly timeline data for current month
- */
 export async function fetchMonthlyPaymentData(): Promise<MonthlyData[]> {
   try {
     const now = new Date();
@@ -548,17 +489,14 @@ export async function fetchMonthlyPaymentData(): Promise<MonthlyData[]> {
     const res = await shm_request('/shm/v1/admin/user/pay?limit=2000');
     const { data: allPayments } = normalizeListResponse(res);
     
-    // Filter out manual payments
     const payments = filterRealPayments(allPayments);
 
-    // Create map for all days in month
     const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
     const dataMap = new Map<string, number>();
     days.forEach(day => {
       dataMap.set(format(day, 'yyyy-MM-dd'), 0);
     });
 
-    // Aggregate payments by day
     payments.forEach((p: any) => {
       if (!p.date) return;
       const date = format(new Date(p.date), 'yyyy-MM-dd');
@@ -573,14 +511,10 @@ export async function fetchMonthlyPaymentData(): Promise<MonthlyData[]> {
       label: format(new Date(dateStr), 'dd.MM'),
     }));
   } catch (error) {
-    console.error('Failed to fetch monthly payment data:', error);
     return [];
   }
 }
 
-/**
- * Fetches monthly user registration timeline
- */
 export async function fetchMonthlyUserData(): Promise<MonthlyData[]> {
   try {
     const now = new Date();
@@ -590,14 +524,12 @@ export async function fetchMonthlyUserData(): Promise<MonthlyData[]> {
     const res = await shm_request('/shm/v1/admin/user?limit=2000');
     const { data: users } = normalizeListResponse(res);
 
-    // Create map for all days in month
     const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
     const dataMap = new Map<string, number>();
     days.forEach(day => {
       dataMap.set(format(day, 'yyyy-MM-dd'), 0);
     });
 
-    // Aggregate users by registration day
     users.forEach((u: any) => {
       if (!u.created) return;
       const date = format(new Date(u.created), 'yyyy-MM-dd');
@@ -612,14 +544,10 @@ export async function fetchMonthlyUserData(): Promise<MonthlyData[]> {
       label: format(new Date(dateStr), 'dd.MM'),
     }));
   } catch (error) {
-    console.error('Failed to fetch monthly user data:', error);
     return [];
   }
 }
 
-/**
- * Fetches monthly service creation timeline
- */
 export async function fetchMonthlyServiceData(): Promise<MonthlyData[]> {
   try {
     const now = new Date();
@@ -629,14 +557,12 @@ export async function fetchMonthlyServiceData(): Promise<MonthlyData[]> {
     const res = await shm_request('/shm/v1/admin/user/service?limit=2000');
     const { data: services } = normalizeListResponse(res);
 
-    // Create map for all days in month
     const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
     const dataMap = new Map<string, number>();
     days.forEach(day => {
       dataMap.set(format(day, 'yyyy-MM-dd'), 0);
     });
 
-    // Aggregate services by creation day
     services.forEach((s: any) => {
       if (!s.created) return;
       const date = format(new Date(s.created), 'yyyy-MM-dd');
@@ -651,29 +577,22 @@ export async function fetchMonthlyServiceData(): Promise<MonthlyData[]> {
       label: format(new Date(dateStr), 'dd.MM'),
     }));
   } catch (error) {
-    console.error('Failed to fetch monthly service data:', error);
     return [];
   }
 }
 
-/**
- * Financial metrics interfaces
- */
 export interface FinancialMetrics {
-  arpu: number;           // Average Revenue Per User
-  arppu: number;          // Average Revenue Per Paying User
-  ltv: number;            // Lifetime Value (simplified)
-  churnRate: number;      // Churn rate percentage
+  arpu: number;           
+  arppu: number;          
+  ltv: number;            
+  churnRate: number;      
   payingUsersCount: number;
   totalUsers: number;
   avgRevenuePerPayment: number;
   avgPaymentsPerUser: number;
-  conversionRate: number; // % of users who made at least one payment
+  conversionRate: number; 
 }
 
-/**
- * Fetches financial metrics (ARPU, LTV, Churn)
- */
 export async function fetchFinancialMetrics(): Promise<FinancialMetrics> {
   try {
     const [usersRes, paysRes, userServicesRes] = await Promise.all([
@@ -686,39 +605,27 @@ export async function fetchFinancialMetrics(): Promise<FinancialMetrics> {
     const { data: allPayments } = normalizeListResponse(paysRes);
     const { data: userServices } = normalizeListResponse(userServicesRes);
     
-    // Filter out manual payments
     const payments = filterRealPayments(allPayments);
 
-    // Total revenue from all payments
     const totalRevenue = payments.reduce((sum: number, p: any) => 
       sum + (parseFloat(p.money) || 0), 0);
 
-    // Count unique paying users
     const payingUserIds = new Set<number>();
     payments.forEach((p: any) => {
       if (p.user_id) payingUserIds.add(p.user_id);
     });
     const payingUsersCount = payingUserIds.size;
 
-    // ARPU = Total Revenue / Total Users
     const arpu = totalUsers > 0 ? totalRevenue / totalUsers : 0;
 
-    // ARPPU = Total Revenue / Paying Users
     const arppu = payingUsersCount > 0 ? totalRevenue / payingUsersCount : 0;
 
-    // Average payments per paying user
     const avgPaymentsPerUser = payingUsersCount > 0 ? payments.length / payingUsersCount : 0;
 
-    // Average revenue per payment
     const avgRevenuePerPayment = payments.length > 0 ? totalRevenue / payments.length : 0;
 
-    // LTV (simplified) = ARPPU * Average customer lifetime
-    // We estimate lifetime based on average service duration
-    // For simplicity: LTV ≈ ARPU * 12 (assuming 12 month avg lifetime)
     const ltv = arpu * 12;
 
-    // Churn Rate calculation
-    // Count users with BLOCK status services vs total
     const blockedServices = userServices.filter((s: any) => 
       s.status === 'BLOCK' || s.status === 'block'
     ).length;
@@ -731,7 +638,6 @@ export async function fetchFinancialMetrics(): Promise<FinancialMetrics> {
       ? (blockedServices / totalServicesForChurn) * 100 
       : 0;
 
-    // Conversion rate = paying users / total users
     const conversionRate = totalUsers > 0 
       ? (payingUsersCount / totalUsers) * 100 
       : 0;
@@ -748,7 +654,6 @@ export async function fetchFinancialMetrics(): Promise<FinancialMetrics> {
       conversionRate,
     };
   } catch (error) {
-    console.error('Failed to fetch financial metrics:', error);
     return {
       arpu: 0,
       arppu: 0,
@@ -763,9 +668,6 @@ export async function fetchFinancialMetrics(): Promise<FinancialMetrics> {
   }
 }
 
-/**
- * Top customers by revenue
- */
 export interface TopCustomer {
   userId: number;
   login: string;
@@ -774,9 +676,6 @@ export interface TopCustomer {
   servicesCount: number;
 }
 
-/**
- * Fetches top customers by total payments
- */
 export async function fetchTopCustomers(limit: number = 10): Promise<TopCustomer[]> {
   try {
     const [usersRes, paysRes, userServicesRes] = await Promise.all([
@@ -789,16 +688,13 @@ export async function fetchTopCustomers(limit: number = 10): Promise<TopCustomer
     const { data: allPayments } = normalizeListResponse(paysRes);
     const { data: userServices } = normalizeListResponse(userServicesRes);
     
-    // Filter out manual payments
     const payments = filterRealPayments(allPayments);
 
-    // Create users map
     const usersMap = new Map<number, string>();
     users.forEach((u: any) => {
       usersMap.set(u.user_id || u.id, u.login || u.email || `User ${u.user_id || u.id}`);
     });
 
-    // Aggregate payments by user
     const customerStats = new Map<number, { total: number; count: number; services: number }>();
     
     payments.forEach((p: any) => {
@@ -813,7 +709,6 @@ export async function fetchTopCustomers(limit: number = 10): Promise<TopCustomer
       });
     });
 
-    // Count services per user
     userServices.forEach((s: any) => {
       const userId = s.user_id;
       if (!userId) return;
@@ -825,7 +720,6 @@ export async function fetchTopCustomers(limit: number = 10): Promise<TopCustomer
       });
     });
 
-    // Sort by total payments and take top
     return Array.from(customerStats.entries())
       .map(([userId, stats]) => ({
         userId,
@@ -837,24 +731,17 @@ export async function fetchTopCustomers(limit: number = 10): Promise<TopCustomer
       .sort((a, b) => b.totalPayments - a.totalPayments)
       .slice(0, limit);
   } catch (error) {
-    console.error('Failed to fetch top customers:', error);
     return [];
   }
 }
 
-/**
- * MRR (Monthly Recurring Revenue) calculation
- */
 export interface MRRStats {
   mrr: number;
   activeSubscriptions: number;
   avgSubscriptionValue: number;
-  mrrGrowth: number; // compared to previous month
+  mrrGrowth: number; 
 }
 
-/**
- * Fetches MRR statistics
- */
 export async function fetchMRRStats(): Promise<MRRStats> {
   try {
     const [userServicesRes, paysRes] = await Promise.all([
@@ -865,19 +752,14 @@ export async function fetchMRRStats(): Promise<MRRStats> {
     const { data: userServices } = normalizeListResponse(userServicesRes);
     const { data: allPayments } = normalizeListResponse(paysRes);
     
-    // Filter out manual payments
     const payments = filterRealPayments(allPayments);
 
-    // Count active services
     const activeServices = userServices.filter((s: any) => 
       s.status === 'ACTIVE' || s.status === 'active'
     );
 
-    // Calculate MRR from active services costs
-    // MRR = sum of monthly recurring payments
     let mrr = 0;
     activeServices.forEach((s: any) => {
-      // Assume cost is monthly if period is ~30 days or cost field exists
       const cost = parseFloat(s.cost) || 0;
       mrr += cost;
     });
@@ -886,7 +768,6 @@ export async function fetchMRRStats(): Promise<MRRStats> {
       ? mrr / activeServices.length 
       : 0;
 
-    // Calculate MRR growth (current month vs previous)
     const now = new Date();
     const currentMonthStart = startOfMonth(now);
     const prevMonthStart = startOfMonth(subDays(currentMonthStart, 1));
@@ -914,7 +795,6 @@ export async function fetchMRRStats(): Promise<MRRStats> {
       mrrGrowth,
     };
   } catch (error) {
-    console.error('Failed to fetch MRR stats:', error);
     return {
       mrr: 0,
       activeSubscriptions: 0,

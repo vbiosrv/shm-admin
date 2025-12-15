@@ -53,10 +53,8 @@ function SpoolHistory() {
   const [modalOpen, setModalOpen] = useState(false);
   const [filters, setFilters] = useState<Record<string, string>>({});
       
-    // Получаем выбранного пользователя из store
     const { selectedUser } = useSelectedUserStore();
       
-    // Формируем externalFilters для автоматического заполнения поля user_id
     const externalFilters = useMemo(() => {
       if (selectedUser?.user_id) {
         return { user_id: String(selectedUser.user_id) };
@@ -68,7 +66,6 @@ function SpoolHistory() {
     setLoading(true);
     let url = `/shm/v1/admin/spool/history?limit=${l}&offset=${o}`;
     
-    // Добавляем фильтры в формате filter={"field":"%value%"}
     if (Object.keys(f).length > 0) {
       url += `&filter=${encodeURIComponent(JSON.stringify(f))}`;
     }
@@ -103,7 +100,7 @@ function SpoolHistory() {
 
   const handleFilterChange = useCallback((newFilters: Record<string, string>) => {
     setFilters(newFilters);
-    setOffset(0); // Сбрасываем offset при изменении фильтров
+    setOffset(0); 
   }, []);
 
   const handleRowClick = (row: any) => {

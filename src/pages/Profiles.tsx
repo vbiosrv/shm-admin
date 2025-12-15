@@ -26,10 +26,8 @@ function Profiles() {
   const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   
-    // Получаем выбранного пользователя из store
     const { selectedUser } = useSelectedUserStore();
   
-    // Формируем externalFilters для автоматического заполнения поля user_id
     const externalFilters = useMemo(() => {
       if (selectedUser?.user_id) {
         return { user_id: String(selectedUser.user_id) };

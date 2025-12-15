@@ -89,7 +89,6 @@ function Services() {
       setViewModalOpen(false);
       fetchData(limit, offset, filters, sortField, sortDirection);
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       throw error;
     }
   };
@@ -103,7 +102,6 @@ function Services() {
       setCreateModalOpen(false);
       fetchData(limit, offset, filters, sortField, sortDirection);
     } catch (error) {
-      console.error('Ошибка создания:', error);
       throw error;
     }
   };
@@ -116,7 +114,6 @@ function Services() {
       setViewModalOpen(false);
       fetchData(limit, offset, filters, sortField, sortDirection);
     } catch (error) {
-      console.error('Ошибка удаления:', error);
       throw error;
     }
   };

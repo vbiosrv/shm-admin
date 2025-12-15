@@ -22,9 +22,6 @@ interface AreaLineChartProps {
   averageLine?: boolean;
 }
 
-/**
- * Reusable Area/Line Chart component for time series data
- */
 export function AreaLineChart({
   data,
   dataKey = 'value',

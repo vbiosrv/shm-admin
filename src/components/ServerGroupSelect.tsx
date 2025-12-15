@@ -17,13 +17,9 @@ interface ServerGroupSelectProps {
   onLoadingChange?: (loading: boolean) => void;
   className?: string;
   disabled?: boolean;
-  /** Показывать кнопку "Добавить группу" */
   showAddButton?: boolean;
 }
 
-/**
- * Компонент выбора группы серверов
- */
 export default function ServerGroupSelect({
   value,
   onChange,
@@ -46,7 +42,6 @@ export default function ServerGroupSelect({
         const data = res.data || res;
         const serverGroups = Array.isArray(data) ? data : [];
         
-        // Добавляем AUTO группу в начало
         const autoGroup: ServerGroup = {
           group_id: 0,
           name: '<AUTO> - на том же сервере, на котором услуга была создана',
@@ -56,7 +51,6 @@ export default function ServerGroupSelect({
         setGroups([autoGroup, ...serverGroups]);
       })
       .catch((err) => {
-        console.error('Ошибка загрузки групп серверов:', err);
         setGroups([]);
       })
       .finally(() => {
@@ -65,7 +59,6 @@ export default function ServerGroupSelect({
       });
   }, [onLoadingChange]);
 
-  // Загрузка конкретной группы по ID
   useEffect(() => {
     if (value !== undefined && value !== null && lastLoadedIdRef.current !== value) {
       const found = groups.find((g) => g.group_id === value);
@@ -83,13 +76,11 @@ export default function ServerGroupSelect({
               });
             }
           })
-          .catch(err => console.error('Failed to load group:', err))
+          .catch(err => )
           .finally(() => setLoadingGroup(false));
       } else if (!found && loading) {
-        // Если список еще грузится, показываем skeleton
         setLoadingGroup(true);
       } else if (found || value === 0) {
-        // Группа найдена или это AUTO, убираем skeleton
         setLoadingGroup(false);
         lastLoadedIdRef.current = value;
       }

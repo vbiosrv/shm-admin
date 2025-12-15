@@ -39,14 +39,12 @@ export default function ServerModal({
     if (open && data) {
       setFormData(data);
       
-      // Определяем режим на основе settings
       if (data.settings?.cmd) {
         setMode('cmd');
       } else {
         setMode('template');
       }
       
-      // Сохраняем transport (из данных сервера или из группы)
       setTransport(data.transport || data.server?.transport || '');
     }
   }, [open, data]);
@@ -63,7 +61,6 @@ export default function ServerModal({
   };
 
   const handleSave = async () => {
-    // Валидация
     if (!formData.name?.trim()) {
       toast.error('Введите имя сервера');
       return;
@@ -93,7 +90,6 @@ export default function ServerModal({
     try {
       const dataToSave = { ...formData };
       
-      // Очищаем ненужные поля в зависимости от режима
       if (mode !== 'cmd') {
         delete dataToSave.settings?.cmd;
       }
@@ -105,7 +101,6 @@ export default function ServerModal({
       onClose();
       toast.success(data ? 'Сервер обновлён' : 'Сервер создан');
     } catch (error) {
-      console.error('Ошибка сохранения сервера:', error);
       toast.error('Ошибка сохранения сервера');
     } finally {
       setSaving(false);
@@ -121,7 +116,6 @@ export default function ServerModal({
       onClose();
       toast.success('Сервер удалён');
     } catch (error) {
-      console.error('Ошибка удаления сервера:', error);
       toast.error('Ошибка удаления сервера');
     }
   };
@@ -145,7 +139,6 @@ export default function ServerModal({
         setShowConsole(true);
       }
     } catch (error) {
-      console.error('Ошибка тестирования SSH:', error);
       toast.error('Ошибка тестирования SSH');
     } finally {
       setTesting(false);
@@ -177,7 +170,6 @@ export default function ServerModal({
         setShowConsole(true);
       }
     } catch (error) {
-      console.error('Ошибка инициализации шаблона:', error);
       toast.error('Ошибка инициализации шаблона');
     } finally {
       setTesting(false);
@@ -193,7 +185,6 @@ export default function ServerModal({
       });
       toast.success('Письмо отправлено');
     } catch (error) {
-      console.error('Ошибка отправки письма:', error);
       toast.error('Ошибка отправки письма');
     } finally {
       setTesting(false);
@@ -229,7 +220,7 @@ export default function ServerModal({
         )}
       </div>
       <div className="flex gap-2">
-        {/* TEST SSH */}
+        {}
         {transport === 'ssh' && (
           <button
             onClick={handleTestSSH}
@@ -245,7 +236,7 @@ export default function ServerModal({
           </button>
         )}
         
-        {/* INIT */}
+        {}
         {transport === 'ssh' && mode === 'template' && data?.server_id && (
           <button
             onClick={handleTemplateInit}
@@ -261,7 +252,7 @@ export default function ServerModal({
           </button>
         )}
         
-        {/* TEST MAIL */}
+        {}
         {transport === 'mail' && (
           <button
             onClick={handleTestMail}
@@ -357,7 +348,7 @@ export default function ServerModal({
       size="xl"
     >
       <div className="space-y-4">
-        {/* ID сервера */}
+        {}
         {data?.server_id && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -373,7 +364,7 @@ export default function ServerModal({
           </div>
         )}
 
-        {/* Имя сервера */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Имя сервера *
@@ -388,7 +379,7 @@ export default function ServerModal({
           />
         </div>
 
-        {/* Статус и услуги */}
+        {}
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
               Статус
@@ -419,7 +410,7 @@ export default function ServerModal({
             />
           </div>
 
-            {/* Ограничение услуг */}
+            {}
             <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
                 Огр. кол-ва услуг
@@ -435,7 +426,7 @@ export default function ServerModal({
             </div>
         </div>
 
-        {/* Группа серверов */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Группа *
@@ -456,7 +447,7 @@ export default function ServerModal({
           />
         </div>
 
-        {/* Транспорт */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Транспорт
@@ -470,7 +461,7 @@ export default function ServerModal({
           />
         </div>
 
-        {/* Хост (не для local) */}
+        {}
         {transport !== 'local' && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -487,7 +478,7 @@ export default function ServerModal({
           </div>
         )}
 
-        {/* Mail настройки */}
+        {}
         {transport === 'mail' && (
           <>
             <div className="flex items-center gap-3">
@@ -541,7 +532,7 @@ export default function ServerModal({
           </>
         )}
 
-        {/* SSH ключ */}
+        {}
         {transport === 'ssh' && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -556,7 +547,7 @@ export default function ServerModal({
           </div>
         )}
 
-        {/* Использовать */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Использовать *
@@ -572,7 +563,7 @@ export default function ServerModal({
           </select>
         </div>
 
-        {/* Шаблон */}
+        {}
         {mode === 'template' && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -586,7 +577,7 @@ export default function ServerModal({
           </div>
         )}
 
-        {/* Команда */}
+        {}
         {mode === 'cmd' && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -603,7 +594,7 @@ export default function ServerModal({
           </div>
         )}
 
-        {/* Settings (JSON) */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Настройки
@@ -617,7 +608,7 @@ export default function ServerModal({
         </div>
       </div>
       
-      {/* Модалка подтверждения удаления */}
+      {}
       <ConfirmModal
         open={confirmDeleteOpen}
         onClose={() => setConfirmDeleteOpen(false)}
@@ -629,7 +620,7 @@ export default function ServerModal({
         variant="danger"
       />
 
-      {/* Модалка подтверждения инициализации */}
+      {}
       <ConfirmModal
         open={confirmInitOpen}
         onClose={() => setConfirmInitOpen(false)}

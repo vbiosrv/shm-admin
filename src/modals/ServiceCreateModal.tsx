@@ -40,7 +40,6 @@ export default function ServiceCreateModal({
   useEffect(() => {
     if (open) {
       if (initialData) {
-        // Дублирование - используем данные из initialData
         const onceService = initialData.period === 0 && initialData.next === -1;
         setFormData({
           name: initialData.name || '',
@@ -59,7 +58,6 @@ export default function ServiceCreateModal({
           config: initialData.config || {},
         });
       } else {
-        // Новая услуга - чистые поля
         setFormData({
           name: '',
           cost: '',
@@ -78,7 +76,6 @@ export default function ServiceCreateModal({
         });
       }
       
-      // Загрузка списка всех услуг
       shm_request('/shm/v1/admin/service?limit=0')
         .then(res => {
           const { data: items } = normalizeListResponse(res);
@@ -98,13 +95,12 @@ export default function ServiceCreateModal({
       return;
     }
 
-    // Применяем логику once_service перед сохранением
     const dataToSave = { ...formData };
     if (dataToSave.once_service) {
       dataToSave.period = 0;
       dataToSave.next = -1;
     }
-    delete dataToSave.once_service; // Удаляем вспомогательное поле
+    delete dataToSave.once_service; 
 
     setSaving(true);
     try {
@@ -112,7 +108,6 @@ export default function ServiceCreateModal({
       toast.success('Услуга создана');
       onClose();
     } catch (error) {
-      console.error('Ошибка создания:', error);
       toast.error('Ошибка создания');
     } finally {
       setSaving(false);

@@ -21,7 +21,6 @@ export default function WithdrawModal({
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
 
-  // Синхронизация данных при открытии
   useEffect(() => {
     if (data) {
       setFormData({ ...data });
@@ -41,7 +40,6 @@ export default function WithdrawModal({
       onClose();
       toast.success('Списание обновлено');
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -96,7 +94,7 @@ export default function WithdrawModal({
       size="lg"
     >
       <div className="space-y-4">
-        {/* Пользователь */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Пользователь
@@ -110,7 +108,7 @@ export default function WithdrawModal({
           </div>
         </div>
 
-        {/* Услуга */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Услуга
@@ -123,7 +121,7 @@ export default function WithdrawModal({
           </div>
         </div>
 
-        {/* Цена и Количество */}
+        {}
         <div className="grid grid-cols-2 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -155,7 +153,7 @@ export default function WithdrawModal({
           </div>
         </div>
 
-        {/* Бонусы и Скидка */}
+        {}
         <div className="grid grid-cols-2 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -188,7 +186,7 @@ export default function WithdrawModal({
           </div>
         </div>
 
-        {/* Период */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Период (мес.) 
@@ -206,7 +204,7 @@ export default function WithdrawModal({
           <span className="text-xs" style={labelStyles}>M.DDHH (M - месяцы, DD - дни, HH - часы)</span>
         </div>
 
-        {/* Итого */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Итого
@@ -220,7 +218,7 @@ export default function WithdrawModal({
           />
         </div>
 
-        {/* Даты */}
+        {}
         <div className="grid grid-cols-2 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>

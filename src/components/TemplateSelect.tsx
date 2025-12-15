@@ -11,29 +11,15 @@ interface Template {
 }
 
 interface TemplateSelectProps {
-  /** Текущий template id */
   value?: string | null;
-  /** Callback при выборе шаблона */
   onChange?: (templateId: string | null, template: Template | null) => void;
-  /** Callback при изменении состояния загрузки */
   onLoadingChange?: (loading: boolean) => void;
-  /** Callback после обновления шаблона через модалку */
   onTemplateUpdated?: () => void;
-  /** Режим только для чтения */
   readonly?: boolean;
-  /** Placeholder для поля поиска */
   placeholder?: string;
-  /** Дополнительные CSS классы */
   className?: string;
 }
 
-/**
- * Глобальный компонент выбора шаблона с автокомплитом.
- * 
- * Использование:
- * - readonly mode: показывает template id с кнопкой редактирования
- * - edit mode: поле поиска + список с dropdown для выбора шаблона
- */
 export default function TemplateSelect({
   value,
   onChange,
@@ -60,12 +46,10 @@ export default function TemplateSelect({
   const lastLoadedTemplateIdRef = useRef<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Форматирование отображения шаблона
   const formatTemplate = (template: Template) => {
     return template.id;
   };
 
-  // Загрузка шаблона по ID при инициализации или изменении value
   useEffect(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -87,7 +71,6 @@ export default function TemplateSelect({
         })
         .catch(err => {
           if (err.name !== 'AbortError') {
-            console.error(err);
           }
         })
         .finally(() => setLoadingTemplate(false));
@@ -104,7 +87,6 @@ export default function TemplateSelect({
     };
   }, [value]);
 
-  // Загрузка всех шаблонов для режима списка
   useEffect(() => {
     if (viewMode === 'list' && allTemplates.length === 0) {
       setLoading(true);
@@ -115,12 +97,11 @@ export default function TemplateSelect({
           setAllTemplates(templates);
           setItems(templates);
         })
-        .catch(err => console.error(err))
+        .catch(err => )
         .finally(() => setLoading(false));
     }
   }, [viewMode, allTemplates.length]);
 
-  // Поиск шаблонов
   const searchTemplates = useCallback((query: string) => {
     if (!query.trim()) {
       setItems([]);
@@ -137,14 +118,13 @@ export default function TemplateSelect({
         const templates = Array.isArray(data) ? data : [];
         setItems(templates);
       })
-      .catch(err => console.error(err))
+      .catch(err => )
       .finally(() => {
         setLoading(false);
         onLoadingChange?.(false);
       });
   }, [onLoadingChange]);
 
-  // Debounce поиска
   useEffect(() => {
     if (viewMode === 'search') {
       if (searchTimeoutRef.current) {
@@ -167,7 +147,6 @@ export default function TemplateSelect({
     }
   }, [search, searchTemplates, viewMode]);
 
-  // Закрытие dropdown при клике вне компонента
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -179,7 +158,6 @@ export default function TemplateSelect({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Обновление позиции dropdown при изменении размера окна
   useEffect(() => {
     const updatePosition = () => {
       if (inputRef.current && dropdownVisible) {
@@ -203,7 +181,6 @@ export default function TemplateSelect({
     }
   }, [dropdownVisible]);
 
-  // Выбор шаблона
   const selectTemplate = (template: Template) => {
     setSelectedTemplate(template);
     setSearch(formatTemplate(template));
@@ -211,14 +188,12 @@ export default function TemplateSelect({
     onChange?.(template.id, template);
   };
 
-  // Очистка выбора
   const clearSelection = () => {
     setSelectedTemplate(null);
     setSearch('');
     onChange?.(null, null);
   };
 
-  // Обработка нажатий клавиш
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!dropdownVisible || items.length === 0) return;
 
@@ -244,7 +219,6 @@ export default function TemplateSelect({
     }
   };
 
-  // Обработка изменения поля ввода
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setSearch(newValue);
@@ -258,19 +232,16 @@ export default function TemplateSelect({
     }
   };
 
-  // Обработка фокуса на поле
   const handleInputFocus = () => {
     setDropdownVisible(true);
   };
 
-  // Открытие модалки редактирования
   const handleEdit = () => {
     if (selectedTemplate) {
       setTemplateModalOpen(true);
     }
   };
 
-  // Сохранение шаблона
   const handleSave = async (templateData: Record<string, any>) => {
     try {
       const method = templateData.is_add ? 'PUT' : 'POST';
@@ -279,7 +250,6 @@ export default function TemplateSelect({
         body: JSON.stringify(templateData),
       });
       
-      // Обновляем выбранный шаблон
       if (templateData.id === selectedTemplate?.id && selectedTemplate) {
         setSelectedTemplate({
           ...selectedTemplate,
@@ -290,12 +260,10 @@ export default function TemplateSelect({
       
       onTemplateUpdated?.();
     } catch (error) {
-      console.error('Ошибка сохранения шаблона:', error);
       throw error;
     }
   };
 
-  // Стили
   const inputStyles = {
     backgroundColor: 'var(--theme-input-bg)',
     borderColor: 'var(--theme-input-border)',
@@ -308,7 +276,6 @@ export default function TemplateSelect({
     color: 'var(--theme-content-text)',
   };
 
-  // Readonly режим
   if (readonly && selectedTemplate) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
@@ -339,7 +306,6 @@ export default function TemplateSelect({
     );
   }
 
-  // Readonly режим без загруженного шаблона - показываем только ID
   if (readonly) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
@@ -354,7 +320,7 @@ export default function TemplateSelect({
   return (
     <div ref={containerRef} className={`w-full ${className}`}>
       <div className="flex items-center gap-2">
-        {/* Переключатель режима просмотра */}
+        {}
         <button
           onClick={() => {
             const newMode = viewMode === 'search' ? 'list' : 'search';
@@ -382,7 +348,7 @@ export default function TemplateSelect({
           )}
         </button>
 
-        {/* Поле ввода */}
+        {}
         <div className="relative flex-1">
           <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
             <FileText className="w-4 h-4" style={{ color: 'var(--theme-content-text-muted)' }} />
@@ -423,7 +389,7 @@ export default function TemplateSelect({
             </div>
           )}
 
-          {/* Dropdown список */}
+          {}
           {dropdownVisible && items.length > 0 && dropdownPosition && (
             <div
               className="fixed z-[9999] rounded shadow-lg max-h-60 overflow-y-auto"
@@ -456,7 +422,7 @@ export default function TemplateSelect({
           )}
         </div>
 
-        {/* Кнопка редактирования */}
+        {}
         {selectedTemplate && (
           <button
             onClick={handleEdit}
@@ -473,7 +439,7 @@ export default function TemplateSelect({
         )}
       </div>
 
-      {/* Модалка редактирования */}
+      {}
       <TemplateModal
         open={templateModalOpen}
         onClose={() => setTemplateModalOpen(false)}

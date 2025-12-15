@@ -33,10 +33,8 @@ function Withdraws() {
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
-  // Получаем выбранного пользователя из store
   const { selectedUser } = useSelectedUserStore();
 
-  // Формируем externalFilters для автоматического заполнения поля user_id
   const externalFilters = useMemo(() => {
     if (selectedUser?.user_id) {
       return { user_id: String(selectedUser.user_id) };

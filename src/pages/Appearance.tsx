@@ -214,7 +214,7 @@ function Appearance() {
         )}
       </div>
 
-      {/* Theme selector */}
+      {}
       <div className="card mb-6">
         <div className="card-header">
           <h2 className="text-lg font-semibold" style={{ color: 'var(--theme-content-text)' }}>
@@ -265,7 +265,7 @@ function Appearance() {
         </div>
       </div>
 
-      {/* Interface settings */}
+      {}
       <div className="card mb-6">
         <div className="card-header">
           <h2 className="text-lg font-semibold" style={{ color: 'var(--theme-content-text)' }}>
@@ -309,7 +309,7 @@ function Appearance() {
         </div>
       </div>
 
-      {/* Color customization */}
+      {}
       <div className="card">
         <div className="card-header">
           <h2 className="text-lg font-semibold" style={{ color: 'var(--theme-content-text)' }}>

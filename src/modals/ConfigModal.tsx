@@ -141,7 +141,7 @@ export default function ConfigModal({ open, onClose, data, onSave }: ConfigModal
         size="lg"
       >
         <div className="space-y-4">
-          {/* Key - readonly */}
+          {}
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
               Ключ
@@ -155,7 +155,7 @@ export default function ConfigModal({ open, onClose, data, onSave }: ConfigModal
             />
           </div>
 
-          {/* Value - JSON editor */}
+          {}
           <div className="flex items-start gap-3">
             <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
               Значение

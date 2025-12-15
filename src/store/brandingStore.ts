@@ -43,7 +43,6 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
         set({ branding: { ...DEFAULT_BRANDING, ...data }, loaded: true });
       }
     } catch (error) {
-      console.error('Failed to fetch branding:', error);
     } finally {
       set({ loading: false });
     }
@@ -62,11 +61,9 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
       if (response.ok) {
         const { data } = await response.json();
         set({ branding: data });
-        // Update document title
         document.title = data.appTitle || data.appName;
       }
     } catch (error) {
-      console.error('Failed to update branding:', error);
       throw error;
     } finally {
       set({ loading: false });
@@ -82,7 +79,6 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
         document.title = DEFAULT_BRANDING.appTitle;
       }
     } catch (error) {
-      console.error('Failed to reset branding:', error);
       throw error;
     } finally {
       set({ loading: false });

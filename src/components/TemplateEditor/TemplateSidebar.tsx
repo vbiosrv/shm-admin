@@ -25,7 +25,6 @@ export default function TemplateSidebar({
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
 
-  // Загрузка списка шаблонов
   useEffect(() => {
     loadTemplates();
   }, []);
@@ -38,13 +37,11 @@ export default function TemplateSidebar({
       const templateList = Array.isArray(data) ? data : [];
       setTemplates(templateList);
     } catch (error) {
-      console.error('Ошибка загрузки шаблонов:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Фильтрация по поиску
   const filteredTemplates = templates.filter((template) =>
     template.id.toLowerCase().includes(search.toLowerCase())
   );
@@ -65,7 +62,7 @@ export default function TemplateSidebar({
         borderColor: 'var(--theme-content-border)',
       }}
     >
-      {/* Заголовок */}
+      {}
       <div
         className="px-4 py-3 border-b flex items-center justify-between"
         style={{ borderColor: 'var(--theme-content-border)' }}
@@ -86,7 +83,7 @@ export default function TemplateSidebar({
         </button>
       </div>
 
-      {/* Поиск */}
+      {}
       <div className="px-3 py-2">
         <div className="relative">
           <Search
@@ -108,7 +105,7 @@ export default function TemplateSidebar({
         </div>
       </div>
 
-      {/* Список шаблонов */}
+      {}
       <div className="flex-1 overflow-y-auto">
         {loading ? (
           <div className="flex items-center justify-center py-8">

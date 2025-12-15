@@ -26,7 +26,6 @@ export default function TemplateCreateModal({
   const [editorLanguage, setEditorLanguage] = useState('plaintext');
   const editorRef = useRef<any>(null);
 
-  // Сброс формы при открытии
   useEffect(() => {
     if (open) {
       setFormData({
@@ -59,7 +58,6 @@ export default function TemplateCreateModal({
       onClose();
       toast.success('Шаблон создан');
     } catch (error) {
-      console.error('Ошибка создания:', error);
       toast.error('Ошибка создания');
     } finally {
       setSaving(false);
@@ -114,7 +112,7 @@ export default function TemplateCreateModal({
       size="xl"
     >
       <div className="space-y-4">
-        {/* ID шаблона */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-24 text-sm font-medium shrink-0" style={labelStyles}>
             ID *
@@ -130,7 +128,7 @@ export default function TemplateCreateModal({
           />
         </div>
 
-        {/* Переключатель языка */}
+        {}
         <div className="flex items-center gap-2">
           <label className="w-24 text-sm font-medium shrink-0" style={labelStyles}>
             Язык
@@ -155,7 +153,7 @@ export default function TemplateCreateModal({
           </div>
         </div>
 
-        {/* Monaco Editor для data */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-24 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Данные
@@ -185,7 +183,7 @@ export default function TemplateCreateModal({
           </div>
         </div>
 
-        {/* JsonEditor для settings */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-24 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Settings

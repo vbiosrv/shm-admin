@@ -11,7 +11,6 @@ interface UserServiceCreateModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (data: Record<string, any>) => void | Promise<void>;
-  /** Предзаполненный user_id (если создаём из карточки пользователя) */
   defaultUserId?: number | null;
 }
 
@@ -26,7 +25,6 @@ export default function UserServiceCreateModal({
   const [saving, setSaving] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
 
-  // Сброс формы при открытии и автозаполнение user_id
   useEffect(() => {
     if (open) {
       setFormData({
@@ -48,7 +46,6 @@ export default function UserServiceCreateModal({
     setSelectedService(service);
     handleChange('service_id', serviceId);
     
-    // Автозаполнение стоимости и периода из услуги
     if (service) {
       setFormData(prev => ({
         ...prev,
@@ -60,7 +57,6 @@ export default function UserServiceCreateModal({
   };
 
   const handleSave = async () => {
-    // Валидация
     if (!formData.user_id) {
       toast.error('Выберите пользователя');
       return;
@@ -76,7 +72,6 @@ export default function UserServiceCreateModal({
       onClose();
       toast.success('Услуга создана');
     } catch (error) {
-      console.error('Ошибка создания:', error);
       toast.error('Ошибка создания');
     } finally {
       setSaving(false);
@@ -134,7 +129,7 @@ export default function UserServiceCreateModal({
       size="lg"
     >
       <div className="space-y-4">
-        {/* Пользователь */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-28 text-sm font-medium shrink-0" style={labelStyles}>
             Пользователь <span className="text-red-500">*</span>
@@ -148,7 +143,7 @@ export default function UserServiceCreateModal({
           </div>
         </div>
 
-        {/* Услуга */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-28 text-sm font-medium shrink-0" style={labelStyles}>
             Услуга <span className="text-red-500">*</span>
@@ -161,7 +156,7 @@ export default function UserServiceCreateModal({
           </div>
         </div>
 
-        {/* Стоимость и Период */}
+        {}
         <div className="grid grid-cols-2 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-28 text-sm font-medium shrink-0" style={labelStyles}>
@@ -192,7 +187,7 @@ export default function UserServiceCreateModal({
           </div>
         </div>
 
-        {/* Settings (JSON) */}
+        {}
         <div className="pt-2">
           <label className="text-sm font-medium" style={labelStyles}>
             Settings

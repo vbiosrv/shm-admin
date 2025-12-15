@@ -26,7 +26,6 @@ export default function PromoModal({
   const [saving, setSaving] = useState(false);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
-  // Синхронизация данных при открытии
   useEffect(() => {
     if (data) {
       setFormData({ ...data });
@@ -53,7 +52,6 @@ export default function PromoModal({
       onClose();
       toast.success('Промокод обновлён');
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -69,7 +67,6 @@ export default function PromoModal({
       onClose();
       toast.success('Промокод удалён');
     } catch (error) {
-      console.error('Ошибка удаления:', error);
       toast.error('Ошибка удаления');
     }
   };
@@ -147,7 +144,7 @@ export default function PromoModal({
       size="lg"
     >
       <div className="space-y-4">
-        {/* ID */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Промокод
@@ -161,7 +158,7 @@ export default function PromoModal({
           />
         </div>
 
-        {/* Тип */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Тип
@@ -178,7 +175,7 @@ export default function PromoModal({
           </select>
         </div>
 
-        {/* Статус */}
+        {}
         {canEdit && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -198,7 +195,7 @@ export default function PromoModal({
           </div>
         )}
 
-        {/* Количество использований (для многоразовых) */}
+        {}
         {isReusable && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -217,7 +214,7 @@ export default function PromoModal({
           </div>
         )}
 
-        {/* Дата истечения */}
+        {}
         {canEdit && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -233,7 +230,7 @@ export default function PromoModal({
           </div>
         )}
 
-        {/* Использован пользователем */}
+        {}
         {isUsed && (
           <>
             <div className="flex items-center gap-3">
@@ -263,7 +260,7 @@ export default function PromoModal({
           </>
         )}
 
-        {/* Шаблон */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Шаблон
@@ -275,7 +272,7 @@ export default function PromoModal({
           />
         </div>
 
-        {/* Настройки (JSON) */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Настройки
@@ -292,7 +289,7 @@ export default function PromoModal({
         </div>
       </div>
 
-      {/* Модалка подтверждения удаления */}
+      {}
       <ConfirmModal
         open={confirmDeleteOpen}
         onClose={() => setConfirmDeleteOpen(false)}

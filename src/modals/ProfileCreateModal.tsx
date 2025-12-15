@@ -9,7 +9,6 @@ interface ProfileCreateModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (data: Record<string, any>) => void | Promise<void>;
-  /** Предзаполненный user_id (опционально) */
   userId?: number;
 }
 
@@ -25,7 +24,6 @@ export default function ProfileCreateModal({
   });
   const [saving, setSaving] = useState(false);
 
-  // Сброс при открытии
   useEffect(() => {
     if (open) {
       setFormData({
@@ -51,7 +49,6 @@ export default function ProfileCreateModal({
       onClose();
       toast.success('Персональные данные созданы');
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -106,7 +103,7 @@ export default function ProfileCreateModal({
       size="lg"
     >
       <div className="space-y-4">
-        {/* Пользователь */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-28 text-sm font-medium shrink-0" style={labelStyles}>
             Пользователь <span className="text-red-500">*</span>
@@ -119,7 +116,7 @@ export default function ProfileCreateModal({
           </div>
         </div>
 
-        {/* Данные (JSON) */}
+        {}
         <div className="pt-2">
           <label className="text-sm font-medium" style={labelStyles}>
             Данные

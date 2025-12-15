@@ -46,9 +46,7 @@ interface DataTableProps {
   sortField?: string;
   sortDirection?: SortDirection;
   height?: string;
-  /** Уникальный ключ для сохранения настроек в localStorage */
   storageKey?: string;
-  /** Внешние фильтры для программного управления */
   externalFilters?: Record<string, string>;
 }
 
@@ -63,13 +61,11 @@ const AUTO_REFRESH_OPTIONS = [
   { value: 30, label: '30 сек' },
 ];
 
-// Интерфейс для сохраняемых настроек
 interface StoredSettings {
   columns: { key: string; visible: boolean; width: number }[];
   autoRefresh: number;
 }
 
-// Функция загрузки настроек из localStorage
 function loadSettings(storageKey: string): StoredSettings | null {
   try {
     const stored = localStorage.getItem(`dataTable_${storageKey}`);
@@ -77,21 +73,17 @@ function loadSettings(storageKey: string): StoredSettings | null {
       return JSON.parse(stored);
     }
   } catch (e) {
-    console.error('Error loading DataTable settings:', e);
   }
   return null;
 }
 
-// Функция сохранения настроек в localStorage
 function saveSettings(storageKey: string, settings: StoredSettings) {
   try {
     localStorage.setItem(`dataTable_${storageKey}`, JSON.stringify(settings));
   } catch (e) {
-    console.error('Error saving DataTable settings:', e);
   }
 }
 
-// Функция для форматирования значений ячеек (объекты преобразуем в JSON-строку)
 function formatCellValue(value: any): React.ReactNode {
   if (value === null || value === undefined) {
     return '';
@@ -124,7 +116,6 @@ function DataTable({
   storageKey,
   externalFilters
 }: DataTableProps) {
-  // Инициализация колонок с учётом сохранённых настроек
   const [columns, setColumns] = useState<Column[]>(() => {
     const defaultColumns = initialColumns.map(col => ({ 
       ...col, 
@@ -136,11 +127,9 @@ function DataTable({
     const stored = loadSettings(storageKey);
     if (!stored) return defaultColumns;
     
-    // Применяем сохранённые настройки (порядок, видимость, ширина)
     const storedMap = new Map(stored.columns.map(c => [c.key, c]));
     const result: Column[] = [];
     
-    // Сначала добавляем колонки в сохранённом порядке
     for (const storedCol of stored.columns) {
       const initialCol = defaultColumns.find(c => c.key === storedCol.key);
       if (initialCol) {
@@ -152,7 +141,6 @@ function DataTable({
       }
     }
     
-    // Добавляем новые колонки, которых не было в сохранённых настройках
     for (const col of defaultColumns) {
       if (!storedMap.has(col.key)) {
         result.push(col);
@@ -167,7 +155,6 @@ function DataTable({
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
   const [resizingColumn, setResizingColumn] = useState<string | null>(null);
   
-  // Инициализация автообновления с учётом сохранённых настроек
   const [autoRefresh, setAutoRefresh] = useState(() => {
     if (!storageKey) return 0;
     const stored = loadSettings(storageKey);
@@ -181,29 +168,25 @@ function DataTable({
   const autoRefreshRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
   const prevExternalFiltersKeys = useRef<Set<string>>(new Set());
-  const isFirstLoad = useRef(true); // Отслеживаем первую загрузку
-  const filterTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // Debounce для фильтров
-  const onRefreshRef = useRef(onRefresh); // Храним актуальную версию onRefresh
-  const prevFormattedFiltersRef = useRef<string>(''); // Храним предыдущие отформатированные фильтры
+  const isFirstLoad = useRef(true); 
+  const filterTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); 
+  const onRefreshRef = useRef(onRefresh); 
+  const prevFormattedFiltersRef = useRef<string>(''); 
 
-  // Обновляем ref при изменении onRefresh
   useEffect(() => {
     onRefreshRef.current = onRefresh;
   }, [onRefresh]);
 
-  // Синхронизация внешних фильтров с внутренними
   useEffect(() => {
     setColumnFilters(prev => {
       const newFilters = { ...prev };
       
-      // Удаляем предыдущие внешние фильтры
       prevExternalFiltersKeys.current.forEach(key => {
         if (!externalFilters || !(key in externalFilters)) {
           delete newFilters[key];
         }
       });
       
-      // Добавляем новые внешние фильтры
       if (externalFilters) {
         Object.assign(newFilters, externalFilters);
         prevExternalFiltersKeys.current = new Set(Object.keys(externalFilters));
@@ -215,18 +198,14 @@ function DataTable({
     });
   }, [externalFilters]);
 
-  // Вызов onFilterChange с debounce при изменении фильтров
   useEffect(() => {
     if (!onFilterChange) return;
     
-    // Очищаем предыдущий таймер
     if (filterTimeoutRef.current) {
       clearTimeout(filterTimeoutRef.current);
     }
     
-    // Устанавливаем новый таймер (1 секунда как в старой версии)
     filterTimeoutRef.current = setTimeout(() => {
-      // Формируем фильтры в формате %value% (как в старой версии)
       const formattedFilters: Record<string, string> = {};
       Object.entries(columnFilters).forEach(([key, value]) => {
         if (value) {
@@ -234,7 +213,6 @@ function DataTable({
         }
       });
       
-      // Проверяем, изменились ли фильтры
       const filtersString = JSON.stringify(formattedFilters);
       if (filtersString !== prevFormattedFiltersRef.current) {
         prevFormattedFiltersRef.current = filtersString;
@@ -242,7 +220,6 @@ function DataTable({
       }
     }, 1000);
     
-    // Очистка при размонтировании
     return () => {
       if (filterTimeoutRef.current) {
         clearTimeout(filterTimeoutRef.current);
@@ -250,16 +227,13 @@ function DataTable({
     };
   }, [columnFilters, onFilterChange]);
 
-  // Отслеживаем окончание первой загрузки
   useEffect(() => {
     if (!loading && isFirstLoad.current) {
       isFirstLoad.current = false;
     }
   }, [loading]);
 
-  // Сохранение настроек в localStorage при изменении колонок или автообновления
   useEffect(() => {
-    // Пропускаем первый рендер (настройки только что загружены)
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
@@ -279,7 +253,6 @@ function DataTable({
     saveSettings(storageKey, settings);
   }, [columns, autoRefresh, storageKey]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (columnsDropdownRef.current && !columnsDropdownRef.current.contains(e.target as Node)) {
@@ -293,7 +266,6 @@ function DataTable({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Auto refresh
   useEffect(() => {
     if (autoRefresh > 0) {
       const interval = setInterval(() => {
@@ -305,7 +277,6 @@ function DataTable({
     }
   }, [autoRefresh]);
 
-  // Column resizing handlers - используем ref для мгновенного обновления
   const resizingRef = useRef<{ key: string; startX: number; startWidth: number } | null>(null);
   const wasResizingRef = useRef(false);
   
@@ -326,7 +297,6 @@ function DataTable({
       const diff = e.clientX - startX;
       const newWidth = Math.max(MIN_COLUMN_WIDTH, startWidth + diff);
       
-      // Обновляем напрямую через DOM для мгновенной реакции
       const cells = document.querySelectorAll(`[data-column-key="${key}"]`);
       cells.forEach(cell => {
         (cell as HTMLElement).style.width = `${newWidth}px`;
@@ -342,7 +312,6 @@ function DataTable({
       const diff = e.clientX - startX;
       const newWidth = Math.max(MIN_COLUMN_WIDTH, startWidth + diff);
       
-      // Обновляем state только при отпускании мыши
       setColumns(cols => cols.map(col =>
         col.key === key ? { ...col, width: newWidth } : col
       ));
@@ -350,7 +319,6 @@ function DataTable({
       resizingRef.current = null;
       setResizingColumn(null);
       
-      // Блокируем сортировку на короткое время после ресайза
       wasResizingRef.current = true;
       setTimeout(() => {
         wasResizingRef.current = false;
@@ -365,7 +333,6 @@ function DataTable({
     };
   }, [resizingColumn]);
 
-  // Обработчик сортировки с проверкой на ресайз
   const handleSortClick = useCallback((col: Column) => {
     if (wasResizingRef.current) return;
     if (col.sortable === false || !onSort) return;
@@ -377,7 +344,6 @@ function DataTable({
     onSort(col.key, newDirection);
   }, [sortField, sortDirection, onSort]);
 
-  // Drag and drop for column reordering
   const handleDragStart = (e: React.DragEvent, key: string) => {
     setDraggedColumn(key);
     e.dataTransfer.effectAllowed = 'move';
@@ -403,22 +369,18 @@ function DataTable({
     setDraggedColumn(null);
   };
 
-  // Column visibility toggle
   const toggleColumn = (key: string) => {
     setColumns(cols => cols.map(col =>
       col.key === key ? { ...col, visible: !col.visible } : col
     ));
   };
 
-  // Clear all filters
   const clearAllFilters = () => {
     setColumnFilters({});
   };
 
-  // Check if any filters are active
   const hasActiveFilters = Object.values(columnFilters).some(v => v);
 
-  // Pagination
   const currentPage = Math.floor(offset / limit) + 1;
   const totalPages = Math.ceil(total / limit) || 1;
 
@@ -441,7 +403,7 @@ function DataTable({
         border: '1px solid var(--theme-card-border)',
       }}
     >
-      {/* Toolbar */}
+      {}
       <div 
         className="px-4 py-3 flex flex-wrap gap-3 items-center justify-between"
         style={{ borderBottom: '1px solid var(--theme-card-border)' }}
@@ -461,7 +423,7 @@ function DataTable({
         </div>
 
         <div className="flex gap-2 items-center">
-          {/* Clear filters button */}
+          {}
           <button 
             onClick={clearAllFilters}
             className="btn-icon"
@@ -472,7 +434,7 @@ function DataTable({
             <FilterX className="w-4 h-4" />
           </button>
 
-          {/* Refresh button */}
+          {}
           {onRefresh && (
             <button 
               onClick={onRefresh}
@@ -484,7 +446,7 @@ function DataTable({
             </button>
           )}
 
-          {/* Auto refresh dropdown */}
+          {}
           {onRefresh && (
             <div className="relative" ref={autoRefreshRef}>
               <button 
@@ -527,7 +489,7 @@ function DataTable({
             </div>
           )}
 
-          {/* Columns dropdown */}
+          {}
           <div className="relative" ref={columnsDropdownRef}>
             <button 
               onClick={() => setShowColumns(!showColumns)}
@@ -586,7 +548,7 @@ function DataTable({
         </div>
       </div>
 
-      {/* Table container with scroll */}
+      {}
       <div 
         ref={tableRef}
         className="overflow-auto"
@@ -600,7 +562,7 @@ function DataTable({
             className="sticky top-0 z-10"
             style={{ backgroundColor: 'var(--theme-table-header-bg)' }}
           >
-            {/* Column headers */}
+            {}
             <tr>
               {visibleColumns.map(col => {
                 const isSorted = sortField === col.key;
@@ -634,7 +596,7 @@ function DataTable({
                       />
                       <span className="flex-grow">{col.label}</span>
                       
-                      {/* Sort indicator */}
+                      {}
                       {canSort && (
                         <span className="flex-shrink-0 ml-1">
                           {isSorted ? (
@@ -650,7 +612,7 @@ function DataTable({
                       )}
                     </div>
                     
-                    {/* Resize handle */}
+                    {}
                     <div
                       className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-cyan-500/50"
                       onMouseDown={e => {
@@ -666,7 +628,7 @@ function DataTable({
               })}
             </tr>
             
-            {/* Column filters */}
+            {}
             <tr style={{ backgroundColor: 'var(--theme-card-bg)' }}>
               {visibleColumns.map(col => (
                 <th
@@ -820,7 +782,7 @@ function DataTable({
         </table>
       </div>
 
-      {/* Footer with pagination */}
+      {}
       <div 
         className="px-4 py-3 flex flex-wrap gap-3 items-center justify-between text-sm"
         style={{ 
@@ -869,7 +831,7 @@ function DataTable({
           </button>
           
           <div className="flex gap-1 px-2">
-            {/* Page numbers */}
+            {}
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               let pageNum: number;
               if (totalPages <= 5) {

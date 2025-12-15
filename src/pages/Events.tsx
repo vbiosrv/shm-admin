@@ -42,7 +42,6 @@ function Events() {
     shm_request(url)
       .then(res => {
         const { data: items, total: count } = normalizeListResponse(res);
-        // Извлекаем category из settings для отображения в таблице
         const processedItems = items.map((item: any) => ({
           ...item,
           category: item.settings?.category || '',
@@ -144,7 +143,7 @@ function Events() {
         storageKey="events"
       />
       
-      {/* Модалка редактирования */}
+      {}
       <EventModal
         open={modalOpen}
         onClose={() => {
@@ -156,7 +155,7 @@ function Events() {
         onDelete={handleDelete}
       />
 
-      {/* Модалка создания */}
+      {}
       <EventModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}

@@ -40,7 +40,6 @@ export default function SpoolCreateModal({
 
   useEffect(() => {
     if (open) {
-      // Загружаем группы серверов
       shm_request('/shm/v1/admin/server/group?limit=1000')
         .then(res => {
           const groups = Array.isArray(res.data) ? res.data : res.data?.data || [];
@@ -48,7 +47,6 @@ export default function SpoolCreateModal({
         })
         .catch(() => setServerGroups([]));
 
-      // Загружаем шаблоны
       shm_request('/shm/v1/admin/template?limit=1000')
         .then(res => {
           const temps = Array.isArray(res.data) ? res.data : res.data?.data || [];
@@ -59,7 +57,6 @@ export default function SpoolCreateModal({
   }, [open]);
 
   useEffect(() => {
-    // Обновляем user_id из store
     if (selectedUser?.user_id) {
       setFormData(prev => ({
         user_id: defaultUserId || selectedUser?.user_id || null,
@@ -76,7 +73,6 @@ export default function SpoolCreateModal({
     setFormData(prev => {
       const newData = { ...prev, [field]: value };
       
-      // Если режим изменился на "все пользователи", удаляем user_id
       if (field === 'mode' && value !== 'selected_user') {
         const newSettings = { ...newData.settings };
         delete newSettings.user_id;
@@ -131,7 +127,6 @@ export default function SpoolCreateModal({
       await onSave(args);
       onClose();
       
-      // Сброс формы
       setFormData({
         title: 'Пользовательская задача',
         mode: 'selected_user',
@@ -146,7 +141,6 @@ export default function SpoolCreateModal({
       
       toast.success('Задача создана');
     } catch (error) {
-      console.error('Ошибка создания:', error);
       toast.error('Ошибка создания');
     } finally {
       setSaving(false);
@@ -201,7 +195,7 @@ export default function SpoolCreateModal({
       size="lg"
     >
       <div className="space-y-4">
-        {/* Название */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Название <span className="text-red-500">*</span>
@@ -216,7 +210,7 @@ export default function SpoolCreateModal({
           />
         </div>
 
-        {/* Выполнить для */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Выполнить для <span className="text-red-500">*</span>
@@ -232,7 +226,7 @@ export default function SpoolCreateModal({
           </select>
         </div>
 
-        {/* Пользователь */}
+        {}
         {formData.mode === 'selected_user' && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -248,7 +242,7 @@ export default function SpoolCreateModal({
           </div>
         )}
 
-        {/* Группа серверов */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Группа серверов <span className="text-red-500">*</span>
@@ -268,7 +262,7 @@ export default function SpoolCreateModal({
           </select>
         </div>
 
-        {/* Шаблон */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Шаблон
@@ -280,7 +274,7 @@ export default function SpoolCreateModal({
             />
         </div>
 
-        {/* Приоритет и Периодичность */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Приоритет <span className="text-red-500">*</span>
@@ -313,7 +307,7 @@ export default function SpoolCreateModal({
           </span>
         </div>
 
-        {/* Settings */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Settings

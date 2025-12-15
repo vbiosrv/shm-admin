@@ -35,12 +35,12 @@ function Help({ content }: HelpProps) {
       </button>
       {open && (
         <>
-          {/* Backdrop */}
+          {}
           <div 
             className="fixed inset-0 bg-black/30 z-40"
             onClick={() => setOpen(false)}
           />
-          {/* Panel */}
+          {}
           <div 
             className="fixed top-0 right-0 w-96 h-full shadow-2xl z-50 overflow-auto"
             style={{

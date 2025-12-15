@@ -9,15 +9,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.BACKEND_PORT || 3001;
 
-// ==================== DATABASE CONNECTIONS ====================
-
-// MySQL connection pool
 const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST || 'localhost',
-  port: parseInt(process.env.MYSQL_PORT || '3306'),
-  user: process.env.MYSQL_USER || 'shm',
-  password: process.env.MYSQL_PASS || '',
-  database: process.env.MYSQL_DATABASE || 'shm',
+  host: process.env.DB_HOST || 'mysql',
+  port: parseInt(process.env.DB_PORT || '3306'),
+  user: process.env.DB_USER || 'shm',
+  password: process.env.DB_PASS || '',
+  database: process.env.DB_NAME || 'shm',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -25,14 +22,12 @@ const pool = mysql.createPool({
 
 let mysqlConnected = false;
 
-// Redis connection (for caching only)
 const redis = new Redis({
   host: process.env.REDIS_HOST || 'localhost',
   port: parseInt(process.env.REDIS_PORT || '6379'),
   password: process.env.REDIS_PASSWORD || undefined,
   retryStrategy: (times) => {
     if (times > 3) {
-      console.log('Redis connection failed, running without cache');
       return null;
     }
     return Math.min(times * 100, 3000);
@@ -43,15 +38,11 @@ let redisConnected = false;
 
 redis.on('connect', () => {
   redisConnected = true;
-  console.log('✓ Connected to Redis (cache)');
 });
 
-redis.on('error', (err) => {
+redis.on('error', () => {
   redisConnected = false;
-  console.log('Redis error (caching disabled):', err.message);
 });
-
-// ==================== DATABASE INITIALIZATION ====================
 
 const DEFAULT_BRANDING = {
   appName: 'SHM Admin',
@@ -59,14 +50,13 @@ const DEFAULT_BRANDING = {
   logoUrl: '',
   primaryColor: '#22d3ee',
   loginTitle: 'SHM Admin',
-  loginSubtitle: 'Войдите в систему управления',
+  loginSubtitle: 'Добро пожаловать',
 };
 
 async function initDatabase() {
   try {
     const connection = await pool.getConnection();
     
-    // Create admin_settings table if not exists
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS admin_settings (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -77,7 +67,6 @@ async function initDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     
-    // Check if branding exists, if not insert default
     const [rows] = await connection.execute(
       'SELECT setting_value FROM admin_settings WHERE setting_key = ?',
       ['branding']
@@ -88,35 +77,25 @@ async function initDatabase() {
         'INSERT INTO admin_settings (setting_key, setting_value) VALUES (?, ?)',
         ['branding', JSON.stringify(DEFAULT_BRANDING)]
       );
-      console.log('✓ Default branding settings created');
     }
     
     connection.release();
     mysqlConnected = true;
-    console.log('✓ Connected to MySQL');
-    console.log('✓ Table admin_settings ready');
   } catch (error) {
-    console.error('MySQL initialization error:', error.message);
     mysqlConnected = false;
   }
 }
 
-// Initialize database on startup
 initDatabase();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
 const CACHE_PREFIX = 'shm-admin:cache:';
 const BRANDING_CACHE_KEY = 'shm-admin:branding';
 
-// ==================== BRANDING API (MySQL storage) ====================
-
-// Get branding settings
 app.get('/api/branding', async (req, res) => {
   try {
-    // Try cache first
     if (redisConnected) {
       const cached = await redis.get(BRANDING_CACHE_KEY);
       if (cached) {
@@ -124,7 +103,6 @@ app.get('/api/branding', async (req, res) => {
       }
     }
     
-    // Get from database
     if (mysqlConnected) {
       const [rows] = await pool.execute(
         'SELECT setting_value FROM admin_settings WHERE setting_key = ?',
@@ -134,7 +112,6 @@ app.get('/api/branding', async (req, res) => {
       if (rows.length > 0) {
         const branding = rows[0].setting_value;
         
-        // Cache the result
         if (redisConnected) {
           await redis.setex(BRANDING_CACHE_KEY, 3600, JSON.stringify(branding));
         }
@@ -145,12 +122,10 @@ app.get('/api/branding', async (req, res) => {
     
     res.json(DEFAULT_BRANDING);
   } catch (error) {
-    console.error('Error getting branding:', error);
     res.json(DEFAULT_BRANDING);
   }
 });
 
-// Update branding settings
 app.post('/api/branding', async (req, res) => {
   try {
     const branding = { ...DEFAULT_BRANDING, ...req.body };
@@ -163,7 +138,6 @@ app.post('/api/branding', async (req, res) => {
         ['branding', JSON.stringify(branding), JSON.stringify(branding)]
       );
       
-      // Invalidate cache
       if (redisConnected) {
         await redis.del(BRANDING_CACHE_KEY);
       }
@@ -173,12 +147,10 @@ app.post('/api/branding', async (req, res) => {
     
     res.status(500).json({ success: false, error: 'Database not connected' });
   } catch (error) {
-    console.error('Error saving branding:', error);
     res.status(500).json({ success: false, error: 'Failed to save branding' });
   }
 });
 
-// Reset branding to defaults
 app.delete('/api/branding', async (req, res) => {
   try {
     if (mysqlConnected) {
@@ -187,7 +159,6 @@ app.delete('/api/branding', async (req, res) => {
         [JSON.stringify(DEFAULT_BRANDING), 'branding']
       );
       
-      // Invalidate cache
       if (redisConnected) {
         await redis.del(BRANDING_CACHE_KEY);
       }
@@ -197,14 +168,10 @@ app.delete('/api/branding', async (req, res) => {
     
     res.status(500).json({ success: false, error: 'Database not connected' });
   } catch (error) {
-    console.error('Error resetting branding:', error);
     res.status(500).json({ success: false, error: 'Failed to reset branding' });
   }
 });
 
-// ==================== GENERIC SETTINGS API ====================
-
-// Get any setting
 app.get('/api/settings/:key', async (req, res) => {
   try {
     if (mysqlConnected) {
@@ -220,12 +187,10 @@ app.get('/api/settings/:key', async (req, res) => {
     
     res.json({ data: null, found: false });
   } catch (error) {
-    console.error('Error getting setting:', error);
     res.status(500).json({ error: 'Failed to get setting' });
   }
 });
 
-// Save any setting
 app.post('/api/settings/:key', async (req, res) => {
   try {
     if (mysqlConnected) {
@@ -241,14 +206,10 @@ app.post('/api/settings/:key', async (req, res) => {
     
     res.status(500).json({ success: false, error: 'Database not connected' });
   } catch (error) {
-    console.error('Error saving setting:', error);
     res.status(500).json({ success: false, error: 'Failed to save setting' });
   }
 });
 
-// ==================== CACHE API ====================
-
-// Get cached data
 app.get('/api/cache/:key', async (req, res) => {
   try {
     if (!redisConnected) {
@@ -264,12 +225,10 @@ app.get('/api/cache/:key', async (req, res) => {
     
     res.json({ data: null, cached: false });
   } catch (error) {
-    console.error('Error getting cache:', error);
     res.json({ data: null, cached: false });
   }
 });
 
-// Set cached data
 app.post('/api/cache/:key', async (req, res) => {
   try {
     if (!redisConnected) {
@@ -277,18 +236,16 @@ app.post('/api/cache/:key', async (req, res) => {
     }
     
     const key = CACHE_PREFIX + req.params.key;
-    const { data, ttl = 300 } = req.body; // default TTL 5 minutes
+    const { data, ttl = 300 } = req.body; 
     
     await redis.setex(key, ttl, JSON.stringify(data));
     
     res.json({ success: true });
   } catch (error) {
-    console.error('Error setting cache:', error);
     res.status(500).json({ success: false, error: 'Failed to set cache' });
   }
 });
 
-// Delete cached data
 app.delete('/api/cache/:key', async (req, res) => {
   try {
     if (!redisConnected) {
@@ -300,12 +257,10 @@ app.delete('/api/cache/:key', async (req, res) => {
     
     res.json({ success: true });
   } catch (error) {
-    console.error('Error deleting cache:', error);
     res.status(500).json({ success: false, error: 'Failed to delete cache' });
   }
 });
 
-// Clear all cache
 app.delete('/api/cache', async (req, res) => {
   try {
     if (!redisConnected) {
@@ -319,12 +274,9 @@ app.delete('/api/cache', async (req, res) => {
     
     res.json({ success: true, deleted: keys.length });
   } catch (error) {
-    console.error('Error clearing cache:', error);
     res.status(500).json({ success: false, error: 'Failed to clear cache' });
   }
 });
-
-// ==================== HEALTH CHECK ====================
 
 app.get('/api/health', async (req, res) => {
   res.json({
@@ -335,20 +287,4 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`\n🚀 SHM Admin Backend running on http://localhost:${PORT}`);
-  console.log(`\n   Branding API (MySQL):`);
-  console.log(`   - GET    /api/branding       - Get branding settings`);
-  console.log(`   - POST   /api/branding       - Update branding settings`);
-  console.log(`   - DELETE /api/branding       - Reset to defaults`);
-  console.log(`\n   Settings API (MySQL):`);
-  console.log(`   - GET    /api/settings/:key  - Get any setting`);
-  console.log(`   - POST   /api/settings/:key  - Save any setting`);
-  console.log(`\n   Cache API (Redis):`);
-  console.log(`   - GET    /api/cache/:key     - Get cached data`);
-  console.log(`   - POST   /api/cache/:key     - Set cached data`);
-  console.log(`   - DELETE /api/cache/:key     - Delete cached data`);
-  console.log(`\n   Health:`);
-  console.log(`   - GET    /api/health         - Health check\n`);
-});
+app.listen(PORT);

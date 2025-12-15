@@ -15,9 +15,6 @@ interface StatCardProps {
   onClick?: () => void;
 }
 
-/**
- * KPI Stat Card component for dashboard metrics display
- */
 export function StatCard({
   title,
   value,
@@ -100,9 +97,6 @@ interface StatCardGridProps {
   columns?: 2 | 3 | 4 | 5 | 6;
 }
 
-/**
- * Grid container for StatCards with responsive layout
- */
 export function StatCardGrid({ children, columns = 4 }: StatCardGridProps) {
   const colClasses: Record<number, string> = {
     2: 'grid-cols-1 md:grid-cols-2',

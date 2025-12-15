@@ -30,7 +30,6 @@ export default function PromoCreateModal({
   });
   const [saving, setSaving] = useState(false);
 
-  // Сброс формы при открытии
   useEffect(() => {
     if (open) {
       setFormData({
@@ -61,7 +60,6 @@ export default function PromoCreateModal({
   };
 
   const handleSave = async () => {
-    // Валидация
     if (formData.settings.reusable === 1) {
       if (!formData.code) {
         toast.error('Введите код промокода');
@@ -84,7 +82,6 @@ export default function PromoCreateModal({
 
     setSaving(true);
     try {
-      // Убираем пустое поле expire
       const dataToSave = { ...formData };
       if (!dataToSave.expire) {
         delete dataToSave.expire;
@@ -94,7 +91,6 @@ export default function PromoCreateModal({
       onClose();
       toast.success('Промокод создан');
     } catch (error) {
-      console.error('Ошибка создания промокода:', error);
       toast.error('Ошибка создания промокода');
     } finally {
       setSaving(false);
@@ -151,7 +147,7 @@ export default function PromoCreateModal({
       size="md"
     >
       <div className="space-y-4">
-        {/* Тип промокода */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Тип *
@@ -167,7 +163,7 @@ export default function PromoCreateModal({
           </select>
         </div>
 
-        {/* Статус */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Статус
@@ -185,7 +181,7 @@ export default function PromoCreateModal({
           </label>
         </div>
 
-        {/* Дата истечения */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Срок действия
@@ -199,7 +195,7 @@ export default function PromoCreateModal({
           />
         </div>
 
-        {/* Многоразовый: код и количество */}
+        {}
         {isReusable ? (
           <>
             <div className="flex items-center gap-3">
@@ -232,7 +228,7 @@ export default function PromoCreateModal({
           </>
         ) : (
           <>
-            {/* Одноразовый: количество, длина, префикс */}
+            {}
             <div className="flex items-center gap-3">
               <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
                 Кол-во кодов *
@@ -277,7 +273,7 @@ export default function PromoCreateModal({
           </>
         )}
 
-        {/* Шаблон */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Шаблон
@@ -285,7 +281,7 @@ export default function PromoCreateModal({
           <TemplateSelect
             value={formData.template_id}
             onChange={(id, template) => handleChange('template_id', id)}
-            onTemplateUpdated={() => console.log('Обновлено')}
+            onTemplateUpdated={() => }
             readonly={false}
             className="flex-1"
           />

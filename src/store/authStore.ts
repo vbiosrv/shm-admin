@@ -5,7 +5,7 @@ export interface User {
   user_id: number;
   login: string;
   full_name?: string;
-  gid: number; // 0 - пользователь, 1 - админ
+  gid: number; 
 }
 
 interface AuthState {
@@ -35,7 +35,6 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'shm-auth-storage',
-      // Явно указываем, какие поля сохранять
       partialize: (state) => ({
         user: state.user,
         sessionId: state.sessionId,

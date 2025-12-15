@@ -59,7 +59,6 @@ export default function ServerGroupCreateModal({
     try {
       await onSave(formData);
       onClose();
-      // Сброс формы
       setFormData({
         name: '',
         type: 'random',
@@ -68,7 +67,6 @@ export default function ServerGroupCreateModal({
       });
       toast.success('Группа серверов создана');
     } catch (error) {
-      console.error('Ошибка создания:', error);
       toast.error('Ошибка создания');
     } finally {
       setSaving(false);
@@ -123,7 +121,7 @@ export default function ServerGroupCreateModal({
       size="lg"
     >
       <div className="space-y-4">
-        {/* Название */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Название <span className="text-red-500">*</span>
@@ -138,7 +136,7 @@ export default function ServerGroupCreateModal({
           />
         </div>
 
-        {/* Тип */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Тип <span className="text-red-500">*</span>
@@ -157,7 +155,7 @@ export default function ServerGroupCreateModal({
           </select>
         </div>
 
-        {/* Транспорт */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Транспорт <span className="text-red-500">*</span>

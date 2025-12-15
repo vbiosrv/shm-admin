@@ -29,14 +29,14 @@ export interface FormFieldProps {
   readonly?: boolean;
   required?: boolean;
   placeholder?: string;
-  options?: SelectOption[]; // Для select
+  options?: SelectOption[]; 
   min?: number;
   max?: number;
   step?: number;
-  rows?: number; // Для textarea
+  rows?: number; 
   className?: string;
-  labelWidth?: string; // Ширина label
-  render?: (value: any, onChange: (value: any) => void) => ReactNode; // Для custom
+  labelWidth?: string; 
+  render?: (value: any, onChange: (value: any) => void) => ReactNode; 
   helpText?: string;
   error?: string;
 }
@@ -184,7 +184,7 @@ export default function FormField({
         }
         return null;
 
-      default: // text, email, password
+      default: 
         return (
           <input
             type={type}

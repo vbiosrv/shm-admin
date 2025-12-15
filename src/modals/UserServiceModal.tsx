@@ -18,7 +18,6 @@ interface UserServiceModalProps {
   onRefresh?: () => void;
 }
 
-// Статусы услуги пользователя
 const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string }> = {
   'ACTIVE': { label: 'Активен', color: '#16a34a', bgColor: '#dcfce7' },
   'BLOCK': { label: 'Заблокирован', color: '#dc2626', bgColor: '#fee2e2' },
@@ -50,18 +49,15 @@ export default function UserServiceModal({
   
   const statusMenuRef = useRef<HTMLDivElement>(null);
 
-  // Синхронизация данных при открытии
   useEffect(() => {
     if (open && data) {
       setFormData({ ...data });
     } else if (!open) {
-      // Сброс при закрытии модалки
       setFormData({});
       setContentReady(false);
     }
   }, [data, open]);
 
-  // Загрузка списка услуг для "Следующая услуга" (только один раз)
   useEffect(() => {
     if (open && services.length === 0) {
       setLoadingServices(true);
@@ -70,12 +66,11 @@ export default function UserServiceModal({
           const items = res.data || res;
           setServices(Array.isArray(items) ? items : []);
         })
-        .catch(console.error)
+        .catch(() => {})
         .finally(() => setLoadingServices(false));
     }
   }, [open]);
 
-  // Определяем готовность контента
   useEffect(() => {
     if (open && data && !loadingServices && !loadingUser) {
       setContentReady(true);
@@ -85,7 +80,6 @@ export default function UserServiceModal({
     }
   }, [open, data, loadingServices, loadingUser]);
 
-  // Закрытие меню статуса при клике вне него
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (statusMenuRef.current && !statusMenuRef.current.contains(e.target as Node)) {
@@ -110,7 +104,6 @@ export default function UserServiceModal({
       onClose();
       toast.success('Услуга сохранена');
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -139,14 +132,12 @@ export default function UserServiceModal({
       onClose();
       toast.success('Услуга удалена');
     } catch (error) {
-      console.error('Ошибка удаления:', error);
       toast.error('Ошибка удаления');
     } finally {
       setDeleting(false);
     }
   };
 
-  // Блокировка услуги
   const handleBlock = async () => {
     try {
       await shm_request('/shm/v1/admin/user/service/stop', {
@@ -159,15 +150,12 @@ export default function UserServiceModal({
       });
       toast.success('Услуга заблокирована');
       onRefresh?.();
-      // Обновляем локальный статус без закрытия модалки
       setFormData(prev => ({ ...prev, status: 'BLOCK', auto_bill: 0 }));
     } catch (error) {
-      console.error('Ошибка блокировки:', error);
       toast.error('Ошибка блокировки');
     }
   };
 
-  // Активация услуги
   const handleActivate = async () => {
     try {
       await shm_request('/shm/v1/admin/user/service/activate', {
@@ -180,15 +168,12 @@ export default function UserServiceModal({
       });
       toast.success('Услуга активирована');
       onRefresh?.();
-      // Обновляем локальный статус без закрытия модалки
       setFormData(prev => ({ ...prev, status: 'ACTIVE', auto_bill: 1 }));
     } catch (error) {
-      console.error('Ошибка активации:', error);
       toast.error('Ошибка активации');
     }
   };
 
-  // Ручная смена статуса (без подтверждения)
   const handleSetStatus = async (status: string) => {
     try {
       await shm_request('/shm/v1/admin/user/service/status', {
@@ -203,17 +188,14 @@ export default function UserServiceModal({
       onRefresh?.();
       setFormData(prev => ({ ...prev, status }));
     } catch (error) {
-      console.error('Ошибка изменения статуса:', error);
       toast.error('Ошибка изменения статуса');
     }
   };
 
-  // Открытие модалки списания
   const handleOpenWithdrawModal = async () => {
     if (!formData.user_service_id) return;
     
     try {
-      // Загружаем последнее списание для этой услуги
       const res = await shm_request(
         `/shm/v1/admin/user/service/withdraw?user_service_id=${formData.user_service_id}&limit=1&sort_field=withdraw_date&sort_direction=desc`
       );
@@ -227,7 +209,6 @@ export default function UserServiceModal({
         toast.error('Списания не найдены');
       }
     } catch (error) {
-      console.error('Ошибка загрузки списания:', error);
       toast.error('Ошибка загрузки списания');
     }
   };
@@ -314,7 +295,7 @@ export default function UserServiceModal({
         </div>
       ) : (
       <div className="space-y-4">
-        {/* Пользователь */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Пользователь
@@ -328,7 +309,7 @@ export default function UserServiceModal({
           </div>
         </div>
 
-        {/* Услуга */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Услуга
@@ -342,14 +323,14 @@ export default function UserServiceModal({
           </div>
         </div>
 
-        {/* Статус и Биллинг */}
+        {}
         <div className="grid grid-cols-2 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
               Статус
             </label>
             <div className="relative" ref={statusMenuRef}>
-              {/* Кнопка статуса с выпадающим меню */}
+              {}
               <button
                 onClick={() => setStatusMenuOpen(!statusMenuOpen)}
                 className="flex items-center gap-1 px-3 py-1 rounded text-sm font-medium cursor-pointer hover:opacity-80 transition-opacity"
@@ -359,7 +340,7 @@ export default function UserServiceModal({
                 <ChevronDown className={`w-4 h-4 transition-transform ${statusMenuOpen ? 'rotate-180' : ''}`} />
               </button>
               
-              {/* Выпадающее меню */}
+              {}
               {statusMenuOpen && (
                 <div 
                   className="absolute top-full left-0 mt-1 py-1 rounded shadow-lg border z-50 min-w-[140px]"
@@ -428,7 +409,7 @@ export default function UserServiceModal({
           </div>
         </div>
 
-        {/* Стоимость и Действует до */}
+        {}
         <div className="grid grid-cols-2 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -473,7 +454,7 @@ export default function UserServiceModal({
           </div>
         </div>
 
-        {/* Следующая услуга */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             След. услуга
@@ -497,7 +478,7 @@ export default function UserServiceModal({
           </select>
         </div>
 
-        {/* Settings (JSON) */}
+        {}
         <div className="pt-2">
           <label className="text-sm font-medium" style={labelStyles}>
             Settings
@@ -513,7 +494,7 @@ export default function UserServiceModal({
       </div>
       )}
 
-      {/* Модалка подтверждения удаления */}
+      {}
       <ConfirmModal
         open={confirmDelete}
         onClose={() => setConfirmDelete(false)}
@@ -526,7 +507,7 @@ export default function UserServiceModal({
         loading={deleting}
       />
 
-      {/* Модалка списания */}
+      {}
       <WithdrawModal
         open={withdrawModalOpen}
         onClose={() => setWithdrawModalOpen(false)}

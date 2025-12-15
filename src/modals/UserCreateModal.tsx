@@ -17,7 +17,6 @@ export default function UserCreateModal({
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
 
-  // Сброс формы при открытии
   useEffect(() => {
     if (open) {
       setFormData({});
@@ -29,7 +28,6 @@ export default function UserCreateModal({
   };
 
   const handleSave = async () => {
-    // Валидация
     if (!formData.login?.trim()) {
       toast.error('Введите логин');
       return;
@@ -44,7 +42,6 @@ export default function UserCreateModal({
       await onSave(formData);
       onClose();
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка создания пользователя');
     } finally {
       setSaving(false);

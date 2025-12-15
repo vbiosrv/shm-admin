@@ -50,11 +50,6 @@ const navigation: MenuItem[] = [
     href: '/', 
     icon: Home 
   },
-  // { 
-  //   name: 'Аналитика', 
-  //   href: '/analytics', 
-  //   icon: TrendingUp 
-  // },
   { 
     name: 'Пользователи', 
     icon: Users,
@@ -104,14 +99,8 @@ const navigation: MenuItem[] = [
       { name: 'Внешний вид', href: '/appearance' },
     ]
   },
-  // {
-  //   name: 'SHM Cloud',
-  //   icon: Cloud,
-  //   href: '/cloud',
-  // },
 ];
 
-// Theme toggle component
 function ThemeToggle() {
   const { mode, setMode, resolvedTheme } = useThemeStore();
   const [isOpen, setIsOpen] = useState(false);
@@ -216,14 +205,11 @@ function Layout() {
       const isCurrentlyOpen = prev.includes(name);
       
       if (isCurrentlyOpen) {
-        // Закрываем меню и запоминаем, что оно было закрыто вручную
         setManuallyClosed(closed => [...closed, name]);
         return prev.filter(n => n !== name);
       } else {
-        // Открываем новое меню
         setManuallyClosed(closed => closed.filter(n => n !== name));
         
-        // Закрываем все остальные меню, кроме тех что с активной страницей и не были закрыты вручную
         const activeMenus = navigation
           .filter(item => 
             item.children?.some(child => isActive(child.href)) && 
@@ -238,7 +224,7 @@ function Layout() {
 
   return (
     <div className="flex h-screen" style={{ backgroundColor: 'var(--theme-content-bg)' }}>
-      {/* Mobile sidebar backdrop */}
+      {}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-20 bg-black/50 lg:hidden"
@@ -246,7 +232,7 @@ function Layout() {
         />
       )}
 
-      {/* Sidebar */}
+      {}
       <aside
         className={`fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -257,7 +243,7 @@ function Layout() {
         }}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
+          {}
           <div 
             className="flex items-center justify-between h-16 px-4"
             style={{ borderBottom: '1px solid var(--theme-sidebar-border)' }}
@@ -286,14 +272,13 @@ function Layout() {
             </button>
           </div>
 
-          {/* Navigation */}
+          {}
           <nav className="flex-1 overflow-y-auto py-4 px-2">
             {navigation.map((item) => {
               const Icon = item.icon;
               const active = isMenuActive(item);
               const isOpen = openMenus.includes(item.name);
               
-              // Пункт без подменю
               if (item.href && !item.children) {
                 return (
                   <Link
@@ -308,7 +293,6 @@ function Layout() {
                 );
               }
               
-              // Пункт с подменю
               return (
                 <div key={item.name} className="mb-1">
                   <button
@@ -358,7 +342,7 @@ function Layout() {
             })}
           </nav>
 
-          {/* User info */}
+          {}
           <div className="p-4" style={{ borderTop: '1px solid var(--theme-sidebar-border)' }}>
             <div className="flex items-center gap-3 mb-3">
               <div 
@@ -388,9 +372,9 @@ function Layout() {
         </div>
       </aside>
 
-      {/* Main content */}
+      {}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
+        {}
         <header 
           className="h-16 flex items-center justify-between px-4"
           style={{
@@ -413,7 +397,7 @@ function Layout() {
           </div>
         </header>
 
-        {/* Page content */}
+        {}
         <main className="flex-1 overflow-auto p-6">
           <Outlet />
         </main>

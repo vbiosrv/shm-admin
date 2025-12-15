@@ -51,7 +51,6 @@ export default function IdentityModal({
       if (onRefresh) onRefresh();
       toast.success('Ключ сохранен');
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -74,7 +73,6 @@ export default function IdentityModal({
       if (onRefresh) onRefresh();
       toast.success('Ключ удален');
     } catch (error) {
-      console.error('Ошибка удаления:', error);
       toast.error('Ошибка удаления');
     } finally {
       setDeleting(false);
@@ -92,7 +90,6 @@ export default function IdentityModal({
         toast.success('Публичный ключ скопирован');
       })
       .catch((err) => {
-        console.error('Ошибка копирования:', err);
         toast.error('Ошибка копирования');
       });
   };
@@ -159,7 +156,7 @@ export default function IdentityModal({
       size="lg"
     >
       <div className="space-y-4">
-        {/* ID (только при редактировании) */}
+        {}
         {data?.id && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -175,7 +172,7 @@ export default function IdentityModal({
           </div>
         )}
 
-        {/* Имя */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Имя <span className="text-red-500">*</span>
@@ -190,7 +187,7 @@ export default function IdentityModal({
           />
         </div>
 
-        {/* Fingerprint (только при редактировании) */}
+        {}
         {data?.id && formData.fingerprint && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -206,7 +203,7 @@ export default function IdentityModal({
           </div>
         )}
 
-        {/* Публичный ключ */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Публичный ключ

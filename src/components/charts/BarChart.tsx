@@ -27,9 +27,6 @@ const COLORS = [
   '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1',
 ];
 
-/**
- * Reusable Bar Chart component for categorical data
- */
 export function BarChart({
   data,
   title,

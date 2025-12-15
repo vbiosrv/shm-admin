@@ -21,7 +21,6 @@ export default function ConfigCreateModal({ open, onClose, onSave }: ConfigCreat
 
   useEffect(() => {
     if (open) {
-      // Reset form when modal opens
       setFormData({
         key: '',
         value: {},
@@ -118,7 +117,7 @@ export default function ConfigCreateModal({ open, onClose, onSave }: ConfigCreat
       size="lg"
     >
       <div className="space-y-4">
-        {/* Key - editable */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Ключ *
@@ -135,7 +134,7 @@ export default function ConfigCreateModal({ open, onClose, onSave }: ConfigCreat
           />
         </div>
 
-        {/* Value - JSON editor */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Значение

@@ -56,12 +56,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
         ? res.data[0] 
         : (res.data || []);
       
-      // Сортировка по weight (по убыванию)
       const sortedSystems = systems.sort((a: PaySystem, b: PaySystem) => b.weight - a.weight);
       
       setPaySystems(sortedSystems);
     } catch (error) {
-      console.error('Ошибка загрузки платежных систем:', error);
       toast.error('Не удалось загрузить платежные системы');
     } finally {
       setLoading(false);
@@ -77,10 +75,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
         method: 'DELETE',
       });
       
-      // Удаляем из локального состояния
       setPaySystems(prev => prev.filter((_, i) => i !== index));
       
-      // Если удаленная система была выбрана, сбрасываем выбор
       const uniqueKey = `${paysystem}-${index}`;
       if (selectedSystem === uniqueKey) {
         setSelectedSystem('');
@@ -88,7 +84,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
       
       toast.success('Способ оплаты отвязан');
     } catch (error) {
-      console.error('Ошибка удаления способа оплаты:', error);
       toast.error('Не удалось отвязать способ оплаты');
     }
   };
@@ -105,19 +100,16 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
     }
 
     try {
-      // Извлекаем индекс из uniqueKey (format: "paysystem-index")
       const index = parseInt(selectedSystem.split('-').pop() || '0');
       const selectedPaySystem = paySystems[index];
       
       if (selectedPaySystem) {
-        // Открываем shm_url + amount
         const paymentUrl = `${selectedPaySystem.shm_url}${amount}`;
         window.open(paymentUrl, '_blank');
         toast.success('Переход к оплате');
         onClose();
       }
     } catch (error) {
-      console.error('Ошибка создания платежа:', error);
       toast.error('Ошибка создания платежа');
     }
   };

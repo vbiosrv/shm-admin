@@ -35,14 +35,12 @@ export async function shm_request<T = any>(url: string, options?: RequestInit): 
           
 }
 
-// Нормализация ответа API - может вернуть массив или { data: [] }
 export interface ApiListResponse<T = any> {
   data: T[];
   total: number;
 }
 
 export function normalizeListResponse<T = any>(res: any): ApiListResponse<T> {
-  // API может вернуть массив напрямую или объект { data: [], items: N }
   if (Array.isArray(res)) {
     return { data: res, total: res.length };
   }
@@ -51,9 +49,7 @@ export function normalizeListResponse<T = any>(res: any): ApiListResponse<T> {
   return { data, total };
 }
 
-// Функция для авторизации
 export async function shm_login(login: string, password: string): Promise<any> {
-  // POST запрос для получения session_id
   const response = await fetch('/shm/v1/user/auth', {
     method: 'POST',
     headers: {
@@ -73,7 +69,6 @@ export async function shm_login(login: string, password: string): Promise<any> {
     throw new Error('Не получен session_id');
   }
   
-  // Получаем данные пользователя с использованием session_id
   const userResponse = await fetch('/shm/v1/user', {
     method: 'GET',
     headers: {
@@ -88,12 +83,11 @@ export async function shm_login(login: string, password: string): Promise<any> {
     return { user, sessionId };
   }
   
-  // Если не удалось получить данные пользователя, возвращаем минимальные данные
   return { 
     user: { 
       user_id: 0, 
       login, 
-      gid: 1 // Предполагаем, что это админ
+      gid: 1 
     }, 
     sessionId 
   };

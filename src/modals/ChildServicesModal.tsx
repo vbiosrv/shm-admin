@@ -48,7 +48,6 @@ export const ChildServicesModal: React.FC<ChildServicesModalProps> = ({
       const normalized = normalizeListResponse(response);
       setChildServices(normalized.data || []);
     } catch (error) {
-      console.error('Failed to load child services:', error);
       toast.error('Ошибка загрузки дочерних услуг');
     } finally {
       setLoading(false);
@@ -61,7 +60,6 @@ export const ChildServicesModal: React.FC<ChildServicesModalProps> = ({
     const service = availableServices.find(s => s.service_id === Number(selectedService));
     if (!service) return;
 
-    // Проверяем, не добавлена ли уже эта услуга
     if (childServices.some(cs => cs.service_id === service.service_id)) {
       toast.error('Эта услуга уже добавлена');
       return;
@@ -114,7 +112,6 @@ export const ChildServicesModal: React.FC<ChildServicesModalProps> = ({
       toast.success('Дочерние услуги сохранены');
       onClose();
     } catch (error) {
-      console.error('Failed to save child services:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setLoading(false);
@@ -168,7 +165,7 @@ export const ChildServicesModal: React.FC<ChildServicesModalProps> = ({
       size="lg"
     >
       <div className="space-y-6">
-        {/* Добавление услуг */}
+        {}
         <div>
           <label className="block text-sm font-medium mb-2" style={labelStyles}>
             Услуги
@@ -182,7 +179,7 @@ export const ChildServicesModal: React.FC<ChildServicesModalProps> = ({
             >
               <option value="">Выберите услугу...</option>
               {availableServices
-                .filter(s => s.service_id !== serviceId) // Исключаем текущую услугу
+                .filter(s => s.service_id !== serviceId) 
                 .map(service => (
                   <option key={service.service_id} value={service.service_id}>
                     {service.service_id} - {service.name}
@@ -203,7 +200,7 @@ export const ChildServicesModal: React.FC<ChildServicesModalProps> = ({
           </div>
         </div>
 
-        {/* Таблица дочерних услуг */}
+        {}
         <div>
           <label className="block text-sm font-medium mb-2" style={labelStyles}>
             Дочерние услуги

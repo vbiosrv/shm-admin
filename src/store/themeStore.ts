@@ -4,11 +4,9 @@ import { persist } from 'zustand/middleware';
 export type ThemeMode = 'system' | 'light' | 'dark';
 
 export interface ThemeColors {
-  // Primary accent
   primaryColor: string;
   primaryColorHover: string;
   
-  // Sidebar
   sidebarBg: string;
   sidebarBorder: string;
   sidebarText: string;
@@ -17,29 +15,24 @@ export interface ThemeColors {
   sidebarItemHoverBg: string;
   sidebarItemActiveBg: string;
   
-  // Header
   headerBg: string;
   headerBorder: string;
   headerText: string;
   
-  // Main content area
   contentBg: string;
   contentText: string;
   contentTextMuted: string;
   
-  // Cards
   cardBg: string;
   cardBorder: string;
   cardHeaderBg: string;
   
-  // Inputs
   inputBg: string;
   inputBorder: string;
   inputText: string;
   inputPlaceholder: string;
   inputFocusBorder: string;
   
-  // Tables
   tableBg: string;
   tableHeaderBg: string;
   tableHeaderText: string;
@@ -48,14 +41,12 @@ export interface ThemeColors {
   tableRowAltBg: string;
   tableText: string;
   
-  // Buttons (secondary)
   buttonSecondaryBg: string;
   buttonSecondaryText: string;
   buttonSecondaryBorder: string;
   buttonSecondaryHoverBg: string;
 }
 
-// Dark theme (default)
 export const darkTheme: ThemeColors = {
   primaryColor: '#22d3ee',
   primaryColorHover: '#06b6d4',
@@ -100,7 +91,6 @@ export const darkTheme: ThemeColors = {
   buttonSecondaryHoverBg: '#475569',
 };
 
-// Light theme
 export const lightTheme: ThemeColors = {
   primaryColor: '#0891b2',
   primaryColorHover: '#0e7490',
@@ -237,11 +227,9 @@ export const useThemeStore = create<ThemeState>()(
         const { colors, resolvedTheme } = get();
         const root = document.documentElement;
         
-        // Set theme class
         root.classList.remove('light', 'dark');
         root.classList.add(resolvedTheme);
         
-        // Set CSS variables
         Object.entries(colors).forEach(([key, value]) => {
           const cssVar = `--theme-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
           root.style.setProperty(cssVar, value);
@@ -256,13 +244,11 @@ export const useThemeStore = create<ThemeState>()(
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
-          // Resolve theme after rehydration
           const resolvedTheme = resolveTheme(state.mode);
           const baseColors = resolvedTheme === 'dark' ? darkTheme : lightTheme;
           state.resolvedTheme = resolvedTheme;
           state.colors = { ...baseColors, ...state.customColors };
           
-          // Apply theme
           setTimeout(() => state.applyTheme(), 0);
         }
       },
@@ -270,12 +256,11 @@ export const useThemeStore = create<ThemeState>()(
   )
 );
 
-// Listen for system theme changes
 if (typeof window !== 'undefined') {
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
     const { mode, setMode } = useThemeStore.getState();
     if (mode === 'system') {
-      setMode('system'); // This will recalculate resolvedTheme
+      setMode('system'); 
     }
   });
 }

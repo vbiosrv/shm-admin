@@ -44,7 +44,6 @@ export default function TemplateTestModal({
       setRenderResult(response.data?.[0] || JSON.stringify(response.data, null, 2));
       toast.success('Успех');
     } catch (error) {
-      console.error('Ошибка:', error);
       toast.error('Ошибка');
     } finally {
       setRendering(false);
@@ -107,7 +106,7 @@ export default function TemplateTestModal({
       footer={renderFooter()}
     >
       <div className="space-y-4">
-        {/* Пользователь */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Пользователь *
@@ -120,7 +119,7 @@ export default function TemplateTestModal({
           </div>
         </div>
 
-        {/* USI */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             USI
@@ -135,7 +134,7 @@ export default function TemplateTestModal({
           />
         </div>
 
-        {/* Dry Run */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Dry Run
@@ -156,7 +155,7 @@ export default function TemplateTestModal({
           </label>
         </div>
 
-        {/* Результат рендера */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Результат

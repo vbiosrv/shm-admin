@@ -7,9 +7,6 @@ interface EventSelectProps {
   disabled?: boolean;
 }
 
-/**
- * Компонент выбора типа события
- */
 export default function EventSelect({
   value,
   onChange,

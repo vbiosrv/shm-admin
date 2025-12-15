@@ -29,10 +29,6 @@ const colorScales = {
   amber: ['#78350f', '#b45309', '#f59e0b', '#fbbf24', '#fcd34d'],
 };
 
-/**
- * Monthly calendar heatmap timeline component
- * Shows activity distribution across the current month
- */
 export function MonthTimeline({
   data,
   title,
@@ -48,7 +44,6 @@ export function MonthTimeline({
     return eachDayOfInterval({ start: monthStart, end: monthEnd });
   }, [monthStart, monthEnd]);
 
-  // Create a map for quick lookup
   const dataMap = useMemo(() => {
     const map = new Map<string, number>();
     data.forEach(d => {
@@ -58,12 +53,10 @@ export function MonthTimeline({
     return map;
   }, [data]);
 
-  // Calculate max value for color scaling
   const maxValue = useMemo(() => {
     return Math.max(...data.map(d => d.value), 1);
   }, [data]);
 
-  // Get color based on value intensity
   const getColor = (value: number) => {
     if (value === 0) return 'var(--theme-table-bg)';
     const scale = colorScales[colorScale];
@@ -71,18 +64,14 @@ export function MonthTimeline({
     return scale[intensity];
   };
 
-  // Get day of week header
   const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
-  // Calculate starting offset (0 = Monday)
-  const startDayOfWeek = (monthStart.getDay() + 6) % 7; // Convert Sunday=0 to Monday=0
+  const startDayOfWeek = (monthStart.getDay() + 6) % 7; 
 
-  // Group days by weeks
   const weeks = useMemo(() => {
     const result: (Date | null)[][] = [];
     let currentWeek: (Date | null)[] = [];
     
-    // Add empty cells for days before month start
     for (let i = 0; i < startDayOfWeek; i++) {
       currentWeek.push(null);
     }
@@ -95,7 +84,6 @@ export function MonthTimeline({
       }
     });
     
-    // Add remaining days and fill with nulls
     if (currentWeek.length > 0) {
       while (currentWeek.length < 7) {
         currentWeek.push(null);
@@ -106,7 +94,6 @@ export function MonthTimeline({
     return result;
   }, [daysInMonth, startDayOfWeek]);
 
-  // Calculate totals
   const totalValue = data.reduce((sum, d) => sum + d.value, 0);
   const activeDays = data.filter(d => d.value > 0).length;
 
@@ -121,7 +108,7 @@ export function MonthTimeline({
         </h3>
       )}
       
-      {/* Week day headers */}
+      {}
       <div className="grid grid-cols-7 gap-1 mb-1">
         {weekDays.map(day => (
           <div 
@@ -134,7 +121,7 @@ export function MonthTimeline({
         ))}
       </div>
 
-      {/* Calendar grid */}
+      {}
       <div className="flex flex-col gap-1">
         {weeks.map((week, weekIndex) => (
           <div key={weekIndex} className="grid grid-cols-7 gap-1">
@@ -175,9 +162,9 @@ export function MonthTimeline({
         ))}
       </div>
 
-      {/* Legend and summary */}
+      {}
       <div className="flex items-center justify-between mt-3 pt-3 border-t" style={{ borderColor: 'var(--theme-card-border)' }}>
-        {/* Color legend */}
+        {}
         <div className="flex items-center gap-1">
           <span className="text-xs mr-1" style={{ color: 'var(--theme-content-text-muted)' }}>Меньше</span>
           {[0, ...colorScales[colorScale]].map((color, idx) => (
@@ -190,7 +177,7 @@ export function MonthTimeline({
           <span className="text-xs ml-1" style={{ color: 'var(--theme-content-text-muted)' }}>Больше</span>
         </div>
 
-        {/* Summary stats */}
+        {}
         <div className="flex items-center gap-4 text-xs" style={{ color: 'var(--theme-content-text-muted)' }}>
           <span>Всего: <strong style={{ color: 'var(--theme-content-text)' }}>{valueFormatter(totalValue)}</strong></span>
           <span>Активных дней: <strong style={{ color: 'var(--theme-content-text)' }}>{activeDays}</strong></span>

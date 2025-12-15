@@ -27,17 +27,14 @@ export default function StorageModal({
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // Загрузка данных при открытии
   useEffect(() => {
     if (open && data) {
       setLoading(true);
       setViewData({ ...data });
 
-      // Определяем режим отображения по settings.json из списка
       const isJson = data.settings?.json === 1;
       setIsJsonMode(isJson);
 
-      // Загружаем полные данные через API
       shm_request(`/shm/v1/storage/manage/${data.name}?user_id=${data.user_id}`)
       .then(res => {
           let actualData = res;
@@ -54,7 +51,6 @@ export default function StorageModal({
           setViewData(fullData);
       })
         .catch((error) => {
-          console.error('Ошибка загрузки данных:', error);
           toast.error('Ошибка загрузки данных');
           setViewData({ ...data, data: null });
         })
@@ -87,7 +83,6 @@ export default function StorageModal({
 
       toast.success('Файл скачан');
     } catch (error) {
-      console.error('Ошибка скачивания:', error);
       toast.error('Ошибка скачивания');
     }
   };
@@ -108,7 +103,6 @@ export default function StorageModal({
       toast.success('Данные сохранены');
       onClose();
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -125,7 +119,6 @@ export default function StorageModal({
       onClose();
       toast.success('Запись удалена');
     } catch (error) {
-      console.error('Ошибка удаления:', error);
       toast.error('Ошибка удаления');
     } finally {
       setDeleting(false);
@@ -218,7 +211,7 @@ export default function StorageModal({
           </div>
         ) : (
         <div className="space-y-4">
-          {/* Пользователь */}
+          {}
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
               Пользователь
@@ -232,7 +225,7 @@ export default function StorageModal({
             </div>
           </div>
 
-          {/* Название */}
+          {}
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
               Название
@@ -246,7 +239,7 @@ export default function StorageModal({
             />
           </div>
 
-          {/* Данные */}
+          {}
           <div className="flex items-start gap-3">
             <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
               Данные
@@ -279,7 +272,7 @@ export default function StorageModal({
         )}
       </Modal>
 
-      {/* Модалка подтверждения удаления */}
+      {}
       <ConfirmModal
         open={confirmDeleteOpen}
         onClose={() => setConfirmDeleteOpen(false)}

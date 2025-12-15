@@ -54,10 +54,8 @@ function Spool() {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
     
-  // Получаем выбранного пользователя из store
   const { selectedUser } = useSelectedUserStore();
     
-  // Формируем externalFilters для автоматического заполнения поля user_id
   const externalFilters = useMemo(() => {
     if (selectedUser?.user_id) {
       return { user_id: String(selectedUser.user_id) };
@@ -164,7 +162,7 @@ function Spool() {
         externalFilters={externalFilters}
       />
       
-      {/* Модалка просмотра/редактирования */}
+      {}
       <SpoolModal
         open={viewModalOpen}
         onClose={() => {
@@ -175,7 +173,7 @@ function Spool() {
         onRefresh={handleRefresh}
       />
 
-      {/* Модалка создания */}
+      {}
       <SpoolCreateModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}

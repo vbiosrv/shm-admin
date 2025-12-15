@@ -46,9 +46,6 @@ import {
 
 type TimePeriod = 7 | 14 | 30 | 90 | 'month';
 
-/**
- * Analytics page with comprehensive data visualization
- */
 function Analytics() {
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<TimePeriod>('month');
@@ -101,7 +98,6 @@ function Analytics() {
       setTopCustomers(customers);
       setMrrStats(mrr);
     } catch (error) {
-      console.error('Failed to fetch analytics data:', error);
     } finally {
       setLoading(false);
     }
@@ -119,7 +115,6 @@ function Analytics() {
     { value: 'month', label: 'Текущий месяц' },
   ];
 
-  // Combine revenue and withdraw timelines for comparison chart
   const revenueComparisonData = revenueStats ? 
     revenueStats.revenueTimeline.map((item, index) => ({
       ...item,
@@ -129,14 +124,14 @@ function Analytics() {
 
   return (
     <div>
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
           <h2 className="text-xl font-bold">Аналитика</h2>
           <Help content="<b>Аналитика</b>: детальная статистика и визуализация данных системы." />
         </div>
         <div className="flex items-center gap-3">
-          {/* Period selector */}
+          {}
           <div className="flex rounded-lg overflow-hidden border" style={{ borderColor: 'var(--theme-card-border)' }}>
             {periodButtons.map((btn) => (
               <button
@@ -156,7 +151,7 @@ function Analytics() {
               </button>
             ))}
           </div>
-          {/* Refresh button */}
+          {}
           <button
             onClick={fetchAllData}
             disabled={loading}
@@ -168,7 +163,7 @@ function Analytics() {
         </div>
       </div>
 
-      {/* KPI Cards Row */}
+      {}
       <StatCardGrid columns={4}>
         <StatCard
           title="Выручка"
@@ -204,7 +199,7 @@ function Analytics() {
         />
       </StatCardGrid>
 
-      {/* Financial Metrics Row */}
+      {}
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--theme-content-text)' }}>
           Финансовые метрики
@@ -255,7 +250,7 @@ function Analytics() {
         </StatCardGrid>
       </div>
 
-      {/* Conversion & Payment Metrics Row */}
+      {}
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--theme-content-text)' }}>
           Конверсия и платежи
@@ -296,9 +291,9 @@ function Analytics() {
         </StatCardGrid>
       </div>
 
-      {/* Main Charts Row */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        {/* Revenue vs Withdraws Chart */}
+        {}
         <ChartCard
           title="Выручка и списания"
           subtitle="Сравнение по дням"
@@ -321,7 +316,7 @@ function Analytics() {
           )}
         </ChartCard>
 
-        {/* User Services by Status */}
+        {}
         <ChartCard
           title="Услуги по статусу"
           subtitle="Распределение активных услуг"
@@ -341,9 +336,9 @@ function Analytics() {
         </ChartCard>
       </div>
 
-      {/* Second Charts Row */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        {/* Payments Timeline */}
+        {}
         <ChartCard
           title="Динамика платежей"
           subtitle={period === 'month' ? 'Сумма платежей за текущий месяц' : `Сумма платежей за ${period} дней`}
@@ -364,7 +359,7 @@ function Analytics() {
           )}
         </ChartCard>
 
-        {/* New Users Timeline */}
+        {}
         <ChartCard
           title="Регистрации"
           subtitle={period === 'month' ? 'Новые пользователи за текущий месяц' : `Новые пользователи за ${period} дней`}
@@ -385,9 +380,9 @@ function Analytics() {
         </ChartCard>
       </div>
 
-      {/* Third Charts Row */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        {/* Top Services */}
+        {}
         <ChartCard
           title="Популярные услуги"
           subtitle="Топ-10 по количеству"
@@ -406,7 +401,7 @@ function Analytics() {
           )}
         </ChartCard>
 
-        {/* Payment Systems */}
+        {}
         <ChartCard
           title="Платежные системы"
           subtitle="Распределение по сумме"
@@ -426,7 +421,7 @@ function Analytics() {
           )}
         </ChartCard>
 
-        {/* Tasks Stats */}
+        {}
         <ChartCard
           title="Задачи"
           subtitle="Статистика выполнения"
@@ -449,9 +444,9 @@ function Analytics() {
         </ChartCard>
       </div>
 
-      {/* Detailed Stats Row */}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        {/* Services List */}
+        {}
         <ChartCard
           title="Детализация услуг"
           subtitle="Статистика по каждой услуге"
@@ -482,7 +477,7 @@ function Analytics() {
           )}
         </ChartCard>
 
-        {/* Server Groups */}
+        {}
         <ChartCard
           title="Серверы по группам"
           subtitle="Распределение серверов"
@@ -505,7 +500,7 @@ function Analytics() {
         </ChartCard>
       </div>
 
-      {/* Summary Cards */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
         <StatCard
           title="Всего пользователей"
@@ -539,7 +534,7 @@ function Analytics() {
         />
       </div>
 
-      {/* Top Customers */}
+      {}
       <div className="mt-6">
         <ChartCard
           title="Топ клиентов"

@@ -27,9 +27,6 @@ interface MultiLineChartProps {
   valueFormatter?: (value: number) => string;
 }
 
-/**
- * Reusable Multi-Line/Composed Chart component for comparing multiple metrics
- */
 export function MultiLineChart({
   data,
   lines,

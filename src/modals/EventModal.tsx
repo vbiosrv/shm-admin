@@ -33,7 +33,6 @@ export default function EventModal({
     if (open && data) {
       setFormData(data);
       
-      // Определяем режим на основе settings
       if (data.settings?.template_id) {
         setMode('template');
       } else if (data.settings?.cmd) {
@@ -42,10 +41,8 @@ export default function EventModal({
         setMode('default');
       }
       
-      // Сохраняем transport сервера
       setServerTransport(data.server?.transport || '');
     } else if (open && !data) {
-      // Новое событие
       setFormData({
         title: '',
         name: '',
@@ -71,7 +68,6 @@ export default function EventModal({
   };
 
   const handleSave = async () => {
-    // Валидация
     if (!formData.title?.trim()) {
       toast.error('Введите название');
       return;
@@ -87,7 +83,6 @@ export default function EventModal({
       return;
     }
     
-    // Проверка на использование AUTO для create и not_enough_money
     if (
       formData.server_gid === 0 &&
       (formData.name === 'create' || formData.name === 'not_enough_money')
@@ -112,7 +107,6 @@ export default function EventModal({
     try {
       const dataToSave = { ...formData };
       
-      // Очищаем ненужные поля в зависимости от режима
       if (mode !== 'cmd') {
         delete dataToSave.settings?.cmd;
       }
@@ -124,7 +118,6 @@ export default function EventModal({
       onClose();
       toast.success(data ? 'Событие обновлено' : 'Событие создано');
     } catch (error) {
-      console.error('Ошибка сохранения события:', error);
       toast.error('Ошибка сохранения события');
     } finally {
       setSaving(false);
@@ -140,7 +133,6 @@ export default function EventModal({
       onClose();
       toast.success('Событие удалено');
     } catch (error) {
-      console.error('Ошибка удаления события:', error);
       toast.error('Ошибка удаления события');
     }
   };
@@ -211,7 +203,7 @@ export default function EventModal({
       size="lg"
     >
       <div className="space-y-4">
-        {/* Название */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Название *
@@ -226,7 +218,7 @@ export default function EventModal({
           />
         </div>
 
-        {/* Категория и Событие */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Категория *
@@ -252,7 +244,7 @@ export default function EventModal({
           />
         </div>
 
-        {/* Группа серверов */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Группа серверов *
@@ -263,7 +255,6 @@ export default function EventModal({
               handleChange('server_gid', groupId);
               if (group) {
                 handleChange('server', group);
-                // Устанавливаем transport из группы серверов
                 setServerTransport((group as any).transport || '');
               }
             }}
@@ -272,7 +263,7 @@ export default function EventModal({
           />
         </div>
 
-        {/* Использовать */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Использовать *
@@ -289,7 +280,7 @@ export default function EventModal({
           </select>
         </div>
 
-        {/* Шаблон */}
+        {}
         {mode === 'template' && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -303,7 +294,7 @@ export default function EventModal({
           </div>
         )}
 
-        {/* Команда */}
+        {}
         {mode === 'cmd' && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -320,7 +311,7 @@ export default function EventModal({
           </div>
         )}
 
-        {/* Тема письма (для mail transport) */}
+        {}
         {serverTransport === 'mail' && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -337,7 +328,7 @@ export default function EventModal({
           </div>
         )}
 
-        {/* Settings (JSON) */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Настройки
@@ -351,7 +342,7 @@ export default function EventModal({
         </div>
       </div>
       
-      {/* Модалка подтверждения удаления */}
+      {}
       <ConfirmModal
         open={confirmDeleteOpen}
         onClose={() => setConfirmDeleteOpen(false)}

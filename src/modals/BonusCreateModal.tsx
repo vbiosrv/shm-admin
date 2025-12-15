@@ -24,7 +24,6 @@ export default function BonusCreateModal({
   });
   const [saving, setSaving] = useState(false);
 
-  // Сброс формы при открытии и автозаполнение user_id если пользователь выбран
   useEffect(() => {
     if (open) {
       setFormData({
@@ -40,7 +39,6 @@ export default function BonusCreateModal({
   };
 
   const handleSave = async () => {
-    // Валидация
     if (!formData.user_id) {
       toast.error('Выберите пользователя');
       return;
@@ -56,7 +54,6 @@ export default function BonusCreateModal({
       onClose();
       toast.success('Бонус начислен');
     } catch (error) {
-      console.error('Ошибка начисления бонуса:', error);
       toast.error('Ошибка начисления бонуса');
     } finally {
       setSaving(false);
@@ -111,7 +108,7 @@ export default function BonusCreateModal({
       size="md"
     >
       <div className="space-y-4">
-        {/* Пользователь */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Пользователь *
@@ -124,7 +121,7 @@ export default function BonusCreateModal({
           </div>
         </div>
 
-        {/* Сумма бонуса */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Сумма бонуса *
@@ -141,7 +138,7 @@ export default function BonusCreateModal({
           />
         </div>
 
-        {/* Комментарий */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Комментарий

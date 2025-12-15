@@ -17,7 +17,6 @@ export default function BonusModal({
 }: BonusModalProps) {
   const [viewData, setViewData] = useState<Record<string, any>>({});
 
-  // Синхронизация данных при открытии
   useEffect(() => {
     if (data) {
       setViewData({ ...data });
@@ -62,7 +61,7 @@ export default function BonusModal({
       size="lg"
     >
       <div className="space-y-4">
-        {/* Пользователь */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Пользователь
@@ -76,7 +75,7 @@ export default function BonusModal({
           </div>
         </div>
 
-        {/* Дата */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Дата
@@ -90,7 +89,7 @@ export default function BonusModal({
           />
         </div>
 
-        {/* Сумма бонуса */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Сумма
@@ -104,7 +103,7 @@ export default function BonusModal({
           />
         </div>
 
-        {/* Комментарий (JSON Editor readonly) */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Комментарий

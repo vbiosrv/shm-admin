@@ -13,24 +13,14 @@ interface Service {
 }
 
 interface ServiceSelectProps {
-  /** Текущий service_id */
   value?: number | null;
-  /** Callback при выборе услуги */
   onChange?: (serviceId: number | null, service: Service | null) => void;
-  /** Callback при изменении состояния загрузки */
   onLoadingChange?: (loading: boolean) => void;
-  /** Callback после обновления услуги через модалку */
   onServiceUpdated?: () => void;
-  /** Режим только для чтения */
   readonly?: boolean;
-  /** Дополнительные CSS классы */
   className?: string;
 }
 
-/**
- * Глобальный компонент выбора услуги (простой select).
- * Загружает все услуги при монтировании.
- */
 export default function ServiceSelect({
   value,
   onChange,
@@ -45,7 +35,6 @@ export default function ServiceSelect({
   const [serviceModalOpen, setServiceModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
-  // Загрузка конкретной услуги по ID (для readonly режима)
   useEffect(() => {
     if (readonly && value && !selectedService) {
       setLoadingService(true);
@@ -59,7 +48,7 @@ export default function ServiceSelect({
             setSelectedService(services[0]);
           }
         })
-        .catch(console.error)
+        .catch(() => {})
         .finally(() => {
           setLoadingService(false);
           onLoadingChange?.(false);
@@ -67,7 +56,6 @@ export default function ServiceSelect({
     }
   }, [value, readonly]);
 
-  // Загрузка всех услуг только для edit режима (select)
   useEffect(() => {
     if (!readonly) {
       setLoading(true);
@@ -79,12 +67,11 @@ export default function ServiceSelect({
           const services = Array.isArray(data) ? data : [];
           setItems(services);
           
-          // Если value не задан, выбираем первую услугу
           if ((value === null || value === undefined) && services.length > 0) {
             onChange?.(services[0].service_id, services[0]);
           }
         })
-        .catch(console.error)
+        .catch(() => {})
         .finally(() => {
           setLoading(false);
           onLoadingChange?.(false);
@@ -92,7 +79,6 @@ export default function ServiceSelect({
     }
   }, [readonly]);
 
-  // Уведомляем родителя об изменении состояния загрузки
   useEffect(() => {
     onLoadingChange?.(loading || loadingService);
   }, [loading, loadingService, onLoadingChange]);
@@ -103,7 +89,6 @@ export default function ServiceSelect({
     onChange?.(serviceId, service);
   };
 
-  // Обработчики для ServiceModal
   const handleOpenServiceModal = () => {
     if (selectedService) {
       setServiceModalOpen(true);
@@ -116,7 +101,6 @@ export default function ServiceSelect({
       body: JSON.stringify(serviceData),
     });
     
-    // Перезагружаем данные услуги
     if (value) {
       const res = await shm_request(`/shm/v1/admin/service?service_id=${value}&limit=1`);
       const data = res.data || res;
@@ -142,7 +126,6 @@ export default function ServiceSelect({
     color: 'var(--theme-input-text)',
   };
 
-  // Skeleton при загрузке
   if (loadingService) {
     return (
       <div 
@@ -161,7 +144,6 @@ export default function ServiceSelect({
     );
   }
 
-  // Readonly режим
   if (readonly) {
     const currentService = selectedService;
     return (
@@ -204,7 +186,6 @@ export default function ServiceSelect({
     );
   }
 
-  // Select режим (для редактирования)
   if (loading) {
     return (
       <div 
@@ -223,7 +204,6 @@ export default function ServiceSelect({
     );
   }
 
-  // Select режим
   return (
     <select
       value={value ?? ''}

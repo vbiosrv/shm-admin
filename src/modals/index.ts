@@ -1,4 +1,3 @@
-// Экспорт всех модальных окон
 export { default as UserModal } from './UserModal';
 export { default as UserCreateModal } from './UserCreateModal';
 export { default as UserChangePasswordModal } from './UserChangePasswordModal';
@@ -26,7 +25,3 @@ export { default as SpoolHistoryModal } from './SpoolHistoryModal';
 export { default as ConfigModal } from './ConfigModal';
 export { default as ConfigCreateModal } from './ConfigCreateModal';
 
-// Будут добавлены по мере необходимости:
-// export { default as ServiceModal } from './ServiceModal';
-// export { default as ServerModal } from './ServerModal';
-// и т.д.

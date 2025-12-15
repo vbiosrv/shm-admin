@@ -30,12 +30,10 @@ export default function JsonEditor({
   const containerRef = useRef<HTMLDivElement>(null);
   const dataRef = useRef<any>(data);
 
-  // Обновляем ref при изменении data
   useEffect(() => {
     dataRef.current = data;
   }, [data]);
 
-  // Инициализация редактора при открытии модалки или inline режиме
   useEffect(() => {
     const shouldInitialize = inline || modalOpen;
     
@@ -49,12 +47,10 @@ export default function JsonEditor({
               try {
                 const parsedData = JSON.parse(jsonString);
                 dataRef.current = parsedData;
-                // Для inline режима вызываем onChange сразу
                 if (inline && onChange) {
                   onChange(parsedData);
                 }
               } catch (e) {
-                // Игнорируем ошибки парсинга во время редактирования
               }
             }
           },
@@ -65,16 +61,13 @@ export default function JsonEditor({
         editorRef.current = new JSONEditor(containerRef.current, options);
         editorRef.current.set(dataRef.current || {});
         
-        // Добавляем класс для скрытия ненужных кнопок
         if (containerRef.current) {
           containerRef.current.classList.add('jsoneditor-hide-sort-transform');
         }
       } catch (e) {
-        console.error('Failed to initialize JSON editor:', e);
       }
     }
 
-    // Cleanup при закрытии модалки (но не для inline режима)
     return () => {
       if (!inline && !modalOpen && editorRef.current) {
         editorRef.current.destroy();
@@ -94,7 +87,6 @@ export default function JsonEditor({
         const jsonData = editorRef.current.get();
         onChange(jsonData);
       } catch (e) {
-        console.error('Failed to get JSON data:', e);
         return;
       }
     }
@@ -111,7 +103,6 @@ export default function JsonEditor({
         setTimeout(() => setCopied(false), 2000);
       }
     } catch (e) {
-      console.error('Failed to copy:', e);
     }
   };
 
@@ -125,7 +116,6 @@ export default function JsonEditor({
     }
   };
 
-  // Если inline режим, показываем только редактор
   if (inline) {
     return (
       <div className={className} style={{ width: '100%' }}>

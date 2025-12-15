@@ -74,7 +74,6 @@ export default function ServerGroupModal({
       if (onRefresh) onRefresh();
       toast.success('Группа серверов сохранена');
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -97,7 +96,6 @@ export default function ServerGroupModal({
       if (onRefresh) onRefresh();
       toast.success('Группа серверов удалена');
     } catch (error) {
-      console.error('Ошибка удаления:', error);
       toast.error('Ошибка удаления');
     } finally {
       setDeleting(false);
@@ -166,7 +164,7 @@ export default function ServerGroupModal({
       size="lg"
     >
       <div className="space-y-4">
-        {/* ID (только при редактировании) */}
+        {}
         {data?.group_id && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -182,7 +180,7 @@ export default function ServerGroupModal({
           </div>
         )}
 
-        {/* Название */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Название <span className="text-red-500">*</span>
@@ -197,7 +195,7 @@ export default function ServerGroupModal({
           />
         </div>
 
-        {/* Тип */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Тип <span className="text-red-500">*</span>
@@ -216,7 +214,7 @@ export default function ServerGroupModal({
           </select>
         </div>
 
-        {/* Транспорт */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Транспорт <span className="text-red-500">*</span>

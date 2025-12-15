@@ -22,7 +22,6 @@ export default function UserChangePasswordModal({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [saving, setSaving] = useState(false);
 
-  // Сброс формы при открытии
   useEffect(() => {
     if (open) {
       setPassword('');
@@ -31,7 +30,6 @@ export default function UserChangePasswordModal({
   }, [open]);
 
   const handleSave = async () => {
-    // Валидация
     if (!password.trim()) {
       toast.error('Введите новый пароль');
       return;
@@ -51,7 +49,6 @@ export default function UserChangePasswordModal({
       onClose();
       toast.success('Пароль успешно изменён');
     } catch (error) {
-      console.error('Ошибка смены пароля:', error);
       toast.error('Ошибка смены пароля');
     } finally {
       setSaving(false);
@@ -106,7 +103,7 @@ export default function UserChangePasswordModal({
       size="md"
     >
       <div className="space-y-4">
-        {/* Новый пароль */}
+        {}
         <div className="flex items-center gap-4">
           <label className="w-40 text-sm font-medium shrink-0" style={labelStyles}>
             Новый пароль <span className="text-red-500">*</span>
@@ -121,7 +118,7 @@ export default function UserChangePasswordModal({
           />
         </div>
 
-        {/* Подтверждение пароля */}
+        {}
         <div className="flex items-center gap-4">
           <label className="w-40 text-sm font-medium shrink-0" style={labelStyles}>
             Подтвердите пароль <span className="text-red-500">*</span>

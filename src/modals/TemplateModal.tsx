@@ -41,7 +41,6 @@ export default function TemplateModal({
   const [confirmCloseTabOpen, setConfirmCloseTabOpen] = useState(false);
   const [tabToClose, setTabToClose] = useState<string | null>(null);
 
-  // Загрузка табов из localStorage при монтировании
   useEffect(() => {
     const savedTabs = localStorage.getItem('templateEditorTabs');
     if (savedTabs) {
@@ -53,12 +52,10 @@ export default function TemplateModal({
           setIsMinimized(true);
         }
       } catch (e) {
-        console.error('Error loading saved tabs:', e);
       }
     }
   }, []);
 
-  // Сохранение табов в localStorage
   useEffect(() => {
     if (tabs.length > 0) {
       localStorage.setItem('templateEditorTabs', JSON.stringify({ tabs, activeTabId }));
@@ -67,19 +64,15 @@ export default function TemplateModal({
     }
   }, [tabs, activeTabId]);
 
-  // Загрузка данных шаблона с сервера
   useEffect(() => {
     if (open && data?.id) {
-      // Разминимизируем если был свернут
       if (isMinimized) {
         setIsMinimized(false);
         setIsFullscreen(true);
       }
       
-      // Проверяем есть ли уже такой таб
       const existingTab = tabs.find(t => t.template.id === data.id);
       if (existingTab) {
-        // Просто переключаемся на него в fullscreen
         setIsFullscreen(true);
         setActiveTabId(existingTab.id);
         setFormData({ ...existingTab.template, is_add: 0 });
@@ -87,14 +80,12 @@ export default function TemplateModal({
         return;
       }
       
-      // Открываем в fullscreen только если уже есть табы
       if (tabs.length > 0) {
         setIsFullscreen(true);
       } else {
-        setIsFullscreen(false); // Первый таб - обычный режим
+        setIsFullscreen(false); 
       }
       
-      // Загружаем новый шаблон
       setLoading(true);
       shm_request(`/shm/v1/admin/template?id=${data.id}`)
         .then(res => {
@@ -102,7 +93,6 @@ export default function TemplateModal({
           setFormData({ ...templateData, is_add: 0 });
           detectLanguage(templateData.data || '');
           
-          // Добавляем к существующим табам
           const newTab = {
             id: templateData.id,
             template: templateData,
@@ -112,20 +102,18 @@ export default function TemplateModal({
           setActiveTabId(templateData.id);
         })
         .catch(err => {
-          console.error('Ошибка загрузки шаблона:', err);
           toast.error('Ошибка загрузки шаблона');
           setFormData({ ...data, is_add: 0 });
         })
         .finally(() => setLoading(false));
     } else if (open && !data?.id) {
-      // Разминимизируем если был свернут
       if (isMinimized) {
         setIsMinimized(false);
         setIsFullscreen(true);
       } else if (tabs.length > 0) {
         setIsFullscreen(true);
       } else {
-        setIsFullscreen(false); // Первый таб - обычный режим
+        setIsFullscreen(false); 
       }
       
       setFormData({ is_add: 1, data: '', settings: {} });
@@ -169,7 +157,7 @@ export default function TemplateModal({
       content.includes('<%') || content.includes('%>') ||
       content.includes('{{') || content.includes('}}')
     ) {
-      setEditorLanguage('html'); // Template Toolkit как HTML
+      setEditorLanguage('html'); 
     } else if (
       content.includes('<html') || content.includes('<!DOCTYPE') ||
       content.includes('<head>') || content.includes('<body>')
@@ -186,7 +174,6 @@ export default function TemplateModal({
 
   const handleEditorChange = (value: string | undefined) => {
     handleChange('data', value || '');
-    // Помечаем таб как изменённый и обновляем данные
     if (activeTabId) {
       setTabs(prev => prev.map(t => 
         t.id === activeTabId ? { 
@@ -199,11 +186,9 @@ export default function TemplateModal({
   };
   
   const handleTemplateSelect = (template: any) => {
-    // Проверяем есть ли уже такой таб
     const existingTab = tabs.find(t => t.template.id === template.id);
     if (existingTab) {
       setActiveTabId(existingTab.id);
-      // Загружаем свежие данные
       setLoading(true);
       shm_request(`/shm/v1/admin/template?id=${template.id}`)
         .then(res => {
@@ -212,14 +197,12 @@ export default function TemplateModal({
           detectLanguage(templateData.data || '');
         })
         .catch(err => {
-          console.error('Ошибка загрузки шаблона:', err);
           toast.error('Ошибка загрузки шаблона');
         })
         .finally(() => setLoading(false));
       return;
     }
     
-    // Загружаем новый шаблон
     setLoading(true);
     shm_request(`/shm/v1/admin/template?id=${template.id}`)
       .then(res => {
@@ -235,7 +218,6 @@ export default function TemplateModal({
         detectLanguage(templateData.data || '');
       })
       .catch(err => {
-        console.error('Ошибка загрузки шаблона:', err);
         toast.error('Ошибка загрузки шаблона');
       })
       .finally(() => setLoading(false));
@@ -249,7 +231,6 @@ export default function TemplateModal({
       return;
     }
     
-    // Закрываем таб без подтверждения
     closeTabById(tabId);
   };
   
@@ -262,12 +243,10 @@ export default function TemplateModal({
         const newActiveTab = newTabs[newTabs.length - 1];
         setActiveTabId(newActiveTab.id);
         
-        // Если это новый шаблон
         if (newActiveTab.id.startsWith('new-')) {
           setFormData({ ...newActiveTab.template, is_add: 1 });
           detectLanguage(newActiveTab.template.data || '');
         } else {
-          // Загружаем существующий шаблон
           setLoading(true);
           shm_request(`/shm/v1/admin/template?id=${newActiveTab.template.id}`)
             .then(res => {
@@ -276,13 +255,11 @@ export default function TemplateModal({
               detectLanguage(templateData.data || '');
             })
             .catch(err => {
-              console.error('Ошибка загрузки шаблона:', err);
               toast.error('Ошибка загрузки шаблона');
             })
             .finally(() => setLoading(false));
         }
       } else {
-        // Последний таб закрыт - минимизируем вместо полного закрытия
         setActiveTabId(null);
         setIsMinimized(true);
         setIsFullscreen(false);
@@ -300,7 +277,6 @@ export default function TemplateModal({
       await onSave(formData);
       toast.success('Шаблон сохранён');
       
-      // Сбрасываем флаг несохранённых изменений
       if (activeTabId) {
         setTabs(prev => prev.map(t => 
           t.id === activeTabId ? { 
@@ -311,7 +287,6 @@ export default function TemplateModal({
         ));
       }
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -330,7 +305,6 @@ export default function TemplateModal({
       toast.success('Шаблон сохранён');
       setTestModalOpen(true);
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -347,7 +321,6 @@ export default function TemplateModal({
       onClose();
       toast.success('Шаблон удалён');
     } catch (error) {
-      console.error('Ошибка удаления:', error);
       toast.error('Ошибка удаления');
     } finally {
       setDeleting(false);
@@ -369,14 +342,12 @@ export default function TemplateModal({
   const [confirmCloseAllOpen, setConfirmCloseAllOpen] = useState(false);
 
   const handleClose = () => {
-    // Проверяем есть ли несохранённые изменения
     const hasUnsaved = tabs.some(t => t.hasUnsavedChanges);
     if (hasUnsaved) {
       setConfirmCloseAllOpen(true);
       return;
     }
     
-    // Очищаем все табы
     closeAllTabs();
   };
   
@@ -387,9 +358,7 @@ export default function TemplateModal({
     onClose();
   };
   
-  // Обработчик закрытия модалки (крестик в обычном режиме)
   const handleModalClose = () => {
-    // Если один таб и мы в обычном режиме - закрываем полностью
     if (tabs.length === 1 && !isFullscreen) {
       const hasUnsaved = tabs.some(t => t.hasUnsavedChanges);
       if (hasUnsaved) {
@@ -398,7 +367,6 @@ export default function TemplateModal({
       }
       closeAllTabs();
     } 
-    // Если несколько табов в обычном режиме - удаляем активный и минимизируем
     else if (tabs.length > 1 && !isFullscreen) {
       const activeTab = tabs.find(t => t.id === activeTabId);
       if (activeTab?.hasUnsavedChanges) {
@@ -406,19 +374,16 @@ export default function TemplateModal({
         setConfirmCloseTabOpen(true);
         return;
       }
-      // Удаляем активный таб
       closeTabById(activeTabId!);
       setIsMinimized(true);
       setIsFullscreen(false);
     }
-    // Если нет табов - просто закрываем
     else {
       onClose();
     }
   };
 
   const handleCloseTab = () => {
-    // Если один таб - проверяем несохраненные изменения
     if (tabs.length === 1) {
       const hasUnsaved = tabs.some(t => t.hasUnsavedChanges);
       if (hasUnsaved) {
@@ -426,17 +391,15 @@ export default function TemplateModal({
         setConfirmCloseTabOpen(true);
         return;
       }
-      // Закрываем таб полностью и очищаем localStorage
       setTabs([]);
       setActiveTabId(null);
       localStorage.removeItem('templateEditorTabs');
-      setIsMinimized(false); // Сбрасываем минимизацию
+      setIsMinimized(false); 
       setIsFullscreen(false);
-      onClose(); // Закрываем модалку полностью
+      onClose(); 
       return;
     }
     
-    // Иначе - закрываем только активный таб
     if (activeTabId) {
       handleTabClose(activeTabId);
     }
@@ -552,7 +515,6 @@ export default function TemplateModal({
     </div>
   );
 
-  // Отображаем плавающую кнопку если минимизировано и есть табы
   if (isMinimized && tabs.length > 0 && !open) {
     const hasUnsaved = tabs.some(t => t.hasUnsavedChanges);
     return (
@@ -578,7 +540,6 @@ export default function TemplateModal({
     );
   }
   
-  // Если минимизировано и табов нет - ничего не показываем
   if (isMinimized && tabs.length === 0) {
     return null;
   }
@@ -593,7 +554,7 @@ export default function TemplateModal({
             zIndex: 9999,
           }}
         >
-          {/* Header */}
+          {}
           <div
             className="flex items-center justify-between px-4 py-3 border-b"
             style={{
@@ -604,7 +565,7 @@ export default function TemplateModal({
             <h2 className="text-lg font-semibold" style={{ color: 'var(--theme-content-text)' }}>
               {isAdd ? 'Создание шаблона' : `Редактирование: ${formData.id || ''}`}
             </h2>
-          {/* Tabs */}
+          {}
           {tabs.length > 1 && (
             <div
               className="flex gap-1 px-1 overflow-x-auto"
@@ -621,25 +582,21 @@ export default function TemplateModal({
                       setActiveTabId(tab.id);
                       const templateToLoad = tab.template.id || tab.id;
                       
-                      // Если это новый шаблон
                       if (tab.id.startsWith('new-')) {
                         setFormData({ ...tab.template, is_add: 1 });
                         detectLanguage(tab.template.data || '');
                       } else {
-                        // Загружаем существующий шаблон
                         setLoading(true);
                         shm_request(`/shm/v1/admin/template?id=${templateToLoad}`)
                           .then(res => {
                             const templateData = res.data?.[0] || res.data;
                             setFormData({ ...templateData, is_add: 0 });
                             detectLanguage(templateData.data || '');
-                            // Обновляем данные таба
                             setTabs(prev => prev.map(t => 
                               t.id === tab.id ? { ...t, template: templateData } : t
                             ));
                           })
                           .catch(err => {
-                            console.error('Ошибка загрузки шаблона:', err);
                             toast.error('Ошибка загрузки шаблона');
                           })
                           .finally(() => setLoading(false));
@@ -667,7 +624,6 @@ export default function TemplateModal({
             </div>
           )}
 
-
             <button
               onClick={handleCloseTab}
               className="px-3 py-1.5 rounded flex items-center gap-2"
@@ -681,9 +637,9 @@ export default function TemplateModal({
               <X className="w-4 h-4" />
             </button>
           </div>
-          {/* Main content with sidebar */}
+          {}
           <div className="flex flex-1 overflow-hidden">
-            {/* Sidebar */}
+            {}
             <div
               className="w-64 border-r overflow-y-auto"
               style={{
@@ -708,7 +664,7 @@ export default function TemplateModal({
               />
             </div>
             
-            {/* Editor content */}
+            {}
             <div className="flex-1 flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--theme-content-bg)' }}>
               {loading ? (
                 <div className="flex items-center justify-center flex-1">
@@ -716,7 +672,7 @@ export default function TemplateModal({
                 </div>
               ) : (
                 <div className="flex-1 flex flex-col p-4 min-h-0">
-                  {/* ID шаблона и язык в одной строке */}
+                  {}
                   <div className="flex items-center gap-3 mb-3">
                     <label className="text-sm font-medium shrink-0" style={{ color: 'var(--theme-content-text-muted)' }}>
                       ID *
@@ -769,7 +725,7 @@ export default function TemplateModal({
                     </div>
                   </div>
 
-                  {/* Monaco Editor для data */}
+                  {}
                   <div className="flex-1 flex items-start gap-3 mb-3 min-h-0">
                     <div className="flex-1 border rounded overflow-hidden h-full" style={{ borderColor: 'var(--theme-input-border)', backgroundColor: 'var(--theme-input-bg)' }}>
                       <Editor
@@ -796,7 +752,7 @@ export default function TemplateModal({
                     </div>
                   </div>
 
-                  {/* JsonEditor для settings */}
+                  {}
                   <div className="flex items-start gap-3">
                     <label className="w-24 text-sm font-medium shrink-0 pt-2" style={{ color: 'var(--theme-content-text-muted)' }}>
                       Settings
@@ -811,7 +767,7 @@ export default function TemplateModal({
                 </div>
               )}
               
-              {/* Footer */}
+              {}
               <div
                 className="border-t p-4"
                 style={{
@@ -838,7 +794,7 @@ export default function TemplateModal({
             </div>
           ) : (
             <div className="space-y-4">
-            {/* ID шаблона */}
+            {}
             <div className="flex items-center gap-3">
               <label className="w-24 text-sm font-medium shrink-0" style={labelStyles}>
                 ID *
@@ -855,7 +811,7 @@ export default function TemplateModal({
               />
             </div>
 
-          {/* Переключатель языка */}
+          {}
           <div className="flex items-center gap-2">
             <label className="w-24 text-sm font-medium shrink-0" style={labelStyles}>
               Язык
@@ -892,7 +848,7 @@ export default function TemplateModal({
             </div>
           </div>
 
-          {/* Monaco Editor для data */}
+          {}
           <div className="flex items-start gap-3">
             <label className="w-24 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
               Данные
@@ -922,7 +878,7 @@ export default function TemplateModal({
             </div>
           </div>
 
-          {/* JsonEditor для settings */}
+          {}
           <div className="flex items-start gap-3">
             <label className="w-24 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
               Settings
@@ -939,7 +895,7 @@ export default function TemplateModal({
         </Modal>
       )}
 
-      {/* Модалка подтверждения удаления */}
+      {}
       <div style={{ position: 'relative', zIndex: 10001 }}>
         <ConfirmModal
           open={confirmDeleteOpen}
@@ -955,7 +911,7 @@ export default function TemplateModal({
         />
       </div>
 
-      {/* Модалка подтверждения закрытия таба с несохраненными изменениями */}
+      {}
       <div style={{ position: 'relative', zIndex: 10001 }}>
         <ConfirmModal
           open={confirmCloseTabOpen}
@@ -978,7 +934,7 @@ export default function TemplateModal({
         />
       </div>
 
-      {/* Модалка подтверждения закрытия всех табов */}
+      {}
       <div style={{ position: 'relative', zIndex: 10001 }}>
         <ConfirmModal
           open={confirmCloseAllOpen}
@@ -995,7 +951,7 @@ export default function TemplateModal({
         />
       </div>
 
-      {/* Модалка теста/рендера шаблона */}
+      {}
       <div style={{ position: 'relative', zIndex: 10001 }}>
         <TemplateTestModal
           open={testModalOpen}

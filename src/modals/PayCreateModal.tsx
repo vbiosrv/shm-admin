@@ -25,7 +25,6 @@ export default function PayCreateModal({
   });
   const [saving, setSaving] = useState(false);
 
-  // Сброс формы при открытии и автозаполнение user_id если пользователь выбран
   useEffect(() => {
     if (open) {
       setFormData({
@@ -42,7 +41,6 @@ export default function PayCreateModal({
   };
 
   const handleSave = async () => {
-    // Валидация
     if (!formData.user_id) {
       toast.error('Выберите пользователя');
       return;
@@ -62,7 +60,6 @@ export default function PayCreateModal({
       onClose();
       toast.success('Платёж создан');
     } catch (error) {
-      console.error('Ошибка создания платежа:', error);
       toast.error('Ошибка создания платежа');
     } finally {
       setSaving(false);
@@ -117,7 +114,7 @@ export default function PayCreateModal({
       size="md"
     >
       <div className="space-y-4">
-        {/* Пользователь */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Пользователь *
@@ -130,7 +127,7 @@ export default function PayCreateModal({
           </div>
         </div>
 
-        {/* Платёжная система */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Платёжная система *
@@ -146,7 +143,7 @@ export default function PayCreateModal({
           </select>
         </div>
 
-        {/* Сумма */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Сумма *
@@ -163,7 +160,7 @@ export default function PayCreateModal({
           />
         </div>
 
-        {/* Комментарий */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Комментарий

@@ -153,7 +153,7 @@ function ServerGroups() {
         storageKey="server-groups"
       />
       
-      {/* Модалка редактирования */}
+      {}
       <ServerGroupModal
         open={editModalOpen}
         onClose={() => {
@@ -166,7 +166,7 @@ function ServerGroups() {
         onRefresh={handleRefresh}
       />
 
-      {/* Модалка создания */}
+      {}
       <ServerGroupCreateModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}

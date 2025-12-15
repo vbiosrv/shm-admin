@@ -37,9 +37,6 @@ import {
   MRRStats,
 } from '../lib/analyticsApi';
 
-/**
- * Main Dashboard page with key metrics overview
- */
 function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<AnalyticsStats | null>(null);
@@ -80,7 +77,6 @@ function Dashboard() {
       setMrrStats(mrr);
       
     } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
     } finally {
       setLoading(false);
     }
@@ -107,7 +103,7 @@ function Dashboard() {
 
   return (
     <div>
-      {/* Header */}
+      {}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-bold">Главная</h2>
@@ -125,7 +121,7 @@ function Dashboard() {
         </button>
       </div>
 
-      {/* Main KPI Cards */}
+      {}
       <StatCardGrid columns={4}>
         <StatCard
           title="Пользователи"
@@ -161,7 +157,7 @@ function Dashboard() {
         />
       </StatCardGrid>
 
-      {/* Revenue Summary */}
+      {}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         <StatCard
           title="Выручка (7 дней)"
@@ -186,54 +182,11 @@ function Dashboard() {
         />
       </div>
 
-      {/* Key Financial Metrics 
-      <div className="mt-6">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold" style={{ color: 'var(--theme-content-text)' }}>
-            Ключевые метрики
-          </h3>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard
-            title="MRR"
-            value={mrrStats ? formatMoney(Math.round(mrrStats.mrr)) : '...'}
-            icon={Repeat}
-            color="emerald"
-            subtitle={mrrStats && mrrStats.mrrGrowth !== 0 
-              ? `${mrrStats.mrrGrowth > 0 ? '↑' : '↓'} ${Math.abs(mrrStats.mrrGrowth).toFixed(1)}%` 
-              : undefined}
-            loading={loading}
-          />
-          <StatCard
-            title="ARPU"
-            value={financialMetrics ? formatMoney(Math.round(financialMetrics.arpu)) : '...'}
-            icon={Target}
-            color="blue"
-            subtitle="На пользователя"
-            loading={loading}
-          />
-          <StatCard
-            title="Конверсия"
-            value={financialMetrics ? `${financialMetrics.conversionRate.toFixed(1)}%` : '...'}
-            icon={PieChart}
-            color={financialMetrics && financialMetrics.conversionRate > 20 ? 'emerald' : 'amber'}
-            subtitle={`${financialMetrics?.payingUsersCount || 0} платящих`}
-            loading={loading}
-          />
-          <StatCard
-            title="Ср. чек"
-            value={financialMetrics ? formatMoney(Math.round(financialMetrics.avgRevenuePerPayment)) : '...'}
-            icon={ShoppingCart}
-            color="cyan"
-            subtitle="На платёж"
-            loading={loading}
-          />
-        </div>
-      </div>
-      */}
-      {/* Charts Row */}
+      {
+}
+      {}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        {/* Revenue Chart */}
+        {}
         <ChartCard
           title="Динамика платежей"
           subtitle="За последние 7 дней"
@@ -255,7 +208,7 @@ function Dashboard() {
           )}
         </ChartCard>
 
-        {/* Services by Status */}
+        {}
         <ChartCard
           title="Услуги по статусу"
           subtitle="Текущее распределение"
@@ -286,7 +239,7 @@ function Dashboard() {
         </ChartCard>
       </div>
 
-      {/* Quick Links */}
+      {}
       <div className="mt-6">
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {[

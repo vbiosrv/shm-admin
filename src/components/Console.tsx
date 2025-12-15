@@ -39,7 +39,6 @@ export default function Console({ pipelineId }: ConsoleProps) {
           const text = log.replace(/\n\r?|\r\n?/g, '<br/>');
           consoleRef.current.innerHTML += text;
 
-          // Auto scroll
           if (consoleRef.current.parentElement) {
             consoleRef.current.parentElement.scrollTop = consoleRef.current.parentElement.scrollHeight;
           }
@@ -53,7 +52,6 @@ export default function Console({ pipelineId }: ConsoleProps) {
           setLoading(false);
         }
       } catch (error) {
-        console.error('Ошибка загрузки логов:', error);
         setLoading(false);
       }
     };

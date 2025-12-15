@@ -14,9 +14,7 @@ interface ConfirmModalProps {
   cancelText?: string;
   variant?: ConfirmVariant;
   loading?: boolean;
-  /** Слово, которое нужно ввести для подтверждения (например "delete") */
   confirmWord?: string;
-  /** Подсказка для поля ввода слова */
   confirmWordHint?: string;
 }
 
@@ -59,7 +57,6 @@ export default function ConfirmModal({
   const config = variantConfig[variant];
   const [inputValue, setInputValue] = useState('');
   
-  // Сброс при открытии/закрытии
   useEffect(() => {
     if (!open) {
       setInputValue('');
@@ -158,7 +155,6 @@ export default function ConfirmModal({
   );
 }
 
-// Хук для удобного использования confirm модалки
 interface UseConfirmOptions {
   title?: string;
   message: string | React.ReactNode;

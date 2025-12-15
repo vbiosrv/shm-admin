@@ -63,7 +63,6 @@ export default function SpoolModal({
       if (onRefresh) onRefresh();
       toast.success('Задача сохранена');
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -82,7 +81,6 @@ export default function SpoolModal({
       if (onRefresh) onRefresh();
       toast.success('Задача приостановлена');
     } catch (error) {
-      console.error('Ошибка:', error);
       toast.error('Ошибка приостановки');
     } finally {
       setActionLoading(false);
@@ -101,7 +99,6 @@ export default function SpoolModal({
       if (onRefresh) onRefresh();
       toast.success('Задача запущена');
     } catch (error) {
-      console.error('Ошибка:', error);
       toast.error('Ошибка запуска');
     } finally {
       setActionLoading(false);
@@ -120,7 +117,6 @@ export default function SpoolModal({
       if (onRefresh) onRefresh();
       toast.success('Задача повторяется');
     } catch (error) {
-      console.error('Ошибка:', error);
       toast.error('Ошибка повтора');
     } finally {
       setActionLoading(false);
@@ -139,7 +135,6 @@ export default function SpoolModal({
       if (onRefresh) onRefresh();
       toast.success('Задача считается успешной');
     } catch (error) {
-      console.error('Ошибка:', error);
       toast.error('Ошибка');
     } finally {
       setActionLoading(false);
@@ -161,7 +156,6 @@ export default function SpoolModal({
       if (onRefresh) onRefresh();
       toast.success('Задача удалена');
     } catch (error) {
-      console.error('Ошибка удаления:', error);
       toast.error('Ошибка удаления');
     } finally {
       setDeleting(false);
@@ -272,7 +266,7 @@ export default function SpoolModal({
       size="xl"
     >
       <div className="space-y-4">
-        {/* Событие */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Событие
@@ -286,7 +280,7 @@ export default function SpoolModal({
           />
         </div>
 
-        {/* Статус с действиями */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Статус
@@ -354,7 +348,7 @@ export default function SpoolModal({
           </div>
         </div>
 
-        {/* Пользователь */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Пользователь
@@ -368,7 +362,7 @@ export default function SpoolModal({
           />
         </div>
 
-        {/* Услуга */}
+        {}
         {formData.settings?.user_service_id && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -384,7 +378,7 @@ export default function SpoolModal({
           </div>
         )}
 
-        {/* Даты */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Создана
@@ -408,7 +402,7 @@ export default function SpoolModal({
           />
         </div>
 
-        {/* Отложена */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Отложена
@@ -423,7 +417,7 @@ export default function SpoolModal({
           />
         </div>
 
-        {/* Console Button */}
+        {}
         {formData.response?.pipeline_id && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -443,7 +437,7 @@ export default function SpoolModal({
           </div>
         )}
 
-        {/* Response */}
+        {}
         {formData.response && (
           <div className="flex items-start gap-3">
             <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
@@ -460,7 +454,7 @@ export default function SpoolModal({
           </div>
         )}
 
-        {/* Event */}
+        {}
         {formData.event && (
           <div className="flex items-start gap-3">
             <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
@@ -477,7 +471,7 @@ export default function SpoolModal({
           </div>
         )}
 
-        {/* Settings */}
+        {}
           <div className="flex items-start gap-3">
             <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
               Settings

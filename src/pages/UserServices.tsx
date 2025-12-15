@@ -64,10 +64,8 @@ function UserServices() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
-  // Получаем выбранного пользователя из store
   const { selectedUser } = useSelectedUserStore();
 
-  // Формируем externalFilters для автоматического заполнения поля user_id
   const externalFilters = useMemo(() => {
     if (selectedUser?.user_id) {
       return { user_id: String(selectedUser.user_id) };
@@ -113,7 +111,6 @@ function UserServices() {
 
   const handleFilterChange = useCallback((newFilters: Record<string, string>) => {
     setFilters(prevFilters => {
-      // Проверяем, действительно ли фильтры изменились
       const filtersChanged = JSON.stringify(prevFilters) !== JSON.stringify(newFilters);
       if (filtersChanged) {
         setOffset(0);
@@ -141,7 +138,6 @@ function UserServices() {
   };
 
   const handleSaveNew = async (serviceData: any) => {
-    // Создание услуги через service/order
     await shm_request('/shm/v1/admin/service/order', {
       method: 'PUT',
       body: JSON.stringify(serviceData),
@@ -199,7 +195,7 @@ function UserServices() {
         externalFilters={externalFilters}
       />
       
-      {/* Модалка редактирования */}
+      {}
       <UserServiceModal
         open={editModalOpen}
         onClose={() => {
@@ -212,7 +208,7 @@ function UserServices() {
         onRefresh={handleRefresh}
       />
 
-      {/* Модалка создания */}
+      {}
       <UserServiceCreateModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}

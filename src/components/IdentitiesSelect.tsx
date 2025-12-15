@@ -60,14 +60,12 @@ export default function IdentitiesSelect({
       const { data } = normalizeListResponse(res);
       setIdentities(data);
     } catch (error) {
-      console.error('Failed to load identities:', error);
     } finally {
       setLoading(false);
       onLoadingChange?.(false);
     }
   };
 
-  // Загрузка конкретного ключа по ID
   useEffect(() => {
     if (value && lastLoadedIdRef.current !== value) {
       const found = identities.find((i) => i.id === value);
@@ -84,13 +82,11 @@ export default function IdentitiesSelect({
               });
             }
           })
-          .catch(err => console.error('Failed to load identity:', err))
+          .catch(err => )
           .finally(() => setLoadingIdentity(false));
       } else if (!found && loading) {
-        // Если список еще грузится, показываем skeleton
         setLoadingIdentity(true);
       } else if (found) {
-        // Ключ найден, убираем skeleton
         setLoadingIdentity(false);
         lastLoadedIdRef.current = value;
       }
@@ -204,8 +200,6 @@ export default function IdentitiesSelect({
         <button
           type="button"
           onClick={() => {
-            // TODO: Открыть модалку создания ключа
-            console.log('Add identity clicked');
           }}
           className="p-2 rounded border shrink-0"
           style={{

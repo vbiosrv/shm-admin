@@ -132,7 +132,7 @@ export default function SelectedUserDropdown() {
                 border: '1px solid var(--theme-card-border)',
               }}
             >
-              {/* User info header */}
+              {}
               <div 
                 className="px-4 py-2 border-b"
                 style={{
@@ -147,7 +147,7 @@ export default function SelectedUserDropdown() {
                 </div>
               </div>
 
-              {/* Menu items */}
+              {}
               {menuItems.map((item, index) => {
                 const Icon = item.icon;
                 return (
@@ -172,7 +172,7 @@ export default function SelectedUserDropdown() {
                 );
               })}
 
-              {/* Close button */}
+              {}
               <div 
                 className="border-t mt-1 pt-1"
                 style={{
@@ -205,13 +205,12 @@ export default function SelectedUserDropdown() {
         )}
       </div>
 
-      {/* User Profile Modal */}
+      {}
       <UserModal
         open={userModalOpen}
         onClose={() => setUserModalOpen(false)}
         data={selectedUser}
         onSave={async () => {
-          // Перезагрузка данных пользователя после сохранения
           setUserModalOpen(false);
         }}
       />

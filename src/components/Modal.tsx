@@ -12,7 +12,6 @@ interface ModalProps {
   closeOnEsc?: boolean;
 }
 
-// Фиксированная ширина, высота зависит от контента
 const sizeClasses: Record<string, string> = {
   sm: 'w-[400px]',
   md: 'w-[500px]',
@@ -55,13 +54,13 @@ function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 pb-10">
-      {/* Backdrop */}
+      {}
       <div
         className="absolute inset-0 bg-black/50"
         onClick={closeOnBackdrop ? onClose : undefined}
       />
 
-      {/* Modal */}
+      {}
       <div
         className={`relative ${sizeClasses[size]} max-w-[95vw] mx-4 rounded-lg shadow-2xl overflow-hidden`}
         style={{
@@ -72,7 +71,7 @@ function Modal({
           flexDirection: 'column',
         }}
       >
-        {/* Header */}
+        {}
         {title !== undefined && (
           <div
             className="flex items-center justify-between px-6 py-4 shrink-0"
@@ -97,7 +96,7 @@ function Modal({
           </div>
         )}
 
-        {/* Body */}
+        {}
         <div
           className="flex-1 overflow-auto px-6 py-4"
           style={{ color: 'var(--theme-content-text)' }}
@@ -105,7 +104,7 @@ function Modal({
           {children}
         </div>
 
-        {/* Footer */}
+        {}
         {footer && (
           <div
             className="flex items-center justify-end gap-3 px-6 py-4 shrink-0"

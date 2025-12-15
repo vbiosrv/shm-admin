@@ -26,7 +26,6 @@ export default function ProfileModal({
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  // Синхронизация данных при открытии
   useEffect(() => {
     if (data) {
       setFormData({ ...data });
@@ -46,7 +45,6 @@ export default function ProfileModal({
       onClose();
       toast.success('Профиль сохранён');
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -68,7 +66,6 @@ export default function ProfileModal({
       onClose();
       toast.success('Профиль удалён');
     } catch (error) {
-      console.error('Ошибка удаления:', error);
       toast.error('Ошибка удаления');
     } finally {
       setDeleting(false);
@@ -137,7 +134,7 @@ export default function ProfileModal({
       size="xl"
     >
       <div className="space-y-4">
-        {/* ID и Пользователь */}
+        {}
         <div className="grid grid-cols-2 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-28 text-sm font-medium shrink-0" style={labelStyles}>
@@ -161,7 +158,7 @@ export default function ProfileModal({
           </div>
         </div>
 
-        {/* Данные (JSON) */}
+        {}
         <div className="pt-2">
           <label className="text-sm font-medium" style={labelStyles}>
             Данные

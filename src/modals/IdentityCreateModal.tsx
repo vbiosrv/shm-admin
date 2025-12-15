@@ -46,7 +46,6 @@ export default function IdentityCreateModal({
       
       toast.success('Ключи сгенерированы');
     } catch (error) {
-      console.error('Ошибка генерации ключей:', error);
       toast.error('Ошибка генерации ключей');
     } finally {
       setGenerating(false);
@@ -64,7 +63,6 @@ export default function IdentityCreateModal({
         toast.success('Приватный ключ скопирован');
       })
       .catch((err) => {
-        console.error('Ошибка копирования:', err);
         toast.error('Ошибка копирования');
       });
   };
@@ -80,7 +78,6 @@ export default function IdentityCreateModal({
         toast.success('Публичный ключ скопирован');
       })
       .catch((err) => {
-        console.error('Ошибка копирования:', err);
         toast.error('Ошибка копирования');
       });
   };
@@ -95,7 +92,6 @@ export default function IdentityCreateModal({
     try {
       await onSave(formData);
       onClose();
-      // Сброс формы
       setFormData({
         name: '',
         private_key: '',
@@ -103,7 +99,6 @@ export default function IdentityCreateModal({
       });
       toast.success('Ключ создан');
     } catch (error) {
-      console.error('Ошибка создания:', error);
       toast.error('Ошибка создания');
     } finally {
       setSaving(false);
@@ -175,7 +170,7 @@ export default function IdentityCreateModal({
       size="lg"
     >
       <div className="space-y-4">
-        {/* Имя */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Имя <span className="text-red-500">*</span>
@@ -190,7 +185,7 @@ export default function IdentityCreateModal({
           />
         </div>
 
-        {/* Приватный ключ */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Приватный ключ
@@ -221,7 +216,7 @@ export default function IdentityCreateModal({
           </div>
         </div>
 
-        {/* Публичный ключ */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Публичный ключ

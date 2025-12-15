@@ -31,7 +31,6 @@ export default function UserModal({
   const [payModalOpen, setPayModalOpen] = useState(false);
   const [bonusModalOpen, setBonusModalOpen] = useState(false);
 
-  // Синхронизация данных при открытии
   useEffect(() => {
     if (data) {
       setFormData({ ...data });
@@ -55,7 +54,6 @@ export default function UserModal({
       await onSave(formData);
       onClose();
     } catch (error) {
-      console.error('Ошибка сохранения:', error);
       toast.error('Ошибка сохранения');
     } finally {
       setSaving(false);
@@ -76,7 +74,6 @@ export default function UserModal({
       await onDelete();
       onClose();
     } catch (error) {
-      console.error('Ошибка удаления:', error);
       toast.error('Ошибка удаления');
     } finally {
       setDeleting(false);
@@ -396,8 +393,6 @@ export default function UserModal({
         open={payModalOpen}
         onClose={() => setPayModalOpen(false)}
         onSave={async (payData) => {
-          // Здесь можно добавить логику сохранения платежа
-          // После успешного сохранения модалка закроется автоматически
         }}
       />
 
@@ -405,8 +400,6 @@ export default function UserModal({
         open={bonusModalOpen}
         onClose={() => setBonusModalOpen(false)}
         onSave={async (bonusData) => {
-          // Здесь можно добавить логику сохранения бонуса
-          // После успешного сохранения модалка закроется автоматически
         }}
       />
     </Modal>

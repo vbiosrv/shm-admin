@@ -133,11 +133,9 @@ function SHMCloud() {
   const checkAuth = async () => {
     setLoading(true);
     try {
-      // Пробуем получить данные пользователя
       const res = await shm_request('/shm/v1/admin/cloud/user');
       const userData = res.data || res;
       
-      // Если есть данные пользователя (массив или объект)
       if (Array.isArray(userData) && userData.length > 0) {
         const user = userData[0];
         setCloudUser(user);
@@ -148,13 +146,10 @@ function SHMCloud() {
         setIsAuthenticated(true);
         localStorage.setItem('cloud_auth', JSON.stringify({ user: userData }));
       } else {
-        // Нет данных пользователя - не авторизован
         setIsAuthenticated(false);
         localStorage.removeItem('cloud_auth');
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
-      // Ошибка API - не авторизован
       setIsAuthenticated(false);
       localStorage.removeItem('cloud_auth');
     } finally {
@@ -170,12 +165,10 @@ function SHMCloud() {
         body: JSON.stringify(loginData),
       });
       
-      // После успешной авторизации перезагружаем данные
       await checkAuth();
       toast.success('Успешная авторизация');
       setLoginData({ login: '', password: '' });
     } catch (error) {
-      console.error('Login failed:', error);
       toast.error('Ошибка авторизации');
     }
   };
@@ -192,7 +185,6 @@ function SHMCloud() {
       setShowLogin(true);
       setRegisterData({ login: '', password: '' });
     } catch (error) {
-      console.error('Registration failed:', error);
       toast.error('Ошибка регистрации');
     }
   };
@@ -203,7 +195,6 @@ function SHMCloud() {
         method: 'DELETE',
       });
     } catch (error) {
-      console.error('Logout failed:', error);
     } finally {
       localStorage.removeItem('cloud_auth');
       setIsAuthenticated(false);
@@ -385,7 +376,7 @@ function SHMCloud() {
         </button>
       </div>
 
-      {/* Информация о пользователе */}
+      {}
       <div className="rounded-lg border p-6 mb-6" style={cardStyles}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -415,7 +406,7 @@ function SHMCloud() {
         </div>
       </div>
       
-      {/* Тарифы */}
+      {}
       <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--theme-content-text)' }}>
         Сервисы
       </h2>

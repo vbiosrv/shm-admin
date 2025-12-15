@@ -12,9 +12,6 @@ interface ChartCardProps {
   loading?: boolean;
 }
 
-/**
- * Card wrapper for charts with header and optional actions
- */
 export function ChartCard({
   title,
   subtitle,
@@ -63,9 +60,6 @@ interface MetricRowProps {
   percentage?: number;
 }
 
-/**
- * Simple metric row for displaying key-value pairs in lists
- */
 export function MetricRow({ label, value, color, percentage }: MetricRowProps) {
   return (
     <div className="flex items-center justify-between py-2 border-b last:border-b-0" style={{ borderColor: 'var(--theme-card-border)' }}>
@@ -104,9 +98,6 @@ interface EmptyStateProps {
   icon?: LucideIcon;
 }
 
-/**
- * Empty state placeholder for when no data is available
- */
 export function EmptyState({ 
   title = 'Нет данных', 
   description = 'Данные для отображения отсутствуют',

@@ -6,7 +6,6 @@ import { Copy, ExternalLink, Save, Trash2, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import JsonEditor from './JsonEditor';
 
-// Конфигурация поля для режима просмотра
 export interface FieldConfig {
   key: string;
   label: string;
@@ -16,7 +15,6 @@ export interface FieldConfig {
   linkTo?: string;
 }
 
-// Конфигурация поля для режима редактирования
 export interface EditFieldConfig {
   key: string;
   label: string;
@@ -42,24 +40,16 @@ interface EntityModalProps {
   title: string;
   data: Record<string, any> | null;
   mode?: ModalMode;
-  // Для режима просмотра
   fields?: FieldConfig[];
-  // Для режима редактирования
   editFields?: EditFieldConfig[];
-  // Callbacks
   onEdit?: () => void;
   onSave?: (data: Record<string, any>) => void | Promise<void>;
   onDelete?: (data: Record<string, any>) => void | Promise<void>;
   onDuplicate?: (data: Record<string, any>) => void;
-  // Кастомные кнопки слева в footer
   leftActions?: ReactNode;
-  // Показывать ли кнопку удаления
   showDelete?: boolean;
-  // Показывать ли кнопку дублирования
   showDuplicate?: boolean;
-  // Валидация формы
   validate?: (data: Record<string, any>) => Record<string, string> | null;
-  // Кастомный footer
   customFooter?: ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
 }
@@ -133,7 +123,6 @@ export default function EntityModal({
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  // Синхронизация данных при открытии
   useEffect(() => {
     if (data) {
       setFormData({ ...data });
@@ -145,7 +134,6 @@ export default function EntityModal({
 
   const handleFieldChange = (name: string, value: any) => {
     setFormData(prev => ({ ...prev, [name]: value }));
-    // Очищаем ошибку при изменении поля
     if (errors[name]) {
       setErrors(prev => {
         const next = { ...prev };
@@ -162,7 +150,6 @@ export default function EntityModal({
   };
 
   const handleSave = async () => {
-    // Валидация
     if (validate) {
       const validationErrors = validate(formData);
       if (validationErrors) {
@@ -210,7 +197,6 @@ export default function EntityModal({
     }
   };
 
-  // Рендер режима просмотра
   const renderViewMode = () => {
     if (!data) return null;
 
@@ -286,11 +272,9 @@ export default function EntityModal({
     );
   };
 
-  // Рендер режима редактирования
   const renderEditMode = () => {
     if (!editFields) return null;
 
-    // Фильтруем видимые поля
     const visibleFields = editFields.filter(field => {
       if (field.visible !== undefined) {
         return typeof field.visible === 'function'
@@ -300,7 +284,6 @@ export default function EntityModal({
       return true;
     });
 
-    // Поля которые занимают всю ширину
     const wideTypes = ['json', 'textarea'];
     
     return (
@@ -336,7 +319,6 @@ export default function EntityModal({
     );
   };
 
-  // Формирование footer
   const renderFooter = () => {
     if (customFooter !== undefined) return customFooter;
 
@@ -373,7 +355,6 @@ export default function EntityModal({
       );
     }
 
-    // edit или create mode
     return (
       <div className="flex justify-between w-full">
         <div className="flex gap-2">

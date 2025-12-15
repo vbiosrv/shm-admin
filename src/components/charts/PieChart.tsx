@@ -23,9 +23,6 @@ const COLORS = [
   '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1',
 ];
 
-/**
- * Reusable Pie/Donut Chart component
- */
 export function PieChart({
   data,
   title,
@@ -131,7 +128,7 @@ export function PieChart({
               )}
             />
           )}
-          {/* Center text for donut chart */}
+          {}
           {innerRadius > 0 && (
             <text
               x="50%"

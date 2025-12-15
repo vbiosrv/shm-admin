@@ -28,7 +28,6 @@ import Branding from './pages/Branding';
 import Appearance from './pages/Appearance';
 import SHMCloud from './pages/SHMCloud';
 
-// Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
   if (!isAuthenticated) {
@@ -41,13 +40,11 @@ function App() {
   useEffect(() => {
     const handleToastClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      // Проверяем клик на псевдоэлемент (кнопку закрытия)
       const toastDiv = target.closest('.toast-with-close');
       if (toastDiv) {
         const rect = target.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const width = rect.width;
-        // Если клик в правой части (где кнопка закрытия)
         if (clickX > width - 40) {
           toast.dismiss();
         }
@@ -95,9 +92,9 @@ function App() {
           }
         >
           <Route index element={<Dashboard />} />
-          {/* Аналитика - временно скрыта до внедрения тарификации */}
-          {/* <Route path="analytics" element={<Analytics />} /> */}
-          {/* Пользователи */}
+          {}
+          {}
+          {}
           <Route path="users" element={<Users />} />
           <Route path="profiles" element={<Profiles />} />
           <Route path="user-services" element={<UserServices />} />
@@ -106,22 +103,22 @@ function App() {
           <Route path="bonuses" element={<Bonuses />} />
           <Route path="storage" element={<Storage />} />
           <Route path="promo" element={<Promo />} />
-          {/* Услуги */}
+          {}
           <Route path="services" element={<Services />} />
           <Route path="events" element={<Events />} />
-          {/* Сервера */}
+          {}
           <Route path="servers" element={<Servers />} />
           <Route path="server-groups" element={<ServerGroups />} />
           <Route path="identities" element={<Identities />} />
-          {/* Задачи */}
+          {}
           <Route path="spool" element={<Spool />} />
           <Route path="spool-history" element={<SpoolHistory />} />
-          {/* Настройки */}
+          {}
           <Route path="templates" element={<Templates />} />
           <Route path="config" element={<Config />} />
           <Route path="branding" element={<Branding />} />
           <Route path="appearance" element={<Appearance />} />
-          {/* <Route path="cloud" element={<SHMCloud />} /> */}
+          {}
         </Route>
       </Routes>
     </BrowserRouter>

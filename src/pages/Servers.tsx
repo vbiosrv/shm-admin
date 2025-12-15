@@ -99,7 +99,6 @@ function Servers() {
       });
       fetchData(limit, offset, filters, sortField, sortDirection);
     } catch (error) {
-      console.error('Ошибка создания сервера:', error);
       throw error;
     }
   };
@@ -112,7 +111,6 @@ function Servers() {
       });
       fetchData(limit, offset, filters, sortField, sortDirection);
     } catch (error) {
-      console.error('Ошибка сохранения сервера:', error);
       throw error;
     }
   };
@@ -124,7 +122,6 @@ function Servers() {
       });
       fetchData(limit, offset, filters, sortField, sortDirection);
     } catch (error) {
-      console.error('Ошибка удаления сервера:', error);
       throw error;
     }
   };

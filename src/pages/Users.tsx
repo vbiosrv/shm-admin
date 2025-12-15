@@ -44,7 +44,6 @@ function Users() {
   
   const { setSelectedUser } = useSelectedUserStore();
   
-  // Модальные окна
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -94,7 +93,6 @@ function Users() {
   const handleRowClick = (row: any) => {
     setSelectedRow(row);
     setEditModalOpen(true);
-    // Устанавливаем глобально выбранного пользователя
     setSelectedUser(row);
   };
 
@@ -174,7 +172,7 @@ function Users() {
         storageKey="users"
       />
       
-      {/* Модалка редактирования */}
+      {}
       <UserModal
         open={editModalOpen}
         onClose={() => setEditModalOpen(false)}
@@ -184,14 +182,14 @@ function Users() {
         onChangePassword={handleChangePasswordOpen}
       />
 
-      {/* Модалка создания */}
+      {}
       <UserCreateModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onSave={handleSaveNew}
       />
 
-      {/* Модалка смены пароля */}
+      {}
       <UserChangePasswordModal
         open={changePasswordModalOpen}
         onClose={() => setChangePasswordModalOpen(false)}

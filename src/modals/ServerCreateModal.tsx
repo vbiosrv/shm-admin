@@ -43,7 +43,6 @@ export default function ServerCreateModal({
   };
 
   const handleSave = async () => {
-    // Валидация
     if (!formData.name?.trim()) {
       toast.error('Введите имя сервера');
       return;
@@ -73,7 +72,6 @@ export default function ServerCreateModal({
     try {
       const dataToSave = { ...formData };
       
-      // Очищаем ненужные поля в зависимости от режима
       if (mode !== 'cmd') {
         delete dataToSave.settings?.cmd;
       }
@@ -83,7 +81,6 @@ export default function ServerCreateModal({
       
       await onSave(dataToSave);
       
-      // Сброс формы
       setFormData({
         name: '',
         enabled: 1,
@@ -99,7 +96,6 @@ export default function ServerCreateModal({
       onClose();
       toast.success('Сервер создан');
     } catch (error) {
-      console.error('Ошибка создания сервера:', error);
       toast.error('Ошибка создания сервера');
     } finally {
       setSaving(false);
@@ -154,7 +150,7 @@ export default function ServerCreateModal({
       size="xl"
     >
       <div className="space-y-4">
-        {/* Имя сервера */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Имя сервера *
@@ -169,7 +165,7 @@ export default function ServerCreateModal({
           />
         </div>
 
-        {/* Статус */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Статус
@@ -187,7 +183,7 @@ export default function ServerCreateModal({
           </label>
         </div>
 
-        {/* Ограничение услуг */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Огр. кол-ва услуг
@@ -202,7 +198,7 @@ export default function ServerCreateModal({
           />
         </div>
 
-        {/* Группа серверов */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Группа *
@@ -223,7 +219,7 @@ export default function ServerCreateModal({
           />
         </div>
 
-        {/* Транспорт */}
+        {}
         {formData.server_gid ? (
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -239,7 +235,7 @@ export default function ServerCreateModal({
         </div>
         ) : null }
 
-        {/* Хост (не для local) */}
+        {}
         {transport !== 'local' && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -256,7 +252,7 @@ export default function ServerCreateModal({
           </div>
         )}
 
-        {/* Mail настройки */}
+        {}
         {transport === 'mail' && (
           <>
             <div className="flex items-center gap-3">
@@ -310,7 +306,7 @@ export default function ServerCreateModal({
           </>
         )}
 
-        {/* SSH ключ */}
+        {}
         {transport === 'ssh' && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -325,7 +321,7 @@ export default function ServerCreateModal({
           </div>
         )}
 
-        {/* Использовать */}
+        {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
             Использовать *
@@ -341,7 +337,7 @@ export default function ServerCreateModal({
           </select>
         </div>
 
-        {/* Шаблон */}
+        {}
         {mode === 'template' && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -355,7 +351,7 @@ export default function ServerCreateModal({
           </div>
         )}
 
-        {/* Команда */}
+        {}
         {mode === 'cmd' && (
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
@@ -372,7 +368,7 @@ export default function ServerCreateModal({
           </div>
         )}
 
-        {/* Settings (JSON) */}
+        {}
         <div className="flex items-start gap-3">
           <label className="w-32 text-sm font-medium shrink-0 pt-2" style={labelStyles}>
             Настройки

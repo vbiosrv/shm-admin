@@ -83,7 +83,6 @@ function Identities() {
   };
 
   const handleSaveNew = async (identityData: any) => {
-    // Добавляем fingerprint если его нет (API требует это поле)
     const dataToSend = {
       ...identityData,
       fingerprint: identityData.fingerprint || '',
@@ -145,7 +144,7 @@ function Identities() {
         storageKey="identities"
       />
       
-      {/* Модалка редактирования */}
+      {}
       <IdentityModal
         open={editModalOpen}
         onClose={() => {
@@ -158,7 +157,7 @@ function Identities() {
         onRefresh={handleRefresh}
       />
 
-      {/* Модалка создания */}
+      {}
       <IdentityCreateModal
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}

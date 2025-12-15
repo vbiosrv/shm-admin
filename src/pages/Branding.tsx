@@ -68,7 +68,7 @@ function Branding() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Form */}
+        {}
         <div className="card">
           <div className="card-header">
             <h2 className="text-lg font-semibold" style={{ color: 'var(--theme-content-text)' }}>
@@ -163,7 +163,7 @@ function Branding() {
                 value={formData.logoUrl}
                 onChange={handleChange}
                 className="input"
-                placeholder="https://example.com/logo.png"
+                placeholder="https:
               />
               <p className="text-xs mt-1" style={{ color: 'var(--theme-content-text-muted)' }}>
                 Оставьте пустым для использования иконки по умолчанию
@@ -199,7 +199,7 @@ function Branding() {
           </div>
         </div>
 
-        {/* Preview */}
+        {}
         <div className="card">
           <div className="card-header">
             <h2 className="text-lg font-semibold" style={{ color: 'var(--theme-content-text)' }}>
@@ -207,7 +207,7 @@ function Branding() {
             </h2>
           </div>
           <div className="card-body">
-            {/* Login preview */}
+            {}
             <div 
               className="rounded-lg p-6 mb-4"
               style={{ backgroundColor: 'var(--theme-content-bg)' }}
@@ -241,7 +241,7 @@ function Branding() {
               </div>
             </div>
 
-            {/* Sidebar preview */}
+            {}
             <div 
               className="rounded-lg p-4"
               style={{ backgroundColor: 'var(--theme-sidebar-bg)' }}

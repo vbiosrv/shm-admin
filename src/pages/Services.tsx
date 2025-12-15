@@ -83,7 +83,7 @@ function Services() {
   const handleSaveView = async (updatedData: any) => {
     try {
       await shm_request(`/shm/v1/admin/service/${updatedData.service_id}`, {
-        method: 'PUT',
+        method: 'POST',
         body: JSON.stringify(updatedData),
       });
       setViewModalOpen(false);

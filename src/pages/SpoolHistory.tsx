@@ -14,13 +14,14 @@ const spoolHistoryColumns = [
     label: 'Название', 
     visible: true, 
     sortable: false,
+    filter: false,
     render: (value: any, row: any) => row?.event?.title || '-'
   },
   { 
     key: 'status', 
     label: 'Статус', 
     visible: true, 
-    sortable: true,
+    sortable: false,
     filterType: 'select' as const,
     filterOptions: [
       { value: 'DELAYED', label: 'DELAYED' },

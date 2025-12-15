@@ -8,14 +8,8 @@ import {
   Activity,
   TrendingUp,
   ArrowRight,
-  Clock,
   DollarSign,
-  CheckCircle,
   RefreshCw,
-  Repeat,
-  Target,
-  PieChart,
-  ShoppingCart,
   ArrowUpRight,
   ArrowDownRight,
 } from 'lucide-react';
@@ -25,12 +19,6 @@ import { useCacheStore } from '../store/cacheStore';
 import {
   fetchDashboardAnalytics,
   DashboardAnalytics,
-  AnalyticsStats,
-  PaymentStats,
-  UserServiceStats,
-  RevenueStats,
-  FinancialMetrics,
-  MRRStats,
 } from '../lib/dashboardApi';
 
 function getStatusColor(status: string): string {
@@ -53,12 +41,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [isBackgroundRefresh, setIsBackgroundRefresh] = useState(false);
   const backgroundRefreshRef = useRef(false);
-  const [stats, setStats] = useState<AnalyticsStats | null>(null);
-  const [paymentStats, setPaymentStats] = useState<PaymentStats | null>(null);
-  const [serviceStats, setServiceStats] = useState<UserServiceStats | null>(null);
-  const [revenueStats, setRevenueStats] = useState<RevenueStats | null>(null);
-  const [financialMetrics, setFinancialMetrics] = useState<FinancialMetrics | null>(null);
-  const [mrrStats, setMrrStats] = useState<MRRStats | null>(null);
+  const [analytics, setAnalytics] = useState<DashboardAnalytics | null>(null);
 
   const cacheKey = 'dashboard_main';
 
@@ -66,12 +49,7 @@ function Dashboard() {
     if (!forceRefresh && settings.enabled) {
       const cached = getCached(cacheKey);
       if (cached) {
-        setStats(cached.stats);
-        setPaymentStats(cached.paymentStats);
-        setServiceStats(cached.serviceStats);
-        setRevenueStats(cached.revenueStats);
-        setFinancialMetrics(cached.financialMetrics);
-        setMrrStats(cached.mrrStats);
+        setAnalytics(cached);
         setLoading(false);
 
         if (needsBackgroundRefresh(cacheKey) && !backgroundRefreshRef.current) {
@@ -88,92 +66,29 @@ function Dashboard() {
     }
     
     try {
-      // ОДИН запрос вместо 36!
-      const analytics = await fetchDashboardAnalytics(7);
+      const data = await fetchDashboardAnalytics(7);
       
-      // Преобразуем данные в старый формат для совместимости
-      const mainStats: AnalyticsStats = {
-        totalUsers: analytics.counts.totalUsers,
-        totalServices: analytics.counts.totalServices,
-        totalServers: analytics.counts.totalServers,
-        activeUserServices: analytics.counts.activeUserServices,
-        totalRevenue: analytics.revenue.totalRevenue,
-        recentPayments: analytics.counts.recentPayments,
-        totalWithdraws: analytics.counts.totalWithdraws,
-        pendingTasks: analytics.counts.pendingTasks,
-      };
-      
-      const payments: PaymentStats = {
-        total: analytics.payments.total,
-        count: analytics.payments.count,
-        byPaySystem: analytics.payments.byPaySystem,
-        timeline: analytics.payments.timeline.map(t => ({
-          ...t,
-          label: new Date(t.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }),
-        })),
-      };
-      
-      const services: UserServiceStats = {
-        total: analytics.services.total,
-        byStatus: analytics.services.byStatus.map(s => ({
-          ...s,
-          color: getStatusColor(s.name),
-        })),
-        byService: analytics.services.topServices.map(s => ({ name: s.name, value: s.count })),
-        timeline: [],
-      };
-      
-      const revenue: RevenueStats = {
-        totalRevenue: analytics.revenue.totalRevenue,
-        totalWithdraws: analytics.revenue.totalWithdraws,
-        netRevenue: analytics.revenue.netRevenue,
-        revenueTimeline: analytics.revenue.revenueTimeline.map(t => ({
-          ...t,
-          label: new Date(t.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }),
-        })),
-        withdrawTimeline: analytics.revenue.withdrawTimeline.map(t => ({
-          ...t,
-          label: new Date(t.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }),
-        })),
-      };
-      
-      const financial: FinancialMetrics = {
-        arpu: analytics.financial.arpu,
-        arppu: analytics.financial.arppu,
-        ltv: analytics.financial.arpu * 12,
-        churnRate: 0,
-        payingUsersCount: analytics.financial.payingUsersCount,
-        totalUsers: analytics.financial.totalUsers,
-        avgRevenuePerPayment: analytics.payments.count > 0 ? analytics.payments.total / analytics.payments.count : 0,
-        avgPaymentsPerUser: analytics.financial.payingUsersCount > 0 ? analytics.payments.count / analytics.financial.payingUsersCount : 0,
-        conversionRate: analytics.financial.conversionRate,
-      };
-      
-      const mrr: MRRStats = {
-        mrr: analytics.mrr.mrr,
-        activeSubscriptions: analytics.mrr.activeSubscriptions,
-        avgSubscriptionValue: analytics.mrr.avgSubscriptionValue,
-        mrrGrowth: 0,
+      // Добавляем метки дат и цвета для графиков
+      const enrichedData: DashboardAnalytics = {
+        ...data,
+        payments: {
+          timeline: data.payments.timeline.map(t => ({
+            ...t,
+            label: new Date(t.date).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' }),
+          })),
+        },
+        services: {
+          byStatus: data.services.byStatus.map(s => ({
+            ...s,
+            color: getStatusColor(s.name),
+          })),
+        },
       };
 
-      const data = {
-        stats: mainStats,
-        paymentStats: payments,
-        serviceStats: services,
-        revenueStats: revenue,
-        financialMetrics: financial,
-        mrrStats: mrr,
-      };
-
-      setStats(mainStats);
-      setPaymentStats(payments);
-      setServiceStats(services);
-      setRevenueStats(revenue);
-      setFinancialMetrics(financial);
-      setMrrStats(mrr);
+      setAnalytics(enrichedData);
 
       if (settings.enabled) {
-        setCache(cacheKey, data);
+        setCache(cacheKey, enrichedData);
       }
 
       if (isBackgroundRefresh) {
@@ -182,6 +97,7 @@ function Dashboard() {
       }
       
     } catch (error) {
+      console.error('Dashboard fetch error:', error);
     } finally {
       setLoading(false);
     }
@@ -242,11 +158,11 @@ function Dashboard() {
         </button>
       </div>
 
-      {}
-      <StatCardGrid columns={4}>
+      {/* Основные метрики */}
+      <StatCardGrid columns={3}>
         <StatCard
           title="Пользователи"
-          value={stats?.totalUsers ?? '...'}
+          value={analytics?.counts.totalUsers ?? '...'}
           icon={Users}
           color="cyan"
           loading={loading}
@@ -254,7 +170,7 @@ function Dashboard() {
         />
         <StatCard
           title="Услуги пользователей"
-          value={stats?.activeUserServices ?? '...'}
+          value={analytics?.counts.activeUserServices ?? '...'}
           icon={Package}
           color="emerald"
           loading={loading}
@@ -262,52 +178,42 @@ function Dashboard() {
         />
         <StatCard
           title="Серверы"
-          value={stats?.totalServers ?? '...'}
+          value={analytics?.counts.totalServers ?? '...'}
           icon={Server}
           color="violet"
           loading={loading}
           onClick={() => window.location.href = '/servers'}
         />
-        <StatCard
-          title="Задачи в очереди"
-          value={stats?.pendingTasks ?? '...'}
-          icon={Clock}
-          color="amber"
-          loading={loading}
-          onClick={() => window.location.href = '/spool'}
-        />
       </StatCardGrid>
 
-      {}
+      {/* Финансовые метрики */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         <StatCard
           title="Выручка (7 дней)"
-          value={revenueStats ? formatMoney(revenueStats.totalRevenue) : '...'}
+          value={analytics ? formatMoney(analytics.revenue.totalRevenue) : '...'}
           icon={DollarSign}
           color="emerald"
           loading={loading}
         />
         <StatCard
           title="Списания (7 дней)"
-          value={revenueStats ? formatMoney(revenueStats.totalWithdraws) : '...'}
+          value={analytics ? formatMoney(analytics.revenue.totalWithdraws) : '...'}
           icon={ArrowDownRight}
           color="rose"
           loading={loading}
         />
         <StatCard
           title="Чистая прибыль"
-          value={revenueStats ? formatMoney(revenueStats.netRevenue) : '...'}
-          icon={revenueStats && revenueStats.netRevenue >= 0 ? ArrowUpRight : ArrowDownRight}
-          color={revenueStats && revenueStats.netRevenue >= 0 ? 'emerald' : 'rose'}
+          value={analytics ? formatMoney(analytics.revenue.netRevenue) : '...'}
+          icon={analytics && analytics.revenue.netRevenue >= 0 ? ArrowUpRight : ArrowDownRight}
+          color={analytics && analytics.revenue.netRevenue >= 0 ? 'emerald' : 'rose'}
           loading={loading}
         />
       </div>
 
-      {
-}
-      {}
+      {/* Графики и аналитика */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-        {}
+        {/* График платежей */}
         <ChartCard
           title="Динамика платежей"
           subtitle="За последние 7 дней"
@@ -315,9 +221,9 @@ function Dashboard() {
           iconColor="text-cyan-400"
           loading={loading}
         >
-          {paymentStats && paymentStats.timeline.length > 0 ? (
+          {analytics && analytics.payments.timeline.length > 0 ? (
             <AreaLineChart
-              data={paymentStats.timeline}
+              data={analytics.payments.timeline}
               height={220}
               color="#22d3ee"
               valueFormatter={formatMoney}
@@ -344,9 +250,9 @@ function Dashboard() {
             </Link>
           }
         >
-          {serviceStats && serviceStats.byStatus.length > 0 ? (
+          {analytics && analytics.services.byStatus.length > 0 ? (
             <BarChart
-              data={serviceStats.byStatus}
+              data={analytics.services.byStatus}
               height={220}
               layout="vertical"
             />

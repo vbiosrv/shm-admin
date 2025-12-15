@@ -51,11 +51,6 @@ const navigation: MenuItem[] = [
     href: '/', 
     icon: Home 
   },
-  // { 
-  //   name: 'Аналитика', 
-  //   href: '/analytics', 
-  //   icon: TrendingUp 
-  // },
   { 
     name: 'Пользователи', 
     icon: Users,

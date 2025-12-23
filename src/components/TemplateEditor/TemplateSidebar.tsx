@@ -27,6 +27,17 @@ export default function TemplateSidebar({
 
   useEffect(() => {
     loadTemplates();
+    
+    // Обработчик события удаления шаблона
+    const handleTemplateDeleted = (event: any) => {
+      const deletedId = event.detail?.id;
+      if (deletedId) {
+        setTemplates(prev => prev.filter(t => t.id !== deletedId));
+      }
+    };
+
+    window.addEventListener('templateDeleted', handleTemplateDeleted);
+    return () => window.removeEventListener('templateDeleted', handleTemplateDeleted);
   }, []);
 
   const loadTemplates = async () => {

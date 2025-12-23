@@ -148,8 +148,8 @@ function UserServices() {
 
   const handleDelete = async () => {
     if (!selectedRow?.user_service_id) return;
-    
-    await shm_request(`/shm/v1/admin/user/service?user_service_id=${selectedRow.user_service_id}`, {
+
+    await shm_request(`/shm/v1/admin/user/service?user_id=${selectedRow.user_id}&user_service_id=${selectedRow.user_service_id}`, {
       method: 'DELETE',
     });
     fetchData(limit, offset, filters, sortField, sortDirection);

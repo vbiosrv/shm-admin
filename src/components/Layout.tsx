@@ -37,6 +37,8 @@ import { useAuthStore } from '../store/authStore';
 import { useBrandingStore } from '../store/brandingStore';
 import { useThemeStore, ThemeMode } from '../store/themeStore';
 import toast from 'react-hot-toast';
+import TemplateModal from '../modals/TemplateModal';
+import { shm_request } from '../lib/shm_request';
 
 interface MenuItem {
   name: string;
@@ -185,10 +187,20 @@ function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openMenus, setOpenMenus] = useState<string[]>(['Пользователи']);
   const [manuallyClosed, setManuallyClosed] = useState<string[]>([]);
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [selectedData, setSelectedData] = useState<any>(null);
+  const [templateModalOpen, setTemplateModalOpen] = useState(false);
 
   useEffect(() => {
     fetchBranding();
     applyTheme();
+    const handleOpenTemplate = (event: any) => {
+      setSelectedData(event.detail);
+      setTemplateModalOpen(true);
+    };
+
+    window.addEventListener('openTemplate', handleOpenTemplate);
+    return () => window.removeEventListener('openTemplate', handleOpenTemplate);
   }, [fetchBranding, applyTheme]);
 
   useEffect(() => {
@@ -228,6 +240,50 @@ function Layout() {
         return [name, ...activeMenus.filter(m => m !== name)];
       }
     });
+  };
+
+  const handleTemplateSave = async (templateData: any) => {
+    try {
+      if (templateData.id) {
+        // Update existing template
+        const data = await shm_request(`/shm/v1/admin/template`, {
+          method: 'POST',
+          body: JSON.stringify(templateData)
+        });
+        toast.success('Шаблон обновлен');
+        return data;
+      } else {
+        // Create new template
+        const data = await shm_request('/shm/v1/admin/templates', {
+          method: 'PUT',
+          body: JSON.stringify(templateData)
+        });
+        toast.success('Шаблон создан');
+        return data;
+      }
+    } catch (error: any) {
+      toast.error(error?.message || 'Ошибка при сохранении шаблона');
+      throw error;
+    }
+  };
+
+  const handleTemplateDelete = async (id: string) => {
+    try {
+      await shm_request(`/shm/v1/admin/template?id=${id}`, {
+        method: 'DELETE'
+      });
+      toast.success('Шаблон удален');
+      
+      // Закрываем модал и сбрасываем выбранные данные
+      setTemplateModalOpen(false);
+      setSelectedData(null);
+      
+      // Отправляем событие для обновления списка шаблонов
+      window.dispatchEvent(new CustomEvent('templateDeleted', { detail: { id } }));
+    } catch (error: any) {
+      toast.error(error?.message || 'Ошибка при удалении шаблона');
+      throw error;
+    }
   };
 
   return (
@@ -410,6 +466,14 @@ function Layout() {
           <Outlet />
         </main>
       </div>
+            {/* Global Template Modal */}
+      <TemplateModal
+        open={templateModalOpen}
+        onClose={() => setTemplateModalOpen(false)}
+        data={selectedData}
+        onSave={handleTemplateSave}
+        onDelete={handleTemplateDelete}
+      />
     </div>
   );
 }

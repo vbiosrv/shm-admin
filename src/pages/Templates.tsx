@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import DataTable, { SortDirection } from '../components/DataTable';
 import Help from '../components/Help';
 import { shm_request, normalizeListResponse } from '../lib/shm_request';
-import { TemplateModal, TemplateCreateModal, TemplateUploadModal } from '../modals';
+import { TemplateCreateModal, TemplateUploadModal } from '../modals';
 import { Plus, Upload } from 'lucide-react';
 
 const templateColumns = [
@@ -18,8 +18,6 @@ function Templates() {
   const [sortField, setSortField] = useState<string | undefined>();
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [filters, setFilters] = useState<Record<string, string>>({});
-  const [selectedRow, setSelectedRow] = useState<any>(null);
-  const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
@@ -65,8 +63,8 @@ function Templates() {
   }, []);
 
   const handleRowClick = (row: any) => {
-    setSelectedRow(row);
-    setModalOpen(true);
+    // Открываем шаблон через глобальный TemplateModal
+    window.dispatchEvent(new CustomEvent('openTemplate', { detail: row }));
   };
 
   return (
@@ -114,24 +112,6 @@ function Templates() {
         onRowClick={handleRowClick}
         onRefresh={() => fetchData(limit, offset, filters, sortField, sortDirection)}
         storageKey="templates"
-      />
-      <TemplateModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        data={selectedRow}
-        onSave={async (data) => {
-          await shm_request(`/shm/v1/admin/template`, {
-            method: 'POST',
-            body: JSON.stringify(data),
-          });
-          fetchData(limit, offset, filters, sortField, sortDirection);
-        }}
-        onDelete={async (id) => {
-          await shm_request(`/shm/v1/admin/template/${id}`, {
-            method: 'DELETE',
-          });
-          fetchData(limit, offset, filters, sortField, sortDirection);
-        }}
       />
       <TemplateCreateModal
         open={createModalOpen}

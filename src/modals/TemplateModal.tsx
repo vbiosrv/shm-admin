@@ -65,6 +65,53 @@ export default function TemplateModal({
   }, [tabs, activeTabId]);
 
   useEffect(() => {
+    // Обработчик события удаления шаблона
+    const handleTemplateDeleted = (event: any) => {
+      const deletedId = event.detail?.id;
+      if (deletedId) {
+        // Удаляем вкладку с удаленным шаблоном
+        setTabs(prev => {
+          const newTabs = prev.filter(t => t.template.id !== deletedId);
+          
+          // Если удаленный шаблон был активным, переключаемся на другую вкладку
+          if (activeTabId === deletedId) {
+            if (newTabs.length > 0) {
+              const newActiveTab = newTabs[newTabs.length - 1];
+              setActiveTabId(newActiveTab.id);
+              
+              if (newActiveTab.id.startsWith('new-')) {
+                setFormData({ ...newActiveTab.template, is_add: 1 });
+                detectLanguage(newActiveTab.template.data || '');
+              } else {
+                setLoading(true);
+                shm_request(`/shm/v1/admin/template?id=${newActiveTab.template.id}`)
+                  .then(res => {
+                    const templateData = res.data?.[0] || res.data;
+                    setFormData({ ...templateData, is_add: 0 });
+                    detectLanguage(templateData.data || '');
+                  })
+                  .catch(err => {
+                    toast.error('Ошибка загрузки шаблона');
+                  })
+                  .finally(() => setLoading(false));
+              }
+            } else {
+              setActiveTabId(null);
+              setIsMinimized(true);
+              setIsFullscreen(false);
+            }
+          }
+          
+          return newTabs;
+        });
+      }
+    };
+
+    window.addEventListener('templateDeleted', handleTemplateDeleted);
+    return () => window.removeEventListener('templateDeleted', handleTemplateDeleted);
+  }, [activeTabId, tabs]);
+
+  useEffect(() => {
     if (open && data?.id) {
       if (isMinimized) {
         setIsMinimized(false);
@@ -169,37 +216,32 @@ export default function TemplateModal({
   };
 
   const handleChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleEditorChange = (value: string | undefined) => {
-    handleChange('data', value || '');
+    const newFormData = { ...formData, [field]: value };
+    setFormData(newFormData);
+    
+    // Обновляем данные в текущей вкладке
     if (activeTabId) {
       setTabs(prev => prev.map(t => 
         t.id === activeTabId ? { 
           ...t, 
           hasUnsavedChanges: true,
-          template: { ...t.template, data: value || '' }
+          template: { ...t.template, [field]: value }
         } : t
       ));
     }
+  };
+
+  const handleEditorChange = (value: string | undefined) => {
+    handleChange('data', value || '');
   };
   
   const handleTemplateSelect = (template: any) => {
     const existingTab = tabs.find(t => t.template.id === template.id);
     if (existingTab) {
       setActiveTabId(existingTab.id);
-      setLoading(true);
-      shm_request(`/shm/v1/admin/template?id=${template.id}`)
-        .then(res => {
-          const templateData = res.data?.[0] || res.data;
-          setFormData({ ...templateData, is_add: 0 });
-          detectLanguage(templateData.data || '');
-        })
-        .catch(err => {
-          toast.error('Ошибка загрузки шаблона');
-        })
-        .finally(() => setLoading(false));
+      // Загружаем данные из вкладки (может содержать несохраненные изменения)
+      setFormData({ ...existingTab.template, is_add: 0 });
+      detectLanguage(existingTab.template.data || '');
       return;
     }
     
@@ -345,7 +387,6 @@ export default function TemplateModal({
       await onDelete(formData.id);
       setConfirmDeleteOpen(false);
       onClose();
-      toast.success('Шаблон удалён');
     } catch (error) {
       toast.error('Ошибка удаления');
     } finally {
@@ -453,7 +494,6 @@ export default function TemplateModal({
             <button
               onClick={() => {
                 setIsMinimized(true);
-                setIsFullscreen(false);
               }}
               className="px-4 py-2 rounded flex items-center gap-2"
               title="Свернуть"
@@ -554,7 +594,7 @@ export default function TemplateModal({
     </div>
   );
 
-  if (isMinimized && tabs.length > 0 && !open) {
+  if (isMinimized && tabs.length > 0) {
     const hasUnsaved = tabs.some(t => t.hasUnsavedChanges);
     return (
       <button
@@ -619,26 +659,14 @@ export default function TemplateModal({
                   onClick={() => {
                     if (activeTabId !== tab.id) {
                       setActiveTabId(tab.id);
-                      const templateToLoad = tab.template.id || tab.id;
                       
                       if (tab.id.startsWith('new-')) {
                         setFormData({ ...tab.template, is_add: 1 });
                         detectLanguage(tab.template.data || '');
                       } else {
-                        setLoading(true);
-                        shm_request(`/shm/v1/admin/template?id=${templateToLoad}`)
-                          .then(res => {
-                            const templateData = res.data?.[0] || res.data;
-                            setFormData({ ...templateData, is_add: 0 });
-                            detectLanguage(templateData.data || '');
-                            setTabs(prev => prev.map(t => 
-                              t.id === tab.id ? { ...t, template: templateData } : t
-                            ));
-                          })
-                          .catch(err => {
-                            toast.error('Ошибка загрузки шаблона');
-                          })
-                          .finally(() => setLoading(false));
+                        // Загружаем данные из вкладки (может содержать несохраненные изменения)
+                        setFormData({ ...tab.template, is_add: 0 });
+                        detectLanguage(tab.template.data || '');
                       }
                     }
                   }}
@@ -663,18 +691,32 @@ export default function TemplateModal({
             </div>
           )}
 
-            <button
-              onClick={handleCloseTab}
-              className="px-3 py-1.5 rounded flex items-center gap-2"
-              title="Закрыть"
-              style={{
-                backgroundColor: 'var(--theme-button-secondary-bg)',
-                color: 'var(--theme-button-secondary-text)',
-                border: '1px solid var(--theme-button-secondary-border)',
-              }}
-            >
-              <X className="w-4 h-4" />
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsMinimized(true)}
+                className="px-3 py-1.5 rounded flex items-center gap-2"
+                title="Свернуть"
+                style={{
+                  backgroundColor: 'var(--theme-button-secondary-bg)',
+                  color: 'var(--theme-button-secondary-text)',
+                  border: '1px solid var(--theme-button-secondary-border)',
+                }}
+              >
+                <Minimize2 className="w-4 h-4" />
+              </button>
+              <button
+                onClick={handleCloseTab}
+                className="px-3 py-1.5 rounded flex items-center gap-2"
+                title="Закрыть"
+                style={{
+                  backgroundColor: 'var(--theme-button-secondary-bg)',
+                  color: 'var(--theme-button-secondary-text)',
+                  border: '1px solid var(--theme-button-secondary-border)',
+                }}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
           {}
           <div className="flex flex-1 overflow-hidden">

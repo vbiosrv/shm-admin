@@ -157,8 +157,8 @@ function Users() {
 
   const handleDelete = async () => {
     if (!selectedRow?.user_id) return;
-    
-    await shm_request(`/shm/v1/admin/user/${selectedRow.user_id}`, {
+
+    await shm_request(`/shm/v1/admin/user?user_id=${selectedRow.user_id}`, {
       method: 'DELETE',
     });
     fetchData(limit, offset, filters, sortField, sortDirection);

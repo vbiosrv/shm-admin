@@ -35,7 +35,23 @@ function Templates() {
     shm_request(url)
       .then(res => {
         const { data: items, total: count } = normalizeListResponse(res);
-        setData(items);
+        if (sf && sd) {
+          const direction = sd === 'asc' ? 1 : -1;
+          const sorted = [...items].sort((a, b) => {
+            const aVal = a?.[sf];
+            const bVal = b?.[sf];
+            if (aVal == null && bVal == null) return 0;
+            if (aVal == null) return -1 * direction;
+            if (bVal == null) return 1 * direction;
+            if (typeof aVal === 'number' && typeof bVal === 'number') {
+              return (aVal - bVal) * direction;
+            }
+            return String(aVal).localeCompare(String(bVal), undefined, { sensitivity: 'base' }) * direction;
+          });
+          setData(sorted);
+        } else {
+          setData(items);
+        }
         setTotal(count);
       })
       .catch(() => setData([]))

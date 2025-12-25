@@ -244,23 +244,13 @@ function Layout() {
 
   const handleTemplateSave = async (templateData: any) => {
     try {
-      if (templateData.id) {
-        // Update existing template
-        const data = await shm_request(`/shm/v1/admin/template`, {
-          method: 'POST',
-          body: JSON.stringify(templateData)
-        });
-        toast.success('Шаблон обновлен');
-        return data;
-      } else {
-        // Create new template
-        const data = await shm_request('/shm/v1/admin/templates', {
-          method: 'PUT',
-          body: JSON.stringify(templateData)
-        });
-        toast.success('Шаблон создан');
-        return data;
-      }
+      const isNewTemplate = templateData?.is_add === 1 || templateData?.is_add === true;
+      const data = await shm_request('/shm/v1/admin/template', {
+        method: isNewTemplate ? 'PUT' : 'POST',
+        body: JSON.stringify(templateData)
+      });
+      toast.success(isNewTemplate ? 'Шаблон создан' : 'Шаблон обновлен');
+      return data;
     } catch (error: any) {
       toast.error(error?.message || 'Ошибка при сохранении шаблона');
       throw error;

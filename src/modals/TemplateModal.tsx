@@ -318,13 +318,17 @@ export default function TemplateModal({
     try {
       await onSave(formData);
       toast.success('Шаблон сохранён');
+      const savedFormData = formData.is_add === 1 ? { ...formData, is_add: 0 } : formData;
+      if (savedFormData !== formData) {
+        setFormData(savedFormData);
+      }
       
       if (activeTabId) {
         setTabs(prev => prev.map(t => 
           t.id === activeTabId ? { 
             ...t, 
             hasUnsavedChanges: false,
-            template: formData
+            template: savedFormData
           } : t
         ));
       }
@@ -345,6 +349,19 @@ export default function TemplateModal({
     try {
       await onSave(formData);
       toast.success('Шаблон сохранён');
+      const savedFormData = formData.is_add === 1 ? { ...formData, is_add: 0 } : formData;
+      if (savedFormData !== formData) {
+        setFormData(savedFormData);
+      }
+      if (activeTabId) {
+        setTabs(prev => prev.map(t =>
+          t.id === activeTabId ? {
+            ...t,
+            hasUnsavedChanges: false,
+            template: savedFormData
+          } : t
+        ));
+      }
       setTestModalOpen(true);
     } catch (error) {
       toast.error('Ошибка сохранения');

@@ -133,7 +133,7 @@ function SHMCloud() {
   const checkAuth = async () => {
     setLoading(true);
     try {
-      const res = await shm_request('/shm/v1/admin/cloud/user');
+      const res = await shm_request('shm/v1/admin/cloud/user');
       const userData = res.data || res;
       
       if (Array.isArray(userData) && userData.length > 0) {
@@ -160,7 +160,7 @@ function SHMCloud() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await shm_request('/shm/v1/admin/cloud/user/auth', {
+      await shm_request('shm/v1/admin/cloud/user/auth', {
         method: 'POST',
         body: JSON.stringify(loginData),
       });
@@ -176,7 +176,7 @@ function SHMCloud() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await shm_request('/shm/v1/admin/cloud/user', {
+      const res = await shm_request('shm/v1/admin/cloud/user', {
         method: 'PUT',
         body: JSON.stringify(registerData),
       });
@@ -191,7 +191,7 @@ function SHMCloud() {
 
   const handleLogout = async () => {
     try {
-      await shm_request('/shm/v1/admin/cloud/user/auth', {
+      await shm_request('shm/v1/admin/cloud/user/auth', {
         method: 'DELETE',
       });
     } catch (error) {

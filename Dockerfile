@@ -25,7 +25,6 @@ COPY entry.sh /entry.sh
 RUN chmod +x /entry.sh
 
 COPY --from=builder /app/dist /app
-COPY 404.html /app/404.html
 
 WORKDIR /app
 

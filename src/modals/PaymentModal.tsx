@@ -51,7 +51,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
   const loadPaySystems = async () => {
     setLoading(true);
     try {
-      const res = await shm_request('/shm/v1/admin/cloud/paysystems');
+      const res = await shm_request('shm/v1/admin/cloud/paysystems');
       const systems = Array.isArray(res.data) && Array.isArray(res.data[0])
         ? res.data[0]
         : (res.data || []);
@@ -71,7 +71,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({ open, onClose }) => 
     if (!confirmed) return;
 
     try {
-      await shm_request(`/shm/v1/admin/cloud/autopayment?pay_system=${paysystem}`, {
+      await shm_request(`shm/v1/admin/cloud/autopayment?pay_system=${paysystem}`, {
         method: 'DELETE',
       });
 

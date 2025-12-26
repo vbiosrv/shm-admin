@@ -179,7 +179,7 @@ export default function ServerModal({
   const handleTestMail = async () => {
     setTesting(true);
     try {
-      await shm_request('/shm/admin/mail_test.cgi', {
+      await shm_request('shm/admin/mail_test.cgi', {
         method: 'POST',
         body: JSON.stringify(formData),
       });

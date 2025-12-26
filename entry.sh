@@ -10,19 +10,19 @@ if [ ! -z "$VITE_SHOW_SWAGGER" ] && [ "$VITE_SHOW_SWAGGER" == "true" ]; then
 fi
 
 if [ ! -z "$SHM_BASE_PATH" ] && [ "$SHM_BASE_PATH" != "/" ]; then
-    sed -i "s|location / {|location $SHM_BASE_PATH {|" /etc/nginx/http.d/default.conf
+    sed -i "s|location / {|location $SHM_BASE_PATH/ {|" /etc/nginx/http.d/default.conf
     sed -i "s|#proxy_cookie_path;|proxy_cookie_path / $SHM_BASE_PATH;|" /etc/nginx/http.d/default.conf
     sed -i "s|location /shm {|location $SHM_BASE_PATH/shm {|" /etc/nginx/http.d/default.conf
+    sed -i "s|try_files \$uri \$uri/ /app/index.html;|try_files \$uri \$uri/ $SHM_BASE_PATH/index.html;|" /etc/nginx/http.d/default.conf
     sed -i "s|<base href=\"/\" />|<base href=\"$SHM_BASE_PATH/\" />|" /app/index.html
 
-    REDIRECT="    location / {\n        return 301 \$scheme://\$host$SHM_BASE_PATH\$request_uri;\n    }\n\n    "
-    sed -i "s|location $SHM_BASE_PATH {|$REDIRECT location $SHM_BASE_PATH {|" /etc/nginx/http.d/default.conf
+    REDIRECT="    location = / {\n        return 301 \$scheme://\$host$SHM_BASE_PATH/;\n    }\n\n    "
+    sed -i "s|location $SHM_BASE_PATH/ {|$REDIRECT location $SHM_BASE_PATH/ {|" /etc/nginx/http.d/default.conf
 
     if [ ! -z "$VITE_SHOW_SWAGGER" ] && [ "$VITE_SHOW_SWAGGER" == "true" ]; then
         sed -i "s|location /swagger {|location $SHM_BASE_PATH/swagger {|" /etc/nginx/http.d/default.conf
         sed -i "s|/shm/|$SHM_BASE_PATH/shm/|" /swagger/index.html
     fi
-    
 fi
 
 echo "Starting nginx with configuration:"

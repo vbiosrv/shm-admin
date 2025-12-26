@@ -10,7 +10,7 @@ export default function Console({ pipelineId }: ConsoleProps) {
   const [loading, setLoading] = useState(true);
   const offsetRef = useRef(1);
   const destroyedRef = useRef(false);
-  const timerRef = useRef<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     destroyedRef.current = false;
@@ -21,7 +21,7 @@ export default function Console({ pipelineId }: ConsoleProps) {
     const getLogs = async () => {
       try {
         const response = await fetch(
-          `/shm/admin/console.cgi?id=${pipelineId}&offset=${offsetRef.current}`,
+          `shm/admin/console.cgi?id=${pipelineId}&offset=${offsetRef.current}`,
           {
             credentials: 'include',
             headers: {

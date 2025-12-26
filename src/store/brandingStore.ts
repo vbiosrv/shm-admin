@@ -6,7 +6,6 @@ export interface BrandingSettings {
   appTitle: string;
   logoUrl: string;
   primaryColor: string;
-  loginTitle: string;
   loginSubtitle: string;
 }
 
@@ -25,7 +24,6 @@ const DEFAULT_BRANDING: BrandingSettings = {
   appTitle: 'SHM Admin',
   logoUrl: '',
   primaryColor: '#22d3ee',
-  loginTitle: 'SHM Admin',
   loginSubtitle: 'Войдите в систему управления',
 };
 
@@ -45,9 +43,8 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
         const company = result.data[0];
         const branding = {
           ...DEFAULT_BRANDING,
-          appName: company.title || company.name || DEFAULT_BRANDING.appName,
-          appTitle: company.title || company.name || DEFAULT_BRANDING.appTitle,
-          loginTitle: company.title || company.name || DEFAULT_BRANDING.loginTitle,
+          appName: company.name || DEFAULT_BRANDING.appName,
+          appTitle: company.title || DEFAULT_BRANDING.appTitle,
         };
         set({ branding, loaded: true });
         document.title = branding.appTitle;

@@ -68,7 +68,7 @@ function Login() {
             className="mt-6 text-center text-3xl font-extrabold"
             style={{ color: 'var(--theme-content-text)' }}
           >
-            {branding.loginTitle}
+            {branding.appTitle}
           </h2>
           <p
             className="mt-2 text-center text-sm"

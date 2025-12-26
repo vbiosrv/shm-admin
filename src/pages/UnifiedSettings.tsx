@@ -381,23 +381,6 @@ function UnifiedSettings() {
                       className="block text-sm font-medium mb-1"
                       style={{ color: 'var(--theme-content-text)' }}
                     >
-                      Заголовок страницы входа
-                    </label>
-                    <input
-                      type="text"
-                      name="loginTitle"
-                      value={formData.loginTitle}
-                      onChange={handleBrandingChange}
-                      className="input"
-                      placeholder="SHM Admin"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      className="block text-sm font-medium mb-1"
-                      style={{ color: 'var(--theme-content-text)' }}
-                    >
                       Подзаголовок страницы входа
                     </label>
                     <input
@@ -490,7 +473,7 @@ function UnifiedSettings() {
                         className="text-lg font-bold"
                         style={{ color: 'var(--theme-content-text)' }}
                       >
-                        {formData.loginTitle}
+                        {formData.appTitle}
                       </h3>
                       <p
                         className="text-sm"

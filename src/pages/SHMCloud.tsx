@@ -38,7 +38,6 @@ function SHMCloud() {
       }
     } catch (error: any) {
       if (error.status !== 404 && error.response?.status !== 404) {
-        console.error('Ошибка загрузки информации о подписке:', error);
       }
     }
   };

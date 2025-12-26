@@ -16,7 +16,6 @@ export function IpResetConfirmationModal({
   onConfirm,
   userData 
 }: IpResetConfirmationModalProps) {
-  console.log('IpResetConfirmationModal render, open:', open);
   
   if (!open) return null;
 

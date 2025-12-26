@@ -30,8 +30,6 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
     const start = formatDate(startDate);
     const stop = formatDate(endDate);
 
-    console.log(`[Dashboard] Fetching data for period: ${start} to ${stop}`);
-
     // Параллельные запросы к API - только данные за период
     const results = await Promise.allSettled([
       shm_request('shm/v1/admin/user?limit=1'),
@@ -103,12 +101,9 @@ export async function fetchDashboardAnalytics(period: number = 7): Promise<Dashb
         byStatus: Object.entries(servicesByStatus).map(([name, value]) => ({ name, value })),
       },
     };
-
-    console.log('[Dashboard] Analytics fetched successfully');
     return result;
 
   } catch (error) {
-    console.error('[Dashboard API] Error:', error);
     throw error;
   }
 }

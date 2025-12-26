@@ -3,7 +3,36 @@ import { TrendingUp, RefreshCw, ArrowLeft, Save, Undo2 } from 'lucide-react';
 import { shm_request } from '../lib/shm_request';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import type { Currency, CurrenciesResponse, CurrencyUpdate } from '../types/currency';
+
+export interface Currency {
+  code?: string;
+  currency: string;
+  id?: string;
+  name: string;
+  nominal: number;
+  nominal_value: number;
+  updated: string;
+  value: number;
+  addition_type?: 'fixed' | 'numeric' | 'percent' | '';
+  addition_value?: number;
+}
+
+export interface CurrenciesResponse {
+  data: [{
+    [key: string]: Currency;
+  }];
+  status: number;
+}
+
+export interface CurrencyUpdate {
+  currencies: {
+    [currencyCode: string]: {
+      addition_type?: 'fixed' | 'numeric' | 'percent' | '';
+      addition_value?: number;
+    };
+  };
+}
+
 
 interface CurrencyWithChanges extends Currency {
   hasChanges?: boolean;

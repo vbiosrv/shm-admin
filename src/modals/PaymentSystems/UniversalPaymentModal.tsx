@@ -49,7 +49,6 @@ export const UniversalPaymentModal: React.FC<UniversalPaymentModalProps> = ({ op
         setExistingData(currentConfig[system.name]);
       }
     } catch (error) {
-      console.error('Ошибка загрузки существующих данных:', error);
       // Не показываем ошибку пользователю, просто оставляем форму пустой
     }
   };
@@ -58,7 +57,8 @@ export const UniversalPaymentModal: React.FC<UniversalPaymentModalProps> = ({ op
     setLoading(true);
     try {
       // Загружаем форму через прокси на бэкенде, чтобы обойти CORS
-      const response = await fetch(`shm/v1/admin/cloud/paysystems/form?name=${system.url_form}`);
+      
+      const response = await shm_request(`shm/v1/admin/cloud/paysystems/form?name=${system.url_form}`);
       
       if (!response.ok) {
         throw new Error('Failed to load form');
@@ -69,7 +69,6 @@ export const UniversalPaymentModal: React.FC<UniversalPaymentModalProps> = ({ op
       const html = data.data && data.data[0] ? data.data[0] : '';
       setFormHtml(html);
     } catch (error) {
-      console.error('Ошибка загрузки формы:', error);
       toast.error('Не удалось загрузить форму настройки');
       setFormHtml(`
         <div class="text-center p-4">
@@ -154,7 +153,6 @@ export const UniversalPaymentModal: React.FC<UniversalPaymentModalProps> = ({ op
         toast.success(`Настройки ${system.title} сохранены`);
         onClose();
       } catch (error) {
-        console.error('Ошибка сохранения настроек:', error);
         toast.error('Ошибка сохранения настроек');
       }
     };

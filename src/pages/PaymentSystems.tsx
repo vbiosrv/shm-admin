@@ -39,7 +39,6 @@ function PaymentSystems() {
       const systems = Array.isArray(response.data) ? response.data : (Array.isArray(response) ? response : []);
       setPaymentSystems(systems);
     } catch (error) {
-      console.error('Ошибка загрузки платежных систем:', error);
       toast.error('Ошибка загрузки платежных систем');
     } finally {
       setLoading(false);

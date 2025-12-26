@@ -65,7 +65,6 @@ function Dashboard() {
       setAnalytics(enrichedData);
 
     } catch (error) {
-      console.error('Dashboard fetch error:', error);
     } finally {
       setLoading(false);
     }

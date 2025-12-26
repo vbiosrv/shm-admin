@@ -81,7 +81,6 @@ function Subscription() {
       const plans = Array.isArray(response.data) ? response.data : (Array.isArray(response) ? response : []);
       setSubscriptionPlans(plans);
     } catch (error) {
-      console.error('Ошибка загрузки планов подписки:', error);
     }
   };
 
@@ -122,7 +121,6 @@ function Subscription() {
         loadSubscriptionInfo();
         loadSubscriptionPlans();
     } catch (error) {
-      console.error('Ошибка обновления периода продления:', error);
       toast.error('Ошибка обновления периода продления');
     }
   };

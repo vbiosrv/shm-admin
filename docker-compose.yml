@@ -4,6 +4,9 @@ services:
     image: "bkeenke/shm-admin-2:latest"
     pull_policy: always
     restart: always
+    environment:
+      SHM_BASE_PATH: /
+      SHM_HOST: http://api
     depends_on:
       - api
     ports:

@@ -1,0 +1,146 @@
+<style>
+  .payment-form {
+    max-width: 100%;
+  }
+  
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--theme-content-text);
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--theme-input-border);
+    background-color: var(--theme-input-bg);
+    color: var(--theme-content-text);
+  }
+  
+  .form-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+  }
+  
+  .form-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1rem;
+  }
+  
+  .btn {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .btn-primary {
+    background-color: var(--accent-primary);
+    color: var(--accent-text);
+  }
+  
+  .btn-primary:hover {
+    opacity: 0.9;
+  }
+  
+  .btn-secondary {
+    background-color: var(--theme-button-secondary-bg);
+    color: var(--theme-button-secondary-text);
+    border: 1px solid var(--theme-button-secondary-border);
+  }
+  
+  .btn-secondary:hover {
+    opacity: 0.9;
+  }
+  
+  .help-text {
+    font-size: 0.75rem;
+    color: var(--theme-content-text-muted);
+    margin-top: 0.25rem;
+  }
+  
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+  
+  .checkbox-label input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
+  }
+</style>
+
+<form class="payment-form">
+  <div class="form-group">
+    <label class="form-label" for="name">Название для клиентов</label>
+    <input 
+      type="text" 
+      id="name" 
+      name="name" 
+      class="form-input" 
+      placeholder="ЮКасса"
+      value="ЮКасса"
+      required
+    />
+  </div>
+
+  <div class="form-group">
+    <label class="form-label" for="shop_id">ID магазина</label>
+    <input 
+      type="text" 
+      id="shop_id" 
+      name="shop_id" 
+      class="form-input" 
+      placeholder="123456"
+      required
+    />
+    <div class="help-text">Вы можете найти его в личном кабинете ЮКассы</div>
+  </div>
+  
+  <div class="form-group">
+    <label class="form-label" for="secret_key">Секретный ключ</label>
+      <input 
+        type="text" 
+        id="secret_key" 
+        name="secret_key" 
+        class="form-input" 
+        placeholder="live_..."
+        required
+      />
+    <div class="help-text">Начинается с "live_" для боевого режима или "test_" для тестирования</div>
+  </div>
+  
+  <div class="form-group">
+    <label class="checkbox-label">
+      <input 
+        type="checkbox" 
+        id="show_for_client" 
+        name="show_for_client" 
+        value="true"
+        checked
+      />
+      <span>Показывать клиентам</span>
+    </label>
+  </div>
+  
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">
+      Сохранить
+    </button>
+    <button type="button" class="btn btn-secondary">
+      Отмена
+    </button>
+  </div>
+</form>

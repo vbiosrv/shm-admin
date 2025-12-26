@@ -25,6 +25,9 @@ import Identities from './pages/Identities';
 import SpoolHistory from './pages/SpoolHistory';
 import UnifiedSettings from './pages/UnifiedSettings';
 import SHMCloud from './pages/SHMCloud';
+import Subscription from './pages/Subscription';
+import PaymentSystems from './pages/PaymentSystems';
+import CurrencyConverter from './pages/CurrencyConverter';
 import NotFound from './pages/NotFound';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -112,6 +115,9 @@ function App() {
           <Route path="config" element={<Config />} />
           <Route path="settings" element={<UnifiedSettings />} />
           <Route path="cloud" element={<SHMCloud />} />
+          <Route path="subscription" element={<Subscription />} />
+          <Route path="payment-systems" element={<PaymentSystems />} />
+          <Route path="currency-converter" element={<CurrencyConverter />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

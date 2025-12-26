@@ -23,15 +23,5 @@ export default defineConfig({
       },
     },
     chunkSizeWarningLimit: 1000,
-  },
-  // Uncomment and configure the server proxy if needed
-  // server: {
-  //   proxy: {
-  //     '/shm': {
-  //       target: 'https://YOUR_DOMAIN.ru',
-  //       changeOrigin: true,
-  //       secure: false,
-  //     },
-  //   },
-  // },
+  }
 });

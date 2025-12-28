@@ -22,3 +22,5 @@ src/version
 build.sh
 build.ps1
 /.github
+vite.config-1.ts
+vite.config-2.ts

@@ -3,18 +3,7 @@ import { CreditCard, ArrowLeft } from 'lucide-react';
 import { shm_request } from '../lib/shm_request';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import { UniversalPaymentModal } from '../modals/PaymentSystems/UniversalPaymentModal';
-
-export interface PaymentSystem {
-  descr: string;
-  name: string;
-  title: string;
-  url_file: string;
-  url_form: string;
-  url_logo?: string;
-  logo?: string;
-  price?: number;
-}
+import { UniversalPaymentModal, PaymentSystem } from '../modals/PaymentSystems/UniversalPaymentModal';
 
 function PaymentSystems() {
   const [loading, setLoading] = useState(true);
@@ -59,7 +48,7 @@ function PaymentSystems() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" 
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
                style={{ borderColor: 'var(--accent-primary)' }}></div>
           <p style={{ color: 'var(--theme-content-text-muted)' }}>Загрузка...</p>
         </div>
@@ -70,14 +59,14 @@ function PaymentSystems() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 
+        <h1
           className="text-2xl font-bold flex items-center gap-3"
           style={{ color: 'var(--theme-content-text)' }}
         >
           <CreditCard className="w-7 h-7" style={{ color: 'var(--theme-primary-color)' }} />
           Платежные системы
         </h1>
-        <Link 
+        <Link
           to="/cloud"
           className="px-4 py-2 rounded flex items-center gap-2"
           style={{
@@ -91,7 +80,7 @@ function PaymentSystems() {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {paymentSystems.map((system) => (
           <div
             key={system.name}
@@ -108,15 +97,15 @@ function PaymentSystems() {
               </h3>
             </div>
             <p className="text-sm" style={{ color: 'var(--theme-content-text-muted)' }}>
-              {system.descr}
+              {system.description}
             </p>
-            {system.price && (
+            {system.price && system.price > 0 ? (
               <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--theme-card-border)' }}>
                 <p className="text-sm font-semibold" style={{ color: 'var(--accent-primary)' }}>
                   Стоимость: {system.price} ₽
                 </p>
               </div>
-            )}
+            ) : undefined }
           </div>
         ))}
       </div>

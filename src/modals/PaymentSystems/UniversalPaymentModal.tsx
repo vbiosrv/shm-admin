@@ -2,16 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { shm_request } from '../../lib/shm_request';
+import DynamicPaymentForm, { PaymentFormSchema, PaymentFieldSchema } from '../../components/DynamicPaymentForm';
 
 export interface PaymentSystem {
-  descr: string;
   name: string;
   title: string;
-  url_file: string;
-  url_form: string;
-  url_logo?: string;
-  logo?: string;
+  description: string;
+  infoMessage?: string;
   price?: number;
+  fields: PaymentFieldSchema[];
 }
 
 interface UniversalPaymentModalProps {
@@ -21,8 +20,7 @@ interface UniversalPaymentModalProps {
 }
 
 export const UniversalPaymentModal: React.FC<UniversalPaymentModalProps> = ({ open, onClose, system }) => {
-  const [formHtml, setFormHtml] = useState<string>('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [existingData, setExistingData] = useState<any>(null);
 
   const cardStyles = {
@@ -32,9 +30,8 @@ export const UniversalPaymentModal: React.FC<UniversalPaymentModalProps> = ({ op
   };
 
   useEffect(() => {
-    if (open && system.url_form) {
+    if (open) {
       loadExistingData();
-      loadFormHtml();
     }
   }, [open, system]);
 
@@ -43,7 +40,7 @@ export const UniversalPaymentModal: React.FC<UniversalPaymentModalProps> = ({ op
       // Загружаем существующие настройки платежной системы
       const configResponse = await shm_request('shm/v1/admin/config/pay_systems');
       const currentConfig = configResponse.data?.[0] || {};
-      
+
       // Получаем данные для текущей платежной системы
       if (currentConfig[system.name]) {
         setExistingData(currentConfig[system.name]);
@@ -53,144 +50,42 @@ export const UniversalPaymentModal: React.FC<UniversalPaymentModalProps> = ({ op
     }
   };
 
-  const loadFormHtml = async () => {
-    setLoading(true);
+  const handleFormSubmit = async (formData: Record<string, any>) => {
     try {
-      // Загружаем форму через прокси на бэкенде, чтобы обойти CORS
-      const data = await shm_request(`shm/v1/admin/cloud/paysystems/form?name=${system.url_form}`);
-      
-      // Бэкенд возвращает HTML в формате {data: [html_string]}
-      const html = data.data && data.data[0] ? data.data[0] : '';
-      setFormHtml(html);
-    } catch (error) {
-      toast.error('Не удалось загрузить форму настройки');
-      setFormHtml(`
-        <div class="text-center p-4">
-          <p style="color: var(--theme-content-text-muted);">
-            Форма настройки для ${system.title} временно недоступна
-          </p>
-        </div>
-      `);
-    } finally {
-      setLoading(false);
-    }
-  };
+      // Получаем текущие настройки платежных систем
+      const configResponse = await shm_request('shm/v1/admin/config/pay_systems');
+      const currentConfig = configResponse.data?.[0] || {};
 
-  // Заполняем форму существующими данными
-  useEffect(() => {
-    if (!open || loading || !formHtml || !existingData) return;
+      // Подготовка данных для сохранения
+      const systemConfig: any = {
+        ...formData,
+      };
 
-    const modalContent = document.getElementById('payment-form-container');
-    if (modalContent) {
-      const form = modalContent.querySelector('form');
-      if (form) {
-        // Заполняем все поля формы
-        Object.keys(existingData).forEach((key) => {
-          const value = existingData[key];
-          const input = form.querySelector(`[name="${key}"]`) as HTMLInputElement | HTMLSelectElement;
-          
-          if (input) {
-            if (input.type === 'checkbox') {
-              (input as HTMLInputElement).checked = value === true || value === 'true';
-            } else {
-              input.value = value;
-            }
-          }
-        });
-      }
-    }
-  }, [open, loading, formHtml, existingData]);
+      // Преобразуем числовые поля
+      if (formData.weight) systemConfig.weight = Number(formData.weight);
+      if (formData.lifetime) systemConfig.lifetime = Number(formData.lifetime);
 
-  useEffect(() => {
-    if (!open || loading || !formHtml) return;
+      // Добавляем/обновляем настройки для текущей платежной системы
+      const updatedConfig = {
+        ...currentConfig,
+        [system.name]: systemConfig
+      };
 
-    // Обработка кнопки отмены
-    const handleCancel = () => {
-      onClose();
-    };
-
-    // Обработка отправки формы
-    const handleFormSubmit = async (e: Event) => {
-      e.preventDefault();
-      const form = e.target as HTMLFormElement;
-      const formData = new FormData(form);
-      const formFields: any = {};
-      
-      formData.forEach((value, key) => {
-        formFields[key] = value;
+      // Сохраняем обновленную конфигурацию
+      await shm_request('shm/v1/admin/config', {
+        method: 'POST',
+        body: JSON.stringify({
+          key: 'pay_systems',
+          value: updatedConfig,
+        }),
       });
 
-      // Валидация lifetime для wata (10-43200 минут)
-      if (system.name === 'wata' && formFields.lifetime) {
-        const lifetime = Number(formFields.lifetime);
-        if (lifetime < 10 || lifetime > 43200) {
-          toast.error('Lifetime должен быть от 10 до 43200 минут');
-          return;
-        }
-      }
-
-      try {
-        // Получаем текущие настройки платежных систем
-        const configResponse = await shm_request('shm/v1/admin/config/pay_systems');
-        const currentConfig = configResponse.data?.[0] || {};
-
-        // Подготовка данных для сохранения
-        const systemConfig: any = {
-          ...formFields,
-          name: formFields.name || system.title,
-          show_for_client: formFields.show_for_client === 'true' || formFields.show_for_client === true,
-        };
-
-        // Преобразуем числовые поля
-        if (formFields.weight) systemConfig.weight = Number(formFields.weight);
-        if (formFields.lifetime) systemConfig.lifetime = Number(formFields.lifetime);
-
-        // Добавляем/обновляем настройки для текущей платежной системы
-        const updatedConfig = {
-          ...currentConfig,
-          [system.name]: systemConfig
-        };
-
-        // Сохраняем обновленную конфигурацию
-        await shm_request('shm/v1/admin/config', {
-          method: 'POST',
-          body: JSON.stringify({
-            key: 'pay_systems',
-            value: updatedConfig,
-          }),
-        });
-
-        toast.success(`Настройки ${system.title} сохранены`);
-        onClose();
-      } catch (error) {
-        toast.error('Ошибка сохранения настроек');
-      }
-    };
-
-    // Находим форму в загруженном HTML и добавляем обработчики
-    const modalContent = document.getElementById('payment-form-container');
-    if (modalContent) {
-      const form = modalContent.querySelector('form');
-      const cancelButton = modalContent.querySelector('button[type="button"]');
-      
-      if (form) {
-        form.addEventListener('submit', handleFormSubmit);
-      }
-      
-      if (cancelButton) {
-        cancelButton.addEventListener('click', handleCancel);
-      }
-
-      return () => {
-        if (form) {
-          form.removeEventListener('submit', handleFormSubmit);
-        }
-        if (cancelButton) {
-          cancelButton.removeEventListener('click', handleCancel);
-        }
-      };
+      toast.success(`Настройки ${system.title} сохранены`);
+      onClose();
+    } catch (error) {
+      toast.error('Ошибка сохранения настроек');
     }
-  }, [open, loading, formHtml, system, onClose]);
+  };
 
   if (!open) return null;
 
@@ -205,7 +100,7 @@ export const UniversalPaymentModal: React.FC<UniversalPaymentModalProps> = ({ op
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-6 border-b sticky top-0 z-10"
-             style={{ 
+             style={{
                borderColor: 'var(--theme-card-border)',
                backgroundColor: 'var(--theme-card-bg)'
              }}>
@@ -220,33 +115,44 @@ export const UniversalPaymentModal: React.FC<UniversalPaymentModalProps> = ({ op
         </div>
 
         <div className="p-6">
-          {system.descr && (
+          {system.description && (
             <p className="text-sm mb-4" style={{ color: 'var(--theme-content-text-muted)' }}>
-              {system.descr}
+              {system.description}
             </p>
           )}
 
-          {system.price && (
+          {system.price && system.price > 0 ? (
             <div className="p-3 rounded mb-4" style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)' }}>
               <p className="text-sm font-semibold" style={{ color: 'var(--accent-primary)' }}>
                 Стоимость подключения: {system.price} ₽
               </p>
             </div>
-          )}
+          ) : undefined}
 
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2"
                    style={{ borderColor: 'var(--accent-primary)' }}></div>
             </div>
-          ) : (
-            <div 
-              id="payment-form-container"
-              dangerouslySetInnerHTML={{ __html: formHtml }}
-              style={{
-                color: 'var(--theme-content-text)',
+          ) : system.fields ? (
+            <DynamicPaymentForm
+              schema={{
+                name: system.name,
+                title: system.title,
+                description: system.description,
+                infoMessage: system.infoMessage,
+                fields: system.fields
               }}
+              existingData={existingData}
+              onSubmit={handleFormSubmit}
+              onCancel={onClose}
             />
+          ) : (
+            <div className="text-center p-4">
+              <p style={{ color: 'var(--theme-content-text-muted)' }}>
+                Схема настройки для {system.title} временно недоступна
+              </p>
+            </div>
           )}
         </div>
       </div>

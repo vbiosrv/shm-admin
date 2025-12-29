@@ -92,7 +92,7 @@ export const UniversalPaymentModal: React.FC<UniversalPaymentModalProps> = ({ op
   const handlePurchase = async () => {
     setPurchasing(true);
     try {
-      await shm_request(`shm/v1/admin/cloud/proxy/paysystems/order?ps=${system.name}`, {
+      await shm_request(`shm/v1/admin/cloud/proxy/service/paysystems/order?ps=${system.name}`, {
         method: 'GET',
       });
       toast.success(`Платежная система ${system.title} успешно приобретена`);

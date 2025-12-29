@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
 import WithdrawModal from './WithdrawModal';
-import { Save, Trash2, X, Loader2, ChevronDown, Receipt } from 'lucide-react';
+import ChangeServiceModal from './ChangeServiceModal';
+import { Save, Trash2, X, Loader2, ChevronDown, Receipt, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import JsonEditor from '../components/JsonEditor';
 import UserSelect from '../components/UserSelect';
@@ -46,6 +47,7 @@ export default function UserServiceModal({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false);
   const [withdrawData, setWithdrawData] = useState<Record<string, any> | null>(null);
+  const [changeServiceModalOpen, setChangeServiceModalOpen] = useState(false);
 
   const statusMenuRef = useRef<HTMLDivElement>(null);
 
@@ -312,7 +314,7 @@ export default function UserServiceModal({
         {}
         <div className="flex items-center gap-3">
           <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
-            Услуга
+            Услуга:
           </label>
           <div className="flex-1">
             <ServiceSelect
@@ -324,7 +326,7 @@ export default function UserServiceModal({
         </div>
 
         {}
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-3 gap-6">
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
               Статус
@@ -391,7 +393,7 @@ export default function UserServiceModal({
           </div>
           <div className="flex items-center gap-3">
             <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
-              Биллинг
+              Биллинг:
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -407,6 +409,25 @@ export default function UserServiceModal({
               )}
             </label>
           </div>
+          
+          <div className="flex items-center gap-3">
+          <label className="w-32 text-sm font-medium shrink-0" style={labelStyles}>
+            Смена тарифа:
+            </label>
+            <button
+              type="button"
+              onClick={() => setChangeServiceModalOpen(true)}
+              className="px-3 py-1.5 rounded flex items-center gap-2 text-sm font-medium btn-primary"
+              style={{
+                backgroundColor: 'var(--accent-primary)',
+                borderColor: 'var(--accent-primary)',
+                color: 'var(--accent-text)',
+              }}
+              title="Сменить тариф"
+            >
+              Сменить
+            </button>
+            </div>
         </div>
 
         {}
@@ -513,6 +534,17 @@ export default function UserServiceModal({
         onClose={() => setWithdrawModalOpen(false)}
         data={withdrawData}
         onSave={handleSaveWithdraw}
+      />
+
+      {}
+      <ChangeServiceModal
+        open={changeServiceModalOpen}
+        onClose={() => setChangeServiceModalOpen(false)}
+        userServiceData={formData}
+        onSuccess={() => {
+          onRefresh?.();
+          onClose();
+        }}
       />
     </Modal>
   );

@@ -363,8 +363,8 @@ function Subscription() {
               >
                 <option value={-1}>Не продлевать</option>
                 {subscriptionPlans.map((plan) => (
-                  <option key={plan.service_id} value={plan.service_id}>
-                    {plan.name} - {plan.price} руб.
+                  <option key={plan.service_id} value={plan.next ?? plan.service_id}>
+                    {plan.name} - {plan.price_next ?? plan.price} руб.
                   </option>
                 ))}
               </select>

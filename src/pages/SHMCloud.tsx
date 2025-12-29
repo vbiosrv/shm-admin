@@ -38,7 +38,10 @@ function SHMCloud() {
         setSubscriptionInfo(data);
       }
     } catch (error: any) {
+      // При 404 ошибке очищаем информацию о подписке
+      setSubscriptionInfo(null);
       if (error.status !== 404 && error.response?.status !== 404) {
+        // Логируем только если это не 404
       }
     }
   };

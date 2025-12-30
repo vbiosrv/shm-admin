@@ -113,22 +113,26 @@ function Dashboard() {
 
       {/* Основные метрики */}
       <StatCardGrid columns={2}>
+        <Link
+          to="/users">
         <StatCard
           title="Пользователи"
           value={analytics?.counts.totalUsers ?? '...'}
           icon={Users}
           color="cyan"
           loading={loading}
-          onClick={() => window.location.href = '/users'}
         />
+        </Link>
+        <Link
+          to="/user-services">
         <StatCard
           title="Услуги пользователей"
           value={analytics?.counts.activeUserServices ?? '...'}
           icon={Package}
           color="emerald"
           loading={loading}
-          onClick={() => window.location.href = '/user-services'}
         />
+        </Link>
       </StatCardGrid>
 
       {/* Финансовые метрики */}

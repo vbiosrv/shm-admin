@@ -30,4 +30,4 @@ WORKDIR /app
 
 ENTRYPOINT ["/entry.sh"]
 
-HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD wget --no-verbose --tries=1 --spider "127.0.0.1/shm/healthcheck.cgi" || exit 1
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 CMD curl -f "127.0.0.1${SHM_BASE_PATH:-}/shm/healthcheck.cgi" || exit 1

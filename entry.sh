@@ -15,14 +15,9 @@ if [ ! -z "$SHM_BASE_PATH" ] && [ "$SHM_BASE_PATH" != "/" ]; then
     # Update base path in index.html first
     sed -i "s|<base href=\"/\" />|<base href=\"$SHM_BASE_PATH/\" />|" /app/index.html
     
-    # Update nginx config - main location
-    sed -i "s|location / {|location $SHM_BASE_PATH/ {|" /etc/nginx/http.d/default.conf
+    # Update nginx config
     sed -i "s|try_files \$uri \$uri/ /index.html;|try_files \$uri \$uri/ $SHM_BASE_PATH/index.html;|" /etc/nginx/http.d/default.conf
-    
-    # Update assets location
-    sed -i "s|location /assets/ {|location $SHM_BASE_PATH/assets/ {|" /etc/nginx/http.d/default.conf
-    
-    # Update shm location
+    sed -i "s|location / {|location $SHM_BASE_PATH/ {|" /etc/nginx/http.d/default.conf
     sed -i "s|location /shm {|location $SHM_BASE_PATH/shm {|" /etc/nginx/http.d/default.conf
     sed -i "s|/shm/healthcheck|$SHM_BASE_PATH/shm/healthcheck|" /etc/nginx/http.d/default.conf
     sed -i "s|#proxy_cookie_path;|proxy_cookie_path / $SHM_BASE_PATH;|" /etc/nginx/http.d/default.conf

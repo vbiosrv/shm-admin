@@ -23,12 +23,12 @@ function Events() {
   const [offset, setOffset] = useState(0);
   const [sortField, setSortField] = useState<string | undefined>();
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
-  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [filters, setFilters] = useState<Record<string, any>>({});
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
-  const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
+  const fetchData = useCallback((l: number, o: number, f: Record<string, any>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
     let url = `shm/v1/admin/service/event?limit=${l}&offset=${o}`;
 
@@ -68,7 +68,7 @@ function Events() {
     setOffset(0);
   };
 
-  const handleFilterChange = useCallback((newFilters: Record<string, string>) => {
+  const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
     setFilters(newFilters);
     setOffset(0);
   }, []);

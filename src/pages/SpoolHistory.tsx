@@ -52,7 +52,7 @@ function SpoolHistory() {
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [filters, setFilters] = useState<Record<string, any>>({});
 
     const { selectedUser } = useSelectedUserStore();
 
@@ -63,7 +63,7 @@ function SpoolHistory() {
       return undefined;
     }, [selectedUser]);
 
-  const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
+  const fetchData = useCallback((l: number, o: number, f: Record<string, any>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
     let url = `shm/v1/admin/spool/history?limit=${l}&offset=${o}`;
 
@@ -100,7 +100,7 @@ function SpoolHistory() {
     setOffset(0);
   };
 
-  const handleFilterChange = useCallback((newFilters: Record<string, string>) => {
+  const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
     setFilters(newFilters);
     setOffset(0);
   }, []);

@@ -42,12 +42,12 @@ interface DataTableProps {
   onRowClick?: (row: any) => void;
   onRefresh?: () => void;
   onSort?: (field: string, direction: SortDirection) => void;
-  onFilterChange?: (filters: Record<string, string>) => void;
+  onFilterChange?: (filters: Record<string, any>) => void;
   sortField?: string;
   sortDirection?: SortDirection;
   height?: string;
   storageKey?: string;
-  externalFilters?: Record<string, string>;
+  externalFilters?: Record<string, any>;
 }
 
 const LIMITS = [50, 100, 500, 1000, 5000];
@@ -115,8 +115,7 @@ function DataTable({
   storageKey,
   externalFilters
 }: DataTableProps) {
-  const displayData = data;
-  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [filters, setFilters] = useState<Record<string, any>>({});
   
   const [columns, setColumns] = useState<Column[]>(() => {
     const defaultColumns = initialColumns.map(col => ({ 
@@ -152,7 +151,8 @@ function DataTable({
     return result;
   });
   
-  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [columnFilters, setColumnFilters] = useState<Record<string, any>>({});
+  const [excludeFilters, setExcludeFilters] = useState<Record<string, boolean>>({});
   const [showColumns, setShowColumns] = useState(false);
   const [draggedColumn, setDraggedColumn] = useState<string | null>(null);
   const [resizingColumn, setResizingColumn] = useState<string | null>(null);
@@ -175,29 +175,92 @@ function DataTable({
   const onRefreshRef = useRef(onRefresh); 
   const prevFormattedFiltersRef = useRef<string>(''); 
 
+  const shouldExcludeLocally = useCallback((key: string, rawValue: string) => {
+    if (excludeFilters[key]) return true;
+    return rawValue.trim().startsWith('!');
+  }, [excludeFilters]);
+
+  const getExcludeValue = useCallback((rawValue: string) => {
+    const trimmed = rawValue.trim();
+    return trimmed.startsWith('!') ? trimmed.slice(1).trim() : trimmed;
+  }, []);
+
+  const likePatternToRegExp = useCallback((pattern: string) => {
+    const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regexSource = `^${escaped.replace(/%/g, '.*')}$`;
+    return new RegExp(regexSource, 'i');
+  }, []);
+
+  const displayData = React.useMemo(() => {
+    let result = data;
+
+    for (const [key, value] of Object.entries(columnFilters)) {
+      const rawText = String(value ?? '').trim();
+      if (!rawText) continue;
+      if (!shouldExcludeLocally(key, rawText)) continue;
+
+      const excludeValue = getExcludeValue(rawText);
+      if (!excludeValue) continue;
+
+      const column = columns.find((c) => c.key === key);
+      const isSelect = column?.filterType === 'select';
+
+      if (isSelect) {
+        result = result.filter((row) => String(row?.[key] ?? '') !== excludeValue);
+        continue;
+      }
+
+      const hasExplicitWildcard = excludeValue.includes('%');
+      const matcher = hasExplicitWildcard
+        ? likePatternToRegExp(excludeValue)
+        : null;
+
+      const needle = excludeValue.toLowerCase();
+      result = result.filter((row) => {
+        const hay = String(row?.[key] ?? '').toLowerCase();
+        const matches = matcher ? matcher.test(hay) : hay.includes(needle);
+        return !matches;
+      });
+    }
+
+    return result;
+  }, [columns, columnFilters, data, getExcludeValue, likePatternToRegExp, shouldExcludeLocally]);
+
   useEffect(() => {
     onRefreshRef.current = onRefresh;
   }, [onRefresh]);
 
   useEffect(() => {
-    setColumnFilters(prev => {
-      const newFilters = { ...prev };
-      
-      prevExternalFiltersKeys.current.forEach(key => {
-        if (!externalFilters || !(key in externalFilters)) {
-          delete newFilters[key];
+    const oldKeys = prevExternalFiltersKeys.current;
+    const newKeys = new Set(Object.keys(externalFilters ?? {}));
+
+    setColumnFilters((prev) => {
+      const next = { ...prev };
+      oldKeys.forEach((key) => {
+        if (!newKeys.has(key)) {
+          delete next[key];
         }
       });
-      
       if (externalFilters) {
-        Object.assign(newFilters, externalFilters);
-        prevExternalFiltersKeys.current = new Set(Object.keys(externalFilters));
-      } else {
-        prevExternalFiltersKeys.current.clear();
+        Object.assign(next, externalFilters);
       }
-      
-      return newFilters;
+      return next;
     });
+
+    setExcludeFilters((prev) => {
+      const next = { ...prev };
+      oldKeys.forEach((key) => {
+        if (!newKeys.has(key)) {
+          delete next[key];
+        }
+      });
+      newKeys.forEach((key) => {
+        next[key] = false;
+      });
+      return next;
+    });
+
+    prevExternalFiltersKeys.current = newKeys;
   }, [externalFilters]);
 
   useEffect(() => {
@@ -208,13 +271,21 @@ function DataTable({
     }
     
     filterTimeoutRef.current = setTimeout(() => {
-      const formattedFilters: Record<string, string> = {};
+      const formattedFilters: Record<string, any> = {};
       Object.entries(columnFilters).forEach(([key, value]) => {
         const trimmedValue = String(value ?? '').trim();
         if (!trimmedValue) return;
 
-        const hasExplicitWildcard = trimmedValue.includes('%');
-        formattedFilters[key] = hasExplicitWildcard ? trimmedValue : `%${trimmedValue}%`;
+        const isExclude = shouldExcludeLocally(key, trimmedValue);
+        const rawValue = getExcludeValue(trimmedValue);
+        if (!rawValue) return;
+
+        const hasExplicitWildcard = rawValue.includes('%');
+        const pattern = hasExplicitWildcard ? rawValue : `%${rawValue}%`;
+
+        if (isExclude) return;
+
+        formattedFilters[key] = pattern;
       });
       
       const filtersString = JSON.stringify(formattedFilters);
@@ -229,7 +300,7 @@ function DataTable({
         clearTimeout(filterTimeoutRef.current);
       }
     };
-  }, [columnFilters, onFilterChange]);
+  }, [columnFilters, excludeFilters, onFilterChange]);
 
   useEffect(() => {
     if (!loading && isFirstLoad.current) {
@@ -673,12 +744,30 @@ function DataTable({
                         style={{ color: 'var(--theme-content-text-muted)' }}
                       />
                       {columnFilters[col.key] && (
-                        <button
-                          onClick={() => setColumnFilters(prev => ({ ...prev, [col.key]: '' }))}
-                          className="absolute right-6 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-slate-500/30"
-                        >
-                          <X className="w-3 h-3" style={{ color: 'var(--theme-content-text-muted)' }} />
-                        </button>
+                        <div className="absolute right-6 top-1/2 -translate-y-1/2 flex gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => setExcludeFilters(prev => ({ ...prev, [col.key]: !prev[col.key] }))}
+                            className="p-0.5 rounded hover:bg-slate-500/30"
+                            title={excludeFilters[col.key] ? 'Исключение включено' : 'Исключить'}
+                          >
+                            <FilterX
+                              className="w-3 h-3"
+                              style={{ color: excludeFilters[col.key] ? 'var(--theme-primary-color)' : 'var(--theme-content-text-muted)' }}
+                            />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setColumnFilters(prev => ({ ...prev, [col.key]: '' }));
+                              setExcludeFilters(prev => ({ ...prev, [col.key]: false }));
+                            }}
+                            className="p-0.5 rounded hover:bg-slate-500/30"
+                            title="Очистить"
+                          >
+                            <X className="w-3 h-3" style={{ color: 'var(--theme-content-text-muted)' }} />
+                          </button>
+                        </div>
                       )}
                     </div>
                   ) : (
@@ -689,27 +778,45 @@ function DataTable({
                       />
                       <input
                         type="text"
-                        placeholder="Фильтр..."
+                        placeholder="Фильтр... (! исключить)"
                         value={columnFilters[col.key] || ''}
                         onChange={e => setColumnFilters(prev => ({
                           ...prev,
                           [col.key]: e.target.value
                         }))}
-                        className="w-full text-xs py-1 pl-7 pr-2 rounded"
+                        className="w-full text-xs py-1 pl-7 pr-12 rounded"
                         style={{
                           backgroundColor: 'var(--theme-input-bg)',
                           border: '1px solid var(--theme-input-border)',
                           color: 'var(--theme-input-text)',
                         }}
                       />
-                      {columnFilters[col.key] && (
+                      <div className="absolute right-1 top-1/2 -translate-y-1/2 flex gap-0.5">
                         <button
-                          onClick={() => setColumnFilters(prev => ({ ...prev, [col.key]: '' }))}
-                          className="absolute right-1 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-slate-500/30"
+                          type="button"
+                          onClick={() => setExcludeFilters(prev => ({ ...prev, [col.key]: !prev[col.key] }))}
+                          className="p-0.5 rounded hover:bg-slate-500/30"
+                          title={excludeFilters[col.key] ? 'Исключение включено' : 'Исключить'}
                         >
-                          <X className="w-3 h-3" style={{ color: 'var(--theme-content-text-muted)' }} />
+                          <FilterX
+                            className="w-3 h-3"
+                            style={{ color: excludeFilters[col.key] ? 'var(--theme-primary-color)' : 'var(--theme-content-text-muted)' }}
+                          />
                         </button>
-                      )}
+                        {columnFilters[col.key] && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setColumnFilters(prev => ({ ...prev, [col.key]: '' }));
+                              setExcludeFilters(prev => ({ ...prev, [col.key]: false }));
+                            }}
+                            className="p-0.5 rounded hover:bg-slate-500/30"
+                            title="Очистить"
+                          >
+                            <X className="w-3 h-3" style={{ color: 'var(--theme-content-text-muted)' }} />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </th>
@@ -797,7 +904,7 @@ function DataTable({
         <div className="flex gap-4 items-center">
           <div style={{ color: 'var(--theme-content-text-muted)' }}>
             Всего: <strong style={{ color: 'var(--theme-content-text)' }}>{total}</strong>
-            {' '} | Показано: <strong style={{ color: 'var(--theme-content-text)' }}>{data.length}</strong>
+            {' '} | Показано: <strong style={{ color: 'var(--theme-content-text)' }}>{displayData.length}</strong>
           </div>
           
           <div className="flex gap-2 items-center">

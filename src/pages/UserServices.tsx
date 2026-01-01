@@ -59,7 +59,7 @@ function UserServices() {
   const [offset, setOffset] = useState(0);
   const [sortField, setSortField] = useState<string | undefined>();
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
-  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [filters, setFilters] = useState<Record<string, any>>({});
   const [selectedRow, setSelectedRow] = useState<any>(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -73,7 +73,7 @@ function UserServices() {
     return undefined;
   }, [selectedUser]);
 
-  const fetchData = useCallback((l: number, o: number, f: Record<string, string>, sf?: string, sd?: SortDirection) => {
+  const fetchData = useCallback((l: number, o: number, f: Record<string, any>, sf?: string, sd?: SortDirection) => {
     setLoading(true);
     let url = `shm/v1/admin/user/service?limit=${l}&offset=${o}`;
 
@@ -122,7 +122,7 @@ function UserServices() {
     setOffset(0);
   };
 
-  const handleFilterChange = useCallback((newFilters: Record<string, string>) => {
+  const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
     setFilters(prevFilters => {
       const filtersChanged = JSON.stringify(prevFilters) !== JSON.stringify(newFilters);
       if (filtersChanged) {

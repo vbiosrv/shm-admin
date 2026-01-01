@@ -210,9 +210,11 @@ function DataTable({
     filterTimeoutRef.current = setTimeout(() => {
       const formattedFilters: Record<string, string> = {};
       Object.entries(columnFilters).forEach(([key, value]) => {
-        if (value) {
-          formattedFilters[key] = `%${value}%`;
-        }
+        const trimmedValue = String(value ?? '').trim();
+        if (!trimmedValue) return;
+
+        const hasExplicitWildcard = trimmedValue.includes('%');
+        formattedFilters[key] = hasExplicitWildcard ? trimmedValue : `%${trimmedValue}%`;
       });
       
       const filtersString = JSON.stringify(formattedFilters);

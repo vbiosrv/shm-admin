@@ -19,6 +19,9 @@ import {
   Monitor,
   PanelLeftClose,
   PanelLeftOpen,
+  Send,
+  Star,
+  Github
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useBrandingStore } from '../store/brandingStore';
@@ -111,7 +114,10 @@ function ThemeToggle() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="btn-icon"
+        className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm transition-all"
+        style={{
+          color: 'var(--theme-content-text-muted)'
+        }}
         title="Сменить тему"
       >
         <CurrentIcon className="w-5 h-5" />
@@ -149,7 +155,7 @@ function ThemeToggle() {
                       : 'transparent',
                   }}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-5 h-5" />
                   {theme.label}
                 </button>
               );
@@ -169,13 +175,20 @@ function Layout() {
   const { colors, applyTheme } = useThemeStore();
   const { sidebarCollapsed, setSidebarCollapsed } = useSettingsStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [openMenus, setOpenMenus] = useState<string[]>(['Пользователи']);
+  const [openMenus, setOpenMenus] = useState<string[]>(() => {
+    const activeMenu = navigation.find(item => 
+      item.children?.some(child => child.href === location.pathname)
+    );
+    return activeMenu ? [activeMenu.name] : [];
+  });
   const [manuallyClosed, setManuallyClosed] = useState<string[]>([]);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{ top: number } | null>(null);
   const [selectedData, setSelectedData] = useState<any>(null);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
+  const [version, setVersion] = useState<string>('');
+  const [stars, setStars] = useState<number | null>(null);
   const hoverTimeoutRef = useRef<number | null>(null);
 
   const showSwagger = import.meta.env.VITE_SHOW_SWAGGER === 'true';
@@ -186,6 +199,24 @@ function Layout() {
   useEffect(() => {
     fetchBranding();
     applyTheme();
+    
+    // Загрузка версии из GitHub tags
+    fetch('https://api.github.com/repos/danuk/shm/tags')
+      .then(res => res.json())
+      .then(data => {
+        const validTags = data.filter((tag: any) => tag.name !== 'delete');
+        if (validTags.length > 0) {
+          setVersion(validTags[0].name);
+        }
+      })
+      .catch(() => setVersion('unknown'));
+    
+    // Загрузка звезд с GitHub
+    fetch('https://api.github.com/repos/danuk/shm')
+      .then(res => res.json())
+      .then(data => setStars(data.stargazers_count))
+      .catch(() => setStars(null));
+    
     const handleOpenTemplate = (event: any) => {
       setSelectedData(event.detail);
       setTemplateModalOpen(true);
@@ -199,6 +230,22 @@ function Layout() {
       }
     };
   }, [fetchBranding, applyTheme]);
+
+  // Автоматическое открытие активного меню при изменении пути
+  useEffect(() => {
+    const activeMenu = navigation.find(item => 
+      item.children?.some(child => child.href === location.pathname)
+    );
+    
+    if (activeMenu && !manuallyClosed.includes(activeMenu.name)) {
+      setOpenMenus(prev => {
+        if (!prev.includes(activeMenu.name)) {
+          return [...prev, activeMenu.name];
+        }
+        return prev;
+      });
+    }
+  }, [location.pathname, manuallyClosed]);
 
   useEffect(() => {
     document.title = branding.name;
@@ -481,51 +528,6 @@ function Layout() {
               );
             })}
           </nav>
-
-          {}
-          <div className="p-4" style={{ borderTop: '1px solid var(--theme-sidebar-border)' }}>
-            <div className={sidebarCollapsed ? 'lg:hidden' : ''}>
-              <div className="flex items-center gap-3 mb-3">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                  style={{ background: `linear-gradient(135deg, ${colors.primaryColor}, ${colors.primaryColorHover})` }}
-                >
-                  {user?.login?.charAt(0).toUpperCase() || 'A'}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: 'var(--theme-header-text)' }}>
-                    {user?.login || '-'}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors"
-                style={{ color: 'var(--theme-sidebar-text)' }}
-              >
-                <LogOut className="w-4 h-4" />
-                Выйти
-              </button>
-            </div>
-
-            <div className={`flex-col items-center gap-3 ${sidebarCollapsed ? 'hidden lg:flex' : 'hidden'}`}>
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                style={{ background: `linear-gradient(135deg, ${colors.primaryColor}, ${colors.primaryColorHover})` }}
-                title={user?.login || '-'}
-              >
-                {user?.login?.charAt(0).toUpperCase() || 'A'}
-              </div>
-              <button
-                onClick={handleLogout}
-                className="p-2 rounded-lg transition-colors"
-                style={{ color: 'var(--theme-sidebar-text)' }}
-                title="Выйти"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
         </div>
       </aside>
 
@@ -550,7 +552,57 @@ function Layout() {
             <SelectedUserDropdown />
           </div>
           <div className="flex items-center gap-2">
+            <a
+              href="https://t.me/shm_billing"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm transition-all"
+              style={{
+                color: 'var(--theme-content-text-muted)'
+              }}
+              title="Telegram"
+            >
+              <Send className="w-5 h-5" />
+            </a>
+            {version !== null && (
+              <a
+                href="https://github.com/danuk/shm"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm transition-all"
+                style={{
+                  color: 'var(--theme-content-text-muted)'
+                }}
+              >
+                <span>{version}</span>
+              </a>
+            )}
+            {stars !== null && (
+              <a
+                href="https://github.com/danuk/shm"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm transition-all"
+                style={{
+                  color: 'var(--theme-content-text-muted)'
+                }}
+              >
+                <Github className="w-5 h-5" />
+                <span>{stars}</span>
+                <Star className="w-5 h-5" />
+              </a>
+            )}
             <ThemeToggle />
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm transition-all"
+              style={{
+                color: 'var(--theme-content-text-muted)'
+              }}
+              title="Выйти"
+            >
+              <LogOut className="w-5 h-5" />
+            </button>
           </div>
         </header>
 

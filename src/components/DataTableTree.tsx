@@ -186,7 +186,6 @@ function DataTableTree({
   const columnsDropdownRef = useRef<HTMLDivElement>(null);
   const autoRefreshRef = useRef<HTMLDivElement>(null);
   const isInitialMount = useRef(true);
-  const prevExternalFiltersKeys = useRef<Set<string>>(new Set());
   const filterTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onRefreshRef = useRef(onRefresh);
   const prevFormattedFiltersRef = useRef<string>('');
@@ -208,25 +207,20 @@ function DataTableTree({
     onRefreshRef.current = onRefresh;
   }, [onRefresh]);
 
+  // Инициализируем фильтры из externalFilters только один раз
   useEffect(() => {
-    setColumnFilters(prev => {
-      const newFilters = { ...prev };
-
-      prevExternalFiltersKeys.current.forEach(key => {
-        if (!externalFilters || !(key in externalFilters)) {
-          delete newFilters[key];
-        }
+    if (externalFilters) {
+      setColumnFilters(prev => {
+        const newFilters = { ...prev };
+        // Добавляем externalFilters только если соответствующий фильтр еще не установлен
+        Object.entries(externalFilters).forEach(([key, value]) => {
+          if (prev[key] === undefined) {
+            newFilters[key] = value;
+          }
+        });
+        return newFilters;
       });
-
-      if (externalFilters) {
-        Object.assign(newFilters, externalFilters);
-        prevExternalFiltersKeys.current = new Set(Object.keys(externalFilters));
-      } else {
-        prevExternalFiltersKeys.current.clear();
-      }
-
-      return newFilters;
-    });
+    }
   }, [externalFilters]);
 
   useEffect(() => {

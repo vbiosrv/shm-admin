@@ -38,9 +38,15 @@ function Storage() {
     setLoading(true);
     let url = `shm/v1/admin/storage/manage?limit=${l}&offset=${o}`;
 
-    const combinedFilters = { ...f, ...externalFilters };
-    if (Object.keys(combinedFilters).length > 0) {
-      url += `&filter=${encodeURIComponent(JSON.stringify(combinedFilters))}`;
+    const activeFilters: Record<string, string> = {};
+    Object.entries(f).forEach(([key, value]) => {
+      if (value) {
+        activeFilters[key] = value;
+      }
+    });
+    
+    if (Object.keys(activeFilters).length > 0) {
+      url += `&filter=${encodeURIComponent(JSON.stringify(activeFilters))}`;
     }
 
     if (sf && sd) {
@@ -54,7 +60,7 @@ function Storage() {
       })
       .catch(() => setData([]))
       .finally(() => setLoading(false));
-  }, [externalFilters]);
+  }, []);
 
   useEffect(() => {
     fetchData(limit, offset, filters, sortField, sortDirection);

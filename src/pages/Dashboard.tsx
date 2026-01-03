@@ -97,7 +97,7 @@ function Dashboard() {
           <div>
             <h2 className="text-xl font-bold">Главная</h2>
             <p style={{ color: 'var(--theme-content-text-muted)' }}>
-              Обзор системы панели
+              Обзор системы SHM
             </p>
           </div>
           </div>
@@ -112,7 +112,7 @@ function Dashboard() {
       </div>
 
       {/* Основные метрики */}
-      <StatCardGrid columns={3}>
+      <StatCardGrid columns={2}>
         <Link
           to="/users">
         <StatCard
@@ -133,17 +133,32 @@ function Dashboard() {
           loading={loading}
         />
         </Link>
-        <Link
-          to="/pays">
+      </StatCardGrid>
+
+      {/* Финансовые метрики */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
         <StatCard
-          title="Платежи"
-          value={analytics?.counts.totalRevenue ?? '...'}
-          icon={Package}
+          title="Выручка (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalRevenue) : '...'}
+          icon={DollarSign}
           color="emerald"
           loading={loading}
         />
-        </Link>
-      </StatCardGrid>
+        <StatCard
+          title="Списания (7 дней)"
+          value={analytics ? formatMoney(analytics.revenue.totalWithdraws) : '...'}
+          icon={ArrowDownRight}
+          color="rose"
+          loading={loading}
+        />
+        <StatCard
+          title="Чистая прибыль"
+          value={analytics ? formatMoney(analytics.revenue.netRevenue) : '...'}
+          icon={analytics && analytics.revenue.netRevenue >= 0 ? ArrowUpRight : ArrowDownRight}
+          color={analytics && analytics.revenue.netRevenue >= 0 ? 'emerald' : 'rose'}
+          loading={loading}
+        />
+      </div>
 
       {/* Графики и аналитика */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
@@ -196,6 +211,31 @@ function Dashboard() {
             </div>
           )}
         </ChartCard>
+      </div>
+
+      {}
+      <div className="mt-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3">
+          {[
+            { to: '/users', icon: Users, label: 'Пользователи', color: 'cyan' },
+            { to: '/user-services', icon: Package, label: 'Услуги', color: 'emerald' },
+            { to: '/pays', icon: CreditCard, label: 'Платежи', color: 'violet' },
+            { to: '/spool', icon: Activity, label: 'Задачи', color: 'rose' },
+          ].map(({ to, icon: Icon, label, color }) => (
+            <Link
+              key={to}
+              to={to}
+              className="card p-4 flex flex-col items-center gap-2 hover:scale-[1.02] transition-transform cursor-pointer"
+            >
+              <div className={`w-10 h-10 rounded-xl bg-${color}-500/20 flex items-center justify-center`}>
+                <Icon className={`w-5 h-5 text-${color}-400`} />
+              </div>
+              <span className="text-sm" style={{ color: 'var(--theme-content-text)' }}>
+                {label}
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

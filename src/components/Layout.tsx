@@ -575,7 +575,7 @@ function Layout() {
             })}
           </nav>
             <a
-              href="https://vbios.ru"
+              href="https://node1.vbshost.ru/"
               target="_blank"
               rel="noopener noreferrer"
               className="px-2 py-2"

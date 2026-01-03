@@ -24,7 +24,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           username: idsmef
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: LemiraQw!
 
       - name: Docker metadata
         id: meta

@@ -91,11 +91,6 @@ const navigation: MenuItem[] = [
       { name: 'Конфигурация', href: '/configuration' },
     ]
   },
-  {
-    name: 'SHM Cloud',
-    href: '/cloud',
-    icon: Cloud
-  },
 ];
 
 function ThemeToggle() {

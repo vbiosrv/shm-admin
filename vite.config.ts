@@ -29,13 +29,6 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     allowedHosts: ['admin-2-vite', 'localhost', '127.0.0.1'],
-    port: 5173,
-    proxy: {
-      '/shm': {
-        target: 'https://shm-api.bkcloud.ru',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
+    port: 5173
+  }
 });

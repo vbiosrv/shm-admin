@@ -24,12 +24,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Get latest tag
+      - name: Get tag name
         id: version
         run: |
-          # Get the latest tag (sorted by version)
-          LATEST_TAG=$(git tag --sort=-v:refname | head -n1)
-          echo "tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
 
       - name: Build and push
         uses: docker/build-push-action@v5

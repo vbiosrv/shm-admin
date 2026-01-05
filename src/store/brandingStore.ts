@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { shm_request, normalizeListResponse } from '../lib/shm_request';
+import { shm_request } from '../lib/shm_request';
 
 export interface BrandingSettings {
   name: string;
@@ -39,6 +39,7 @@ export const useBrandingStore = create<BrandingState>((set, get) => ({
           name: company.name || DEFAULT_BRANDING.name,
           logoUrl: company.logoUrl || DEFAULT_BRANDING.logoUrl,
         };
+        localStorage.setItem('version', result.version || 'unknown');
         set({ branding, loaded: true });
         document.title = branding.name;
       } else {

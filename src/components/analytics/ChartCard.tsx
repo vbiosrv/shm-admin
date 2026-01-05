@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { LucideIcon } from 'lucide-react';
 
 interface ChartCardProps {
-  title: string;
+  title: ReactNode;
   subtitle?: string;
   icon?: LucideIcon;
   iconColor?: string;

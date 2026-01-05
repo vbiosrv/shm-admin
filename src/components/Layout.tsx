@@ -13,7 +13,6 @@ import {
   Home,
   Cloud,
   FileText,
-  Activity,
   Sun,
   Moon,
   Monitor,
@@ -21,7 +20,9 @@ import {
   PanelLeftOpen,
   Send,
   Star,
-  Github
+  Github,
+  BarChart3,
+  ListTodo,
 } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { useBrandingStore } from '../store/brandingStore';
@@ -38,7 +39,7 @@ interface MenuItem {
   children?: { name: string; href: string }[];
 }
 
-const navigation: MenuItem[] = [
+const baseNavigation: MenuItem[] = [
   {
     name: 'Главная',
     href: '/',
@@ -77,7 +78,7 @@ const navigation: MenuItem[] = [
   },
   {
     name: 'Задачи',
-    icon: Activity,
+    icon: ListTodo,
     children: [
       { name: 'Текущие задачи', href: '/spool' },
       { name: 'Архив', href: '/spool-history' },
@@ -170,28 +171,40 @@ function ThemeToggle() {
 function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { logout } = useAuthStore();
   const { branding, fetchBranding } = useBrandingStore();
-  const { colors, applyTheme } = useThemeStore();
+  const { applyTheme } = useThemeStore();
   const { sidebarCollapsed, setSidebarCollapsed } = useSettingsStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [openMenus, setOpenMenus] = useState<string[]>(() => {
-    const activeMenu = navigation.find(item => 
+    const activeMenu = baseNavigation.find(item => 
       item.children?.some(child => child.href === location.pathname)
     );
     return activeMenu ? [activeMenu.name] : [];
   });
   const [manuallyClosed, setManuallyClosed] = useState<string[]>([]);
-  const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{ top: number } | null>(null);
   const [selectedData, setSelectedData] = useState<any>(null);
   const [templateModalOpen, setTemplateModalOpen] = useState(false);
   const [version, setVersion] = useState<string>('');
   const [stars, setStars] = useState<number | null>(null);
+  const [hasCloudSub, setHasCloudSub] = useState<boolean>(() => {
+    return localStorage.getItem('cloud_sub') === 'active';
+  });
   const hoverTimeoutRef = useRef<number | null>(null);
+  const local_version = localStorage.getItem('version');
 
   const showSwagger = import.meta.env.VITE_SHOW_SWAGGER === 'true';
+
+  const navigation: MenuItem[] = hasCloudSub
+    ? [
+        baseNavigation[0], // Главная
+        { name: 'Аналитика', href: '/analytics', icon: BarChart3 },
+        ...baseNavigation.slice(1)
+      ]
+    : baseNavigation;
+  
   const menuItems = showSwagger
     ? [...navigation, { name: 'Swagger', href: '/swagger', icon: FileText }]
     : navigation;
@@ -199,6 +212,50 @@ function Layout() {
   useEffect(() => {
     fetchBranding();
     applyTheme();
+    
+    // Check cloud subscription status
+    const checkCloudSubscription = async () => {
+      try {
+        // Проверяем авторизацию в Cloud через API
+        const res = await shm_request('shm/v1/admin/cloud/user');
+        const userData = res.data || res;
+        
+        const isValidUser = (Array.isArray(userData) && userData[0] !== null && userData[0].user_id);
+        
+        if (isValidUser) {
+          localStorage.setItem('cloud_auth', 'authenticated');
+          // try {
+          //   const response = await shm_request('shm/v1/admin/cloud/proxy/service/sub/get');
+          //   const data = response.data || response;
+          //   if (data.status === 'ACTIVE') {
+
+                // Временно: разрешаем аналитику всем авторизованным в Cloud
+                localStorage.setItem('cloud_sub', 'active');
+                setHasCloudSub(true);
+
+          //   } else {
+          //     localStorage.removeItem('cloud_sub');
+          //     setHasCloudSub(false);
+          //   }
+          // } catch (error) {
+          //   // If error (e.g. 404), subscription is not active
+          //   localStorage.removeItem('cloud_sub');
+          //   setHasCloudSub(false);
+          // }
+        } else {
+          localStorage.removeItem('cloud_auth');
+          localStorage.removeItem('cloud_sub');
+          setHasCloudSub(false);
+        }
+      } catch {
+        // Не авторизован в Cloud
+        localStorage.removeItem('cloud_auth');
+        localStorage.removeItem('cloud_sub');
+        setHasCloudSub(false);
+      }
+    };
+    
+    checkCloudSubscription();
     
     // Кеш на 1 час (3600000 мс)
     const CACHE_TTL = 3600000;
@@ -218,7 +275,6 @@ function Layout() {
       try {
         localStorage.setItem(key, value);
       } catch {
-        // Игнорируем ошибки localStorage
       }
     };
 
@@ -273,9 +329,16 @@ function Layout() {
       setTemplateModalOpen(true);
     };
 
+    const handleCloudSubChanged = () => {
+      const cloudSub = localStorage.getItem('cloud_sub');
+      setHasCloudSub(cloudSub === 'active');
+    };
+
     window.addEventListener('openTemplate', handleOpenTemplate);
+    window.addEventListener('cloudSubChanged', handleCloudSubChanged);
     return () => {
       window.removeEventListener('openTemplate', handleOpenTemplate);
+      window.removeEventListener('cloudSubChanged', handleCloudSubChanged);
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
       }
@@ -628,17 +691,14 @@ function Layout() {
               <Send className="w-5 h-5" />
             </a>
             {version !== null && (
-              <a
-                href="https://github.com/danuk/shm"
-                target="_blank"
-                rel="noopener noreferrer"
+              <span
                 className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm transition-all"
                 style={{
                   color: 'var(--theme-content-text-muted)'
                 }}
               >
-                <span>{version}</span>
-              </a>
+                <span>{local_version || version}</span>
+              </span>
             )}
             {stars !== null && (
               <a

@@ -45,7 +45,7 @@ function CurrencyConverter() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [currencies, setCurrencies] = useState<CurrencyWithChanges[]>([]);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<any>();
 
   const cardStyles = {
     backgroundColor: 'var(--theme-card-bg)',
@@ -65,7 +65,7 @@ function CurrencyConverter() {
 
   const loadCurrencies = async (forceUpdate = false) => {
     setLoading(true);
-    setError('');
+    setError(null);
 
     try {
       const url = forceUpdate
@@ -92,8 +92,15 @@ function CurrencyConverter() {
         }
       }
     } catch (err: any) {
-      setError(err.message || 'Ошибка загрузки валют');
-      toast.error('Ошибка загрузки валют');
+      let errorMessage = 'Ошибка загрузки валют';
+      try {
+        const parsed = JSON.parse(err.message);
+        errorMessage = parsed.error || errorMessage;
+      } catch {
+        errorMessage = err.message || errorMessage;
+      }
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

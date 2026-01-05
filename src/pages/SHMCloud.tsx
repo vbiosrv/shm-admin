@@ -36,13 +36,24 @@ function SHMCloud() {
       if (response.status === 200 || response) {
         const data = response.data || response;
         setSubscriptionInfo(data);
+        if (data.status === 'ACTIVE') {
+          localStorage.setItem('cloud_sub', 'active');
+        } else {
+          // localStorage.removeItem('cloud_sub');
+          // Временно: разрешаем аналитику всем авторизованным в Cloud
+          localStorage.setItem('cloud_sub', 'active');
+          // //
+        }
+        window.dispatchEvent(new CustomEvent('cloudSubChanged'));
       }
     } catch (error: any) {
       // При 404 ошибке очищаем информацию о подписке
       setSubscriptionInfo(null);
-      if (error.status !== 404 && error.response?.status !== 404) {
-        // Логируем только если это не 404
-      }
+      // localStorage.removeItem('cloud_sub');
+      // Временно: разрешаем аналитику всем авторизованным в Cloud
+      localStorage.setItem('cloud_sub', 'active');
+      // //
+      window.dispatchEvent(new CustomEvent('cloudSubChanged'));
     }
   };
 
@@ -58,7 +69,7 @@ function SHMCloud() {
         if (user !== null && (user.user_id || user.login)) {
           setCloudUser(user);
           setIsAuthenticated(true);
-          localStorage.setItem('cloud_auth', JSON.stringify({ user }));
+          localStorage.setItem('cloud_auth', 'authenticated');
           loadSubscriptionInfo();
         } else {
           setIsAuthenticated(false);
@@ -67,7 +78,7 @@ function SHMCloud() {
       } else if (userData && (userData.user_id || userData.login)) {
         setCloudUser(userData);
         setIsAuthenticated(true);
-        localStorage.setItem('cloud_auth', JSON.stringify({ user: userData }));
+        localStorage.setItem('cloud_auth', 'authenticated');
         loadSubscriptionInfo();
       } else {
         setIsAuthenticated(false);

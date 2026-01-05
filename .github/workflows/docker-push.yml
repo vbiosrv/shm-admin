@@ -10,6 +10,9 @@ on:
       - '*'
   workflow_dispatch:
 
+env:
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/shm-admin-2
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -17,30 +20,43 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/shm-admin-2
-          tags: |
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
-            type=raw,value=dev,enable=${{ github.ref == 'refs/heads/dev' }}
-            type=ref,event=tag
-            type=sha
+      - name: Set up Docker Buildx
+        run: docker buildx create --use --name builder
+
+      - name: Determine tags
+        id: tags
+        run: |
+          TAGS=""
+          SHA_SHORT=$(echo ${{ github.sha }} | cut -c1-7)
+          
+          # Always add SHA tag
+          TAGS="${{ env.IMAGE_NAME }}:sha-${SHA_SHORT}"
+          
+          # Add latest tag for main branch
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            TAGS="${TAGS},${{ env.IMAGE_NAME }}:latest"
+          fi
+          
+          # Add dev tag for dev branch
+          if [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            TAGS="${TAGS},${{ env.IMAGE_NAME }}:dev"
+          fi
+          
+          # Add version tag for tags
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF#refs/tags/}
+            TAGS="${TAGS},${{ env.IMAGE_NAME }}:${VERSION}"
+          fi
+          
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
       - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --push \
+            --tag ${{ steps.tags.outputs.tags }} \
+            .

@@ -7,7 +7,7 @@ on:
       - master
       - dev
     tags:
-      - 'v*'
+      - '*'
   workflow_dispatch:
 
 jobs:

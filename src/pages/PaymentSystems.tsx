@@ -31,7 +31,11 @@ function PaymentSystems() {
       const response = await shm_request('shm/v1/admin/cloud/proxy/service/paysystems/list');
 const systems = Array.isArray(response.data) ? response.data : (Array.isArray(response) ? response : []);
 // Отмечаем все платежные системы как активные
-const activeSystems = systems.map(system => ({ ...system, paid: true }));
+const activeSystems = systems.map(system => ({
+  ...system,
+  paid: true,         // считаем все системы активными
+  price: system.price || 0 // чтобы стоимость не была undefined
+}));
 setPaymentSystems(activeSystems);
 
     } catch (error) {

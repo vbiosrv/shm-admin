@@ -567,16 +567,14 @@ function ConfigurationTabs() {
           <Shield className="w-4 h-4" />
           OTP (2FA)
         </button>
-          <Link
-            to="/payment-systems"
-            className="px-4 py-2 border-b-2 transition-colors flex items-center gap-2 no-underline"
-            style={{
-              borderColor: 'var(--theme-card-border)',
-              color: 'var(--theme-content-text)'
-          >
-            <CreditCard className="w-4 h-4" />
-            Платежные системы
-          </Link>
+        <button
+          onClick={() => setActiveTab('payment-systems')}
+          className="px-4 py-2 border-b-2 transition-colors flex items-center gap-2"
+          style={tabButtonStyle(activeTab === 'otp')}
+        >
+          <Shield className="w-4 h-4" />
+          OTP (2FA)
+        </button>
         <button
           onClick={() => setActiveTab('all')}
           className="px-4 py-2 border-b-2 transition-colors flex items-center gap-2"

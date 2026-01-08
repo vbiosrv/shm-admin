@@ -29,8 +29,11 @@ function PaymentSystems() {
     setLoading(true);
     try {
       const response = await shm_request('shm/v1/admin/cloud/proxy/service/paysystems/list');
-      const systems = Array.isArray(response.data) ? response.data : (Array.isArray(response) ? response : []);
-      setPaymentSystems(systems);
+const systems = Array.isArray(response.data) ? response.data : (Array.isArray(response) ? response : []);
+// Отмечаем все платежные системы как активные
+const activeSystems = systems.map(system => ({ ...system, paid: true }));
+setPaymentSystems(activeSystems);
+
     } catch (error) {
       toast.error('Ошибка загрузки платежных систем');
     } finally {

@@ -29,15 +29,16 @@ function PaymentSystems() {
     setLoading(true);
     try {
       const response = await shm_request('shm/v1/admin/cloud/proxy/service/paysystems/list');
-const systems = Array.isArray(response.data) ? response.data : (Array.isArray(response) ? response : []);
-// Отмечаем все платежные системы как активные
-const activeSystems = systems.map(system => ({
-  ...system,
-  paid: true,         // считаем все системы активными
-  price: system.price || 0 // чтобы стоимость не была undefined
-}));
-setPaymentSystems(activeSystems);
+      const systems = Array.isArray(response.data) ? response.data : (Array.isArray(response) ? response : []);
+      
+      // Сделать все платежные системы активными
+      const activeSystems = systems.map(system => ({
+        ...system,
+        paid: true,           // считаем все купленными
+        price: system.price || 0, // безопасно для бесплатных
+      }));
 
+      setPaymentSystems(activeSystems);
     } catch (error) {
       toast.error('Ошибка загрузки платежных систем');
     } finally {
@@ -57,33 +58,17 @@ setPaymentSystems(activeSystems);
 
   const sortSystems = (systems: PaymentSystem[]): PaymentSystem[] => {
     const sorted = [...systems];
-    
     switch (sortType) {
       case 'alpha':
         return sorted.sort((a, b) => a.title.localeCompare(b.title, 'ru'));
-      
       case 'price-asc':
         return sorted.sort((a, b) => (a.price || 0) - (b.price || 0));
-      
       case 'price-desc':
         return sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
-      
       case 'paid-first':
-        return sorted.sort((a, b) => {
-          if (a.paid === b.paid) {
-            return a.title.localeCompare(b.title, 'ru');
-          }
-          return a.paid ? -1 : 1;
-        });
-      
+        return sorted.sort((a, b) => (a.paid === b.paid ? a.title.localeCompare(b.title, 'ru') : a.paid ? -1 : 1));
       case 'unpaid-first':
-        return sorted.sort((a, b) => {
-          if (a.paid === b.paid) {
-            return a.title.localeCompare(b.title, 'ru');
-          }
-          return a.paid ? 1 : -1;
-        });
-      
+        return sorted.sort((a, b) => (a.paid === b.paid ? a.title.localeCompare(b.title, 'ru') : a.paid ? 1 : -1));
       default:
         return sorted;
     }
@@ -105,6 +90,7 @@ setPaymentSystems(activeSystems);
 
   return (
     <div>
+      {/* Заголовок и сортировка */}
       <div className="flex items-center justify-between mb-6">
         <h1
           className="text-2xl font-bold flex items-center gap-3"
@@ -113,9 +99,8 @@ setPaymentSystems(activeSystems);
           <CreditCard className="w-7 h-7" style={{ color: 'var(--theme-primary-color)' }} />
           Платежные системы
         </h1>
-        
+
         <div className="flex items-center gap-2">
-          {/* Кнопки сортировки */}
           <div className="flex items-center gap-1 mr-4">
             <button
               onClick={() => setSortType('alpha')}
@@ -129,7 +114,7 @@ setPaymentSystems(activeSystems);
             >
               <SortAsc className="w-4 h-4" />
             </button>
-            
+
             <button
               onClick={() => setSortType(sortType === 'price-asc' ? 'price-desc' : 'price-asc')}
               className={`px-3 py-2 rounded text-sm transition-colors flex items-center gap-1 ${sortType === 'price-asc' || sortType === 'price-desc' ? 'ring-2 ring-blue-500' : ''}`}
@@ -143,7 +128,7 @@ setPaymentSystems(activeSystems);
               <RussianRuble className="w-4 h-4" />
               {sortType === 'price-desc' ? <SortDesc className="w-3 h-3" /> : <SortAsc className="w-3 h-3" />}
             </button>
-            
+
             <button
               onClick={() => setSortType(sortType === 'paid-first' ? 'unpaid-first' : 'paid-first')}
               className={`px-3 py-2 rounded text-sm transition-colors flex items-center gap-1 ${sortType === 'paid-first' || sortType === 'unpaid-first' ? 'ring-2 ring-blue-500' : ''}`}
@@ -152,12 +137,12 @@ setPaymentSystems(activeSystems);
                 color: sortType === 'paid-first' || sortType === 'unpaid-first' ? 'var(--accent-text)' : 'var(--theme-button-secondary-text)',
                 border: '1px solid var(--theme-button-secondary-border)',
               }}
-              title={sortType === 'paid-first' ? 'Сначала не купленные' : 'Сначала купленные'}
+              title={sortType === 'unpaid-first' ? 'Сначала не купленные' : 'Сначала купленные'}
             >
               {sortType === 'unpaid-first' ? <X className="w-4 h-4" /> : <Check className="w-4 h-4" />}
             </button>
           </div>
-          
+
           <button
             onClick={() => navigate(-1)}
             className="px-4 py-2 rounded flex items-center gap-2"
@@ -173,6 +158,7 @@ setPaymentSystems(activeSystems);
         </div>
       </div>
 
+      {/* Список платежных систем */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {sortedSystems.map((system) => (
           <div
@@ -192,25 +178,11 @@ setPaymentSystems(activeSystems);
             <p className="text-sm" style={{ color: 'var(--theme-content-text-muted)' }}>
               {system.description}
             </p>
-            {system.paid ? (
-              <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--theme-card-border)' }}>
-                <p className="text-sm font-semibold" style={{ color: 'var(--accent-success)' }}>
-                  Куплена
-                </p>
-              </div>
-            ) : system.price === 0 ? (
-              <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--theme-card-border)' }}>
-                <p className="text-sm font-semibold" style={{ color: 'var(--accent-success)' }}>
-                  Бесплатно
-                </p>
-              </div>
-            ) : system.price && system.price > 0 ? (
-              <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--theme-card-border)' }}>
-                <p className="text-sm font-semibold" style={{ color: 'var(--accent-primary)' }}>
-                  Стоимость: {system.price} ₽
-                </p>
-              </div>
-            ) : undefined }
+            <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--theme-card-border)' }}>
+              <p className="text-sm font-semibold" style={{ color: 'var(--accent-success)' }}>
+                Доступна
+              </p>
+            </div>
           </div>
         ))}
       </div>

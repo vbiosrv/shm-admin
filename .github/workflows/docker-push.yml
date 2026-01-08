@@ -36,6 +36,6 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/shm-admin-2:${{ steps.version.outputs.tag }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/shm-admin-2:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/admin:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

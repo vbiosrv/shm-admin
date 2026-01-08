@@ -192,13 +192,11 @@ function Layout() {
 
   const showSwagger = import.meta.env.VITE_SHOW_SWAGGER === 'true';
 
-  const navigation: MenuItem[] = hasCloudSub
-    ? [
-        baseNavigation[0], // Главная
-        { name: 'Аналитика', href: '/analytics', icon: BarChart3 },
-        ...baseNavigation.slice(1)
-      ]
-    : baseNavigation;
+  const navigation: MenuItem[] = [
+  baseNavigation[0], // Главная
+  { name: 'Аналитика', href: '/analytics', icon: BarChart3 },
+  ...baseNavigation.slice(1)
+];
   
   const menuItems = showSwagger
     ? [...navigation, { name: 'Swagger', href: '/swagger', icon: FileText }]
